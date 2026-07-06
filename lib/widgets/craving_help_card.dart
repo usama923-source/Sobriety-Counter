@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/screens/craving/drink_water_screen.dart';
+import 'package:quit_drinking/screens/craving/walk_screen.dart';
+import 'package:quit_drinking/screens/craving/my_reasons_screen.dart';
+import 'package:quit_drinking/screens/craving/breathing_screen.dart';
+import 'package:quit_drinking/screens/craving/motivation_screen.dart';
+import 'package:quit_drinking/screens/craving/journal_screen.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 
 /// Section 9 — Craving Help Card.
@@ -257,10 +263,10 @@ const _cravingActions = [
     color: AppColors.softOrange,
   ),
   _CravingAction(
-    icon: Icons.music_note_rounded,
-    label: 'Listen to Music',
-    description: 'Put on your favorite calming song or playlist',
-    color: AppColors.navyBlue,
+    icon: Icons.edit_note_rounded,
+    label: 'Journal Your Feeling',
+    description: 'Write down what you\'re feeling right now',
+    color: AppColors.softOrange,
   ),
   _CravingAction(
     icon: Icons.phone_in_talk_rounded,
@@ -537,6 +543,72 @@ class _CravingActionTileState extends State<_CravingActionTile>
   }
 
   void _onActionTap(BuildContext context) {
+    if (widget.index == 0) {
+      // Dismiss the bottom sheet first, then navigate
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const DrinkWaterScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (widget.index == 1) {
+      // Dismiss the bottom sheet first, then navigate
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const WalkScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (widget.index == 2) {
+      // Dismiss the bottom sheet first, then navigate
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const MyReasonsScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (widget.index == 3) {
+      // Dismiss the bottom sheet first, then navigate
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const BreathingScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (widget.index == 4) {
+      // Dismiss the bottom sheet first, then navigate
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const JournalScreen(),
+        ),
+      );
+      return;
+    }
+
+    if (widget.index == 6) {
+      // Dismiss the bottom sheet first, then navigate
+      Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const MotivationScreen(),
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
