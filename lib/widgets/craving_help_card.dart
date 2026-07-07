@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/screens/ai_chat_screen.dart';
 import 'package:quit_drinking/screens/craving/drink_water_screen.dart';
 import 'package:quit_drinking/screens/craving/walk_screen.dart';
 import 'package:quit_drinking/screens/craving/my_reasons_screen.dart';
@@ -8,6 +9,7 @@ import 'package:quit_drinking/screens/craving/breathing_screen.dart';
 import 'package:quit_drinking/screens/craving/motivation_screen.dart';
 import 'package:quit_drinking/screens/craving/journal_screen.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Section 9 — Craving Help Card.
 ///
@@ -269,10 +271,10 @@ const _cravingActions = [
     color: AppColors.softOrange,
   ),
   _CravingAction(
-    icon: Icons.phone_in_talk_rounded,
-    label: 'Call a Friend',
-    description: 'Reach out to someone who supports your journey',
-    color: AppColors.softTealLight,
+    icon: Icons.smart_toy_rounded,
+    label: 'Talk to AI Friend',
+    description: 'Chat with a supportive AI companion',
+    color: AppColors.navyBlue,
   ),
   _CravingAction(
     icon: Icons.format_quote_rounded,
@@ -392,6 +394,134 @@ class _CravingActionSheetState extends State<_CravingActionSheet> {
 
           const SizedBox(height: AppConstants.spacingMd),
         ],
+      ),
+    );
+  }
+}
+
+// ── Pro Upgrade Bottom Sheet ────────────────────────────────────────────
+
+class _ProUpgradeSheet extends StatelessWidget {
+  final bool isDark;
+  final Future<void> Function() onUpgrade;
+
+  const _ProUpgradeSheet({
+    required this.isDark,
+    required this.onUpgrade,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.white,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppConstants.radiusXl),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          AppConstants.spacingLg,
+          AppConstants.spacingLg,
+          AppConstants.spacingLg,
+          AppConstants.spacingXxl,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag Handle
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.textOnDarkSecondary.withValues(alpha: 0.3)
+                    : AppColors.textTertiary.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+
+            // Pro icon
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.navyBlue.withValues(alpha: 0.12),
+              ),
+              child: const Icon(
+                Icons.smart_toy_rounded,
+                size: 36,
+                color: AppColors.navyBlue,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+
+            // Title
+            Text(
+              'Pro Feature',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                height: 1.2,
+                color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSm),
+
+            // Description
+            Text(
+              'Talk to an AI Friend is a Pro feature.\nUpgrade to unlock AI-powered conversations\nto help you through your journey.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                height: 1.5,
+                color: isDark
+                    ? AppColors.textOnDarkSecondary
+                    : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingXl),
+
+            // Upgrade button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: onUpgrade,
+                icon: const Icon(Icons.star_rounded, size: 20),
+                label: const Text('Upgrade to Pro'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.navyBlue,
+                  foregroundColor: AppColors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingMd,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSm),
+
+            // Maybe later
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Maybe later',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary
+                      : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -598,6 +728,12 @@ class _CravingActionTileState extends State<_CravingActionTile>
       return;
     }
 
+    if (widget.index == 5) {
+      // Check Pro status first (async), THEN dismiss sheet
+      _handleAIFriend(context);
+      return;
+    }
+
     if (widget.index == 6) {
       // Dismiss the bottom sheet first, then navigate
       Navigator.of(context).pop();
@@ -623,6 +759,101 @@ class _CravingActionTileState extends State<_CravingActionTile>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
         ),
+      ),
+    );
+  }
+
+  Future<void> _handleAIFriend(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final isPro = prefs.getBool('is_pro') ?? false;
+
+    if (!context.mounted) return;
+
+    // Pop the craving action sheet (synchronous — context still valid)
+    Navigator.of(context).pop();
+
+    if (isPro) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const AIChatScreen(),
+        ),
+      );
+    } else {
+      _showProUpgradeSheet(context, prefs);
+    }
+  }
+
+  void _showProUpgradeSheet(BuildContext context, SharedPreferences prefs) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.4),
+      builder: (ctx) => _ProUpgradeSheet(
+        isDark: isDark,
+        onUpgrade: () async {
+          // Fake payment confirmation dialog
+          final confirmed = await showDialog<bool>(
+            context: ctx,
+            builder: (ctx2) => AlertDialog(
+              backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.white,
+              surfaceTintColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppConstants.radiusLg),
+              ),
+              title: Text(
+                'Confirm Upgrade',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+                ),
+              ),
+              content: Text(
+                'Upgrade to Pro for \$4.99/month?\n\nIncludes:\n• AI Friend Chat\n• Premium features\n• Early access to new tools',
+                style: TextStyle(
+                  height: 1.5,
+                  color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx2, false),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx2, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.navyBlue,
+                    foregroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                    ),
+                  ),
+                  child: const Text('Upgrade Now'),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmed == true) {
+            await prefs.setBool('is_pro', true);
+            if (ctx.mounted) {
+              Navigator.of(ctx).pop(); // Close upgrade sheet
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const AIChatScreen(),
+                ),
+              );
+            }
+          }
+        },
       ),
     );
   }

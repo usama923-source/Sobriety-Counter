@@ -474,14 +474,17 @@ class _InputRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: isDark
-                ? AppColors.textOnDarkSecondary
-                : AppColors.textSecondary,
+        Flexible(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textSecondary,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         Row(

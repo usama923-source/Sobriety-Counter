@@ -280,19 +280,22 @@ class DailyCheckinCard extends StatelessWidget {
         Row(children: days),
         const SizedBox(height: AppConstants.spacingXxs),
         // Legend
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _legendDot(AppColors.successGreen, 'Sober', isDark),
-            const SizedBox(width: AppConstants.spacingMd),
-            _legendDot(AppColors.softRed, 'Drank', isDark),
-            const SizedBox(width: AppConstants.spacingMd),
-            _legendDot(
-              isDark ? AppColors.darkCardAlt : AppColors.lightGrayAlt,
-              'No check-in',
-              isDark,
-            ),
-          ],
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _legendDot(AppColors.successGreen, 'Sober', isDark),
+              const SizedBox(width: AppConstants.spacingMd),
+              _legendDot(AppColors.softRed, 'Drank', isDark),
+              const SizedBox(width: AppConstants.spacingMd),
+              _legendDot(
+                isDark ? AppColors.darkCardAlt : AppColors.lightGrayAlt,
+                'No check-in',
+                isDark,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -605,6 +608,8 @@ class _MiniStat extends StatelessWidget {
                     ? AppColors.textOnDarkSecondary
                     : AppColors.textSecondary,
               ),
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
             ),
           ],
         ),

@@ -98,9 +98,150 @@ class SobrietyCounterCard extends StatelessWidget {
 
           // ── Milestone Badges ───────────────────────────────────────
           MilestoneBadges(milestones: service.milestonesWithStatus),
+
+          const SizedBox(height: AppConstants.spacingLg),
+
+          // ── I Drank Button ────────────────────────────────────────
+          Center(
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _showResetDialog(context, service),
+                icon: Icon(
+                  Icons.refresh_rounded,
+                  size: 18,
+                  color: isDark
+                      ? AppColors.textOnDarkSecondary.withValues(alpha: 0.7)
+                      : AppColors.textSecondary.withValues(alpha: 0.8),
+                ),
+                label: Text(
+                  'I Drank',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary.withValues(alpha: 0.7)
+                        : AppColors.textSecondary.withValues(alpha: 0.8),
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: isDark
+                        ? AppColors.darkCardAlt
+                        : AppColors.lightGrayAlt,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppConstants.spacingMd,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  // ── Reset Dialog ───────────────────────────────────────────────────
+
+  Future<void> _showResetDialog(BuildContext context, SobrietyService service) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusLg),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppConstants.spacingSm),
+            // Compassionate icon
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.softOrange.withValues(alpha: 0.15),
+              ),
+              child: const Icon(
+                Icons.favorite_rounded,
+                size: 32,
+                color: AppColors.softOrange,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+            Text(
+              'It\'s okay, every day is a new chance.\nYour journey continues now.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                height: 1.5,
+                color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSm),
+            Text(
+              'Your sobriety timer will reset to zero.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w400,
+                height: 1.4,
+                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                      side: BorderSide(
+                        color: isDark ? AppColors.darkCardAlt : AppColors.lightGrayAlt,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingMd),
+                    ),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: AppConstants.spacingMd),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.softOrange,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingMd),
+                    ),
+                    child: const Text('Confirm'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await service.resetSobriety();
+    }
   }
 
   // ── No-Date State ──────────────────────────────────────────────────
@@ -307,15 +448,18 @@ class _TimeTile extends StatelessWidget {
               ),
             );
           },
-          child: Text(
-            displayValue,
-            key: ValueKey('$value-$label'),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.w300,
-              height: 1.1,
-              color: isDark ? AppColors.textOnDark : AppColors.navyBlue,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              displayValue,
+              key: ValueKey('$value-$label'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 36,
+                fontWeight: FontWeight.w300,
+                height: 1.1,
+                color: isDark ? AppColors.textOnDark : AppColors.navyBlue,
+              ),
             ),
           ),
         ),

@@ -6,7 +6,7 @@ import 'package:quit_drinking/models/milestone.dart';
 /// Manages the sobriety quit date, calculates duration, and provides
 /// a live counter that updates every second.
 class SobrietyService extends ChangeNotifier {
-  static const _quitDateKey = 'quit_date_millis';
+  static const _quitDateKey = 'sobriety_start_date';
 
   DateTime? _quitDate;
   Timer? _timer;
@@ -92,6 +92,15 @@ class SobrietyService extends ChangeNotifier {
     _quitDate = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_quitDateKey);
+    notifyListeners();
+  }
+
+  /// Reset sobriety — sets the start date to right now and restarts the timer.
+  /// Used when the user reports a relapse.
+  Future<void> resetSobriety() async {
+    _quitDate = DateTime.now();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_quitDateKey, _quitDate!.millisecondsSinceEpoch);
     notifyListeners();
   }
 
