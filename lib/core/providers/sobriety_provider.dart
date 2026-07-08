@@ -6,7 +6,7 @@ import 'package:quit_drinking/models/milestone.dart';
 final sobrietyServiceProvider = ChangeNotifierProvider<SobrietyService>((ref) {
   final service = SobrietyService();
   service.init();
-  ref.onDispose(() => service.dispose());
+  // ChangeNotifierProvider auto-disposes the notifier — no need for ref.onDispose.
   return service;
 });
 

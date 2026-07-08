@@ -268,7 +268,7 @@ const _cravingActions = [
     icon: Icons.edit_note_rounded,
     label: 'Journal Your Feeling',
     description: 'Write down what you\'re feeling right now',
-    color: AppColors.softOrange,
+    color: AppColors.navyBlueLight,
   ),
   _CravingAction(
     icon: Icons.smart_toy_rounded,

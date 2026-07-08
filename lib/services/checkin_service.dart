@@ -12,6 +12,7 @@ class CheckInService extends ChangeNotifier {
   final Map<String, bool> _history = {};
 
   bool _initialized = false;
+  final bool _disposed = false;
 
   // ── Getters ────────────────────────────────────────────────────────
 
@@ -162,8 +163,9 @@ class CheckInService extends ChangeNotifier {
 
   /// Load history from SharedPreferences.
   Future<void> init() async {
-    if (_initialized) return;
+    if (_initialized || _disposed) return;
     final prefs = await SharedPreferences.getInstance();
+    if (_disposed) return;
     final raw = prefs.getString(_storeKey);
     if (raw != null && raw.isNotEmpty) {
       final parts = raw.split(',');

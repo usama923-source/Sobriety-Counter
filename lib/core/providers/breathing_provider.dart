@@ -5,6 +5,6 @@ import 'package:quit_drinking/services/breathing_service.dart';
 final breathingServiceProvider = ChangeNotifierProvider<BreathingService>((ref) {
   final service = BreathingService();
   service.init();
-  ref.onDispose(() => service.dispose());
+  // ChangeNotifierProvider auto-disposes the notifier — no need for ref.onDispose.
   return service;
 });

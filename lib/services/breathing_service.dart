@@ -12,6 +12,7 @@ class BreathingService extends ChangeNotifier {
   int _bestTimeSeconds = 0;
   List<int> _history = [];
   bool _isRunning = false;
+  bool _disposed = false;
 
   // ── Getters ────────────────────────────────────────────────────────
 
@@ -39,10 +40,11 @@ class BreathingService extends ChangeNotifier {
   // ── Timer Control ─────────────────────────────────────────────────
 
   void start() {
-    if (_isRunning) return;
+    if (_isRunning || _disposed) return;
     _isRunning = true;
     _elapsedSeconds = 0;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (_disposed) return;
       _elapsedSeconds++;
       notifyListeners();
     });
@@ -80,7 +82,9 @@ class BreathingService extends ChangeNotifier {
   // ── Persistence ───────────────────────────────────────────────────
 
   Future<void> init() async {
+    if (_disposed) return;
     final prefs = await SharedPreferences.getInstance();
+    if (_disposed) return;
     _bestTimeSeconds = prefs.getInt(_bestTimeKey) ?? 0;
     final raw = prefs.getStringList(_historyKey);
     if (raw != null) {
@@ -111,6 +115,7 @@ class BreathingService extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _timer?.cancel();
     super.dispose();
   }

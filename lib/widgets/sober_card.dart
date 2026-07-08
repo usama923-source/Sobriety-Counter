@@ -50,7 +50,10 @@ class _SoberCardState extends State<SoberCard> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    Widget card = Container(
+    // Build the base card container first, stored separately so the
+    // StatefulBuilder wrapper below doesn't capture a mutated variable
+    // (which would cause infinite recursive rebuild → StackOverflowError).
+    final Widget baseCard = Container(
       padding: widget.padding ??
           const EdgeInsets.all(AppConstants.spacingLg),
       margin: widget.margin ??
@@ -87,6 +90,8 @@ class _SoberCardState extends State<SoberCard> {
       child: widget.child,
     );
 
+    Widget card = baseCard;
+
     // Hover / tap effect
     if (widget.enableHoverEffect && widget.onTap != null) {
       card = StatefulBuilder(
@@ -97,7 +102,7 @@ class _SoberCardState extends State<SoberCard> {
             child: AnimatedScale(
               scale: _isHovered ? 1.01 : 1.0,
               duration: AppConstants.animationFast,
-              child: card,
+              child: baseCard,
             ),
           );
         },

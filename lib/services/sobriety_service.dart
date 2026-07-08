@@ -10,6 +10,7 @@ class SobrietyService extends ChangeNotifier {
 
   DateTime? _quitDate;
   Timer? _timer;
+  bool _disposed = false;
 
   /// The stored quit date, or null if not set.
   DateTime? get quitDate => _quitDate;
@@ -70,7 +71,9 @@ class SobrietyService extends ChangeNotifier {
 
   /// Load the quit date from [SharedPreferences] and start the timer.
   Future<void> init() async {
+    if (_disposed) return;
     final prefs = await SharedPreferences.getInstance();
+    if (_disposed) return;
     final millis = prefs.getInt(_quitDateKey);
     if (millis != null) {
       _quitDate = DateTime.fromMillisecondsSinceEpoch(millis);
@@ -109,6 +112,7 @@ class SobrietyService extends ChangeNotifier {
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (_disposed) return;
       if (_quitDate != null) {
         notifyListeners();
       }
@@ -117,6 +121,7 @@ class SobrietyService extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _timer?.cancel();
     super.dispose();
   }
