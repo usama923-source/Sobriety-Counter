@@ -66,7 +66,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   /// Whether a real API key is configured (vs. the placeholder value).
   bool get _hasRealApiKey =>
       ApiConfig.apiKey.isNotEmpty &&
-      ApiConfig.apiKey != '<REDACTED_GROQ_KEY>';
+      ApiConfig.apiKey != 'YOUR_API_KEY_HERE';
 
   // ── Welcome Messages ──────────────────────────────────────────────────
 
