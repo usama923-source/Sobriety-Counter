@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launch background used by the Android LaunchTheme while Flutter initializes.
+     Solid fill matching the app's light background color (#F5F7FA). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#F5F7FA" />
+</shape>
