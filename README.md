@@ -1,9 +1,9 @@
-# Sober Today
+# QuitDrink Ai
 
 > **A calming wellness app for your sobriety journey.**
 > One day at a time.
 
-Sober Today is a premium Flutter application designed to help individuals track and celebrate their sobriety journey. With a calming navy blue aesthetic, smooth animations, and thoughtful interactions inspired by Calm, Headspace, and Apple Health, the app provides a supportive, encouraging experience.
+QuitDrink Ai is a premium Flutter application designed to help individuals track and celebrate their sobriety journey. With a calming navy blue aesthetic, smooth animations, and thoughtful interactions inspired by Calm, Headspace, and Apple Health, the app provides a supportive, encouraging experience.
 
 ## Features
 

@@ -213,7 +213,7 @@ class _SplashScreenState extends State<_SplashScreen>
                 FadeTransition(
                   opacity: _nameFade,
                   child: Text(
-                    'Sober Today',
+                    'QuitDrink Ai',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,

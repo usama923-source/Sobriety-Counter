@@ -96,18 +96,50 @@ class PrivacyPolicyScreen extends StatelessWidget {
               _PolicySection(
                 icon: Icons.storage_rounded,
                 iconColor: AppColors.navyBlue,
-                title: 'Data We Collect',
+                title: 'Data Stored on Your Device',
                 body:
-                    'Nothing personal. Your sobriety date, reasons for quitting, '
-                    'weight, daily check-in history, and AI chat messages are all '
-                    'stored locally on your device only. We never send this data '
-                    'to our servers — because we don\'t have any.',
+                    'Your sobriety date, the reasons you save, your weight '
+                    'entries, daily check-in history, favourite quotes, and app '
+                    'settings are stored locally on your device. We do not upload '
+                    'this information to our own servers.',
                 isDark: isDark,
               ),
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 2: AI Chat ─────────────────────────────────
+              // ── Section 2: Analytics ───────────────────────────────
+              _PolicySection(
+                icon: Icons.insights_rounded,
+                iconColor: AppColors.skyBlueDark,
+                title: 'Analytics',
+                body:
+                    'We use Firebase Analytics (Google) to understand how the app '
+                    'is used. It records basic events such as when the app is '
+                    'opened and when the Pro upgrade is unlocked. These events '
+                    'contain no name, email, or contact details, and are not used '
+                    'to advertise to you.',
+                isDark: isDark,
+              ),
+
+              const SizedBox(height: AppConstants.spacingSm),
+
+              // ── Section 3: Pro Purchases ───────────────────────────
+              _PolicySection(
+                icon: Icons.workspace_premium_rounded,
+                iconColor: AppColors.gold,
+                title: 'Pro Purchases',
+                body:
+                    'When you unlock Pro, a record is written to Google Cloud '
+                    'Firestore. It contains a random device identifier generated '
+                    'on your device, the purchase date, amount, and currency. The '
+                    'device identifier is not your name or email and is not used '
+                    'to identify you personally.',
+                isDark: isDark,
+              ),
+
+              const SizedBox(height: AppConstants.spacingSm),
+
+              // ── Section 4: AI Chat ─────────────────────────────────
               _PolicySection(
                 icon: Icons.smart_toy_rounded,
                 iconColor: AppColors.softTeal,
@@ -115,9 +147,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 body:
                     'When you use the AI Friend chat feature, your messages are '
                     'sent to the Groq API (groq.com) to generate helpful responses. '
-                    'Groq\'s privacy policy applies to those transmissions. We '
-                    'do not store your chat messages on any server — they remain '
-                    'on your device.',
+                    'Groq\'s privacy policy applies to those transmissions. We do '
+                    'not store your chat messages on our servers — they remain on '
+                    'your device.',
                 isDark: isDark,
               ),
 
@@ -142,10 +174,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
               _PolicySection(
                 icon: Icons.verified_rounded,
                 iconColor: AppColors.softTeal,
-                title: 'No Data Selling',
+                title: 'We Don\'t Sell Your Data',
                 body:
-                    'We never sell, rent, or share your personal data with third '
-                    'parties. Not now, not ever. Your sobriety journey is yours alone.',
+                    'We do not sell or rent your personal data. We share data only '
+                    'with the service providers described above (Google Firebase '
+                    'and Groq) to operate the app.',
                 isDark: isDark,
               ),
 

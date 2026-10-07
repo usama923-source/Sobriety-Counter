@@ -75,12 +75,72 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     // Mark onboarding as complete
     await prefs.setBool('onboarding_complete', true);
 
+    // One-time first-run safety acknowledgement (persisted with a safe
+    // fallback: if prefs fail the notice simply shows again next launch).
+    final acknowledged = prefs.getBool('health_notice_acknowledged') ?? false;
+    if (!acknowledged && mounted) {
+      await _showHealthNoticeDialog();
+      try {
+        await prefs.setBool('health_notice_acknowledged', true);
+      } catch (_) {
+        // Ignore — the acknowledgement will be requested again next time.
+      }
+    }
+
     // Navigate to home screen (replace so user can't go back)
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     }
+  }
+
+  /// One-time notice: QuitDrink Ai is not medical advice, and stopping heavy
+  /// drinking suddenly can be dangerous.
+  Future<void> _showHealthNoticeDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusLg),
+        ),
+        title: Text(
+          'Before You Begin',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+          ),
+        ),
+        content: Text(
+          'QuitDrink Ai is not medical advice and is not a substitute for '
+          'professional care.\n\n'
+          'Stopping heavy drinking suddenly can be dangerous. Please talk to '
+          'a doctor before making big changes — especially if you drink '
+          'heavily or have withdrawal symptoms.\n\n'
+          'In an emergency, call your local emergency services, or 988 in '
+          'the US.',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            height: 1.5,
+            color: isDark
+                ? AppColors.textOnDarkSecondary
+                : AppColors.textSecondary,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('I understand'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _nextPage() {

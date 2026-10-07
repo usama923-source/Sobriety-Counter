@@ -654,6 +654,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     _AboutDivider(isDark: isDark),
                     _AboutTile(
+                      icon: Icons.health_and_safety_rounded,
+                      iconColor: AppColors.softRed,
+                      label: 'Get Help',
+                      isDark: isDark,
+                      onTap: _showGetHelpDialog,
+                    ),
+                    _AboutDivider(isDark: isDark),
+                    _AboutTile(
                       icon: Icons.info_outline_rounded,
                       iconColor:
                           isDark ? AppColors.textOnDarkSecondary : AppColors.textTertiary,
@@ -704,6 +712,88 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
+  }
+
+  /// Show crisis and alcohol-support resources.
+  Future<void> _showGetHelpDialog() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusLg),
+        ),
+        title: Text(
+          'Get Help',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _helpLine(
+              isDark,
+              'If you are in immediate danger, call your local emergency '
+              'number (for example 911 in the US or 999 in the UK).',
+            ),
+            const SizedBox(height: AppConstants.spacingMd),
+            _helpLine(
+              isDark,
+              'US: Call or text 988 — Suicide & Crisis Lifeline (24/7).',
+            ),
+            const SizedBox(height: AppConstants.spacingMd),
+            _helpLine(
+              isDark,
+              'US: SAMHSA National Helpline 1-800-662-4357 — free, '
+              'confidential, 24/7 treatment referral.',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _helpLine(bool isDark, String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 6),
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+          ),
+        ),
+        const SizedBox(width: AppConstants.spacingSm),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              height: 1.4,
+              color: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 

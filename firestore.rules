@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Deny all reads and writes by default. No client should ever read from
+    // or write to Firestore directly; relax specific paths only when needed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
