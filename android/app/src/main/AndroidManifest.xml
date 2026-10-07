@@ -40,15 +40,15 @@
         <!-- flutter_local_notifications scheduled notifications -->
         <receiver
             android:exported="false"
-            android:name="io.flutter.plugins.localNotifications.LifecycleAwareScheduledNotificationReceiver" />
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
         <receiver
             android:exported="false"
-            android:name="io.flutter.plugins.local_notifications.ScheduledNotificationReceiver" />
-        <receiver
-            android:exported="false"
-            android:name="io.flutter.plugins.local_notifications.ScheduledNotificationBootReceiver">
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
     </application>
