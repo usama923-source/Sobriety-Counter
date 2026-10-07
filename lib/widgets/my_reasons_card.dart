@@ -76,10 +76,10 @@ class MyReasonsCard extends StatelessWidget {
               icon: const Icon(Icons.add_rounded, size: 20),
               label: const Text('Add a reason'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
+                foregroundColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
                 side: BorderSide(
                   color: isDark
-                      ? AppColors.skyBlueLight.withValues(alpha: 0.4)
+                      ? AppColors.softTealLight.withValues(alpha: 0.4)
                       : AppColors.navyBlue.withValues(alpha: 0.3),
                 ),
                 shape: RoundedRectangleBorder(
@@ -167,8 +167,8 @@ class MyReasonsCard extends StatelessWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
-              foregroundColor: isDark ? AppColors.navyBlueDark : AppColors.white,
+              backgroundColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+              foregroundColor: isDark ? AppColors.navyBlue : AppColors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppConstants.radiusSm),
               ),
@@ -381,8 +381,8 @@ class _ReasonChip extends StatelessWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
-              foregroundColor: isDark ? AppColors.navyBlueDark : AppColors.white,
+              backgroundColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+              foregroundColor: isDark ? AppColors.navyBlue : AppColors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppConstants.radiusSm),
               ),
@@ -420,7 +420,7 @@ class _ReasonChip extends StatelessWidget {
                 width: 6,
                 height: 6,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
+                  color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -450,7 +450,7 @@ class _ReasonChip extends StatelessWidget {
                     child: Icon(
                       Icons.edit_rounded,
                       size: 18,
-                      color: isDark ? AppColors.skyBlue : AppColors.navyBlue,
+                      color: isDark ? AppColors.softTeal : AppColors.navyBlue,
                     ),
                   ),
                 ),

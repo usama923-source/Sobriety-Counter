@@ -67,13 +67,13 @@ class ProUpgradeSheet extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: const LinearGradient(
-                colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                colors: [AppColors.gold, AppColors.goldDark],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFD700).withValues(alpha: 0.35),
+                  color: AppColors.gold.withValues(alpha: 0.35),
                   blurRadius: 16,
                   offset: const Offset(0, 4),
                 ),
@@ -141,15 +141,11 @@ class ProUpgradeSheet extends StatelessWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+              color: AppColors.gold,
               borderRadius: BorderRadius.circular(AppConstants.radiusSm),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+                  color: AppColors.gold.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
                 ),
@@ -200,11 +196,14 @@ class ProUpgradeSheet extends StatelessWidget {
   }
 
   Future<void> _handleUpgrade(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_pro', true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_pro', true);
+    } catch (_) {
+      // Store failure should not crash the upgrade sheet.
+    }
 
     if (!context.mounted) return;
-
     Navigator.of(context).pop(true);
   }
 }

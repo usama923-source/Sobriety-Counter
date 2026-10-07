@@ -6,20 +6,46 @@ import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 
-/// Walk screen — a 10-minute countdown timer to encourage users to
-/// step outside and walk, reducing cravings through movement.
-class WalkScreen extends StatefulWidget {
-  const WalkScreen({super.key});
+/// A reusable countdown screen for timed craving activities (walking,
+/// drinking water, etc.).
+///
+/// Shows a pulsing icon header, a countdown timer with a progress bar,
+/// Start/Reset controls, and a completion celebration card. Previously this
+/// logic was duplicated in walk_screen.dart and drink_water_screen.dart.
+class TimedActivityScreen extends StatefulWidget {
+  /// AppBar title and header heading (e.g. "Go for a Walk").
+  final String title;
+
+  /// Subtitle shown under the header (e.g. why this activity helps).
+  final String message;
+
+  /// Accent color for the icon, progress bar, and buttons.
+  final Color color;
+
+  /// Icon shown in the pulsing header circle.
+  final IconData icon;
+
+  /// Total countdown duration in minutes.
+  final int durationMinutes;
+
+  const TimedActivityScreen({
+    super.key,
+    required this.title,
+    required this.message,
+    required this.color,
+    required this.icon,
+    required this.durationMinutes,
+  });
 
   @override
-  State<WalkScreen> createState() => _WalkScreenState();
+  State<TimedActivityScreen> createState() => _TimedActivityScreenState();
 }
 
-class _WalkScreenState extends State<WalkScreen>
+class _TimedActivityScreenState extends State<TimedActivityScreen>
     with SingleTickerProviderStateMixin {
-  static const _totalSeconds = 10 * 60; // 10 minutes
+  late final int _totalSeconds = widget.durationMinutes * 60;
 
-  int _remainingSeconds = _totalSeconds;
+  int _remainingSeconds = 0;
   bool _isRunning = false;
   bool _isComplete = false;
   Timer? _timer;
@@ -30,6 +56,7 @@ class _WalkScreenState extends State<WalkScreen>
   @override
   void initState() {
     super.initState();
+    _remainingSeconds = _totalSeconds;
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -90,6 +117,7 @@ class _WalkScreenState extends State<WalkScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accent = widget.color;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightGray,
@@ -104,7 +132,7 @@ class _WalkScreenState extends State<WalkScreen>
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Go for a Walk',
+          widget.title,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -121,7 +149,7 @@ class _WalkScreenState extends State<WalkScreen>
           ),
           child: Column(
             children: [
-              // ── Walking Icon Card ────────────────────────────────────────
+              // ── Pulsing Icon Card ──────────────────────────────────────
               SoberCard(
                 padding: const EdgeInsets.symmetric(
                   vertical: AppConstants.spacingXxl,
@@ -143,23 +171,23 @@ class _WalkScreenState extends State<WalkScreen>
                             height: 88,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.successGreen.withValues(
+                              color: accent.withValues(
                                 alpha: isDark ? 0.15 : 0.1,
                               ),
                             ),
                             child: Icon(
                               _isComplete
                                   ? Icons.check_circle_rounded
-                                  : Icons.directions_walk_rounded,
+                                  : widget.icon,
                               size: 48,
                               color: _isComplete
                                   ? AppColors.successGreen
-                                  : AppColors.successGreen,
+                                  : accent,
                             ),
                           ),
                           const SizedBox(height: AppConstants.spacingLg),
                           Text(
-                            'Go for a Walk',
+                            widget.title,
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w700,
@@ -170,7 +198,7 @@ class _WalkScreenState extends State<WalkScreen>
                           ),
                           const SizedBox(height: AppConstants.spacingSm),
                           Text(
-                            'A short walk can reduce cravings\nby up to 60%. Step outside!',
+                            widget.message,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
@@ -190,7 +218,7 @@ class _WalkScreenState extends State<WalkScreen>
 
               const SizedBox(height: AppConstants.spacingLg),
 
-              // ── Timer Card ──────────────────────────────────────────────
+              // ── Timer Card ─────────────────────────────────────────────
               SoberCard(
                 padding: const EdgeInsets.symmetric(
                   vertical: AppConstants.spacingXl,
@@ -202,7 +230,7 @@ class _WalkScreenState extends State<WalkScreen>
                 hasShadow: true,
                 child: Column(
                   children: [
-                    // ── Time Display ─────────────────────────────────────
+                    // ── Time Display ───────────────────────────────────
                     Text(
                       _formattedTime,
                       style: TextStyle(
@@ -229,30 +257,28 @@ class _WalkScreenState extends State<WalkScreen>
 
                     const SizedBox(height: AppConstants.spacingLg),
 
-                    // ── Progress Bar ─────────────────────────────────────
+                    // ── Progress Bar ───────────────────────────────────
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppConstants.radiusFull),
                       child: LinearProgressIndicator(
                         value: _progress,
                         minHeight: 10,
-                        backgroundColor: AppColors.successGreen.withValues(
+                        backgroundColor: accent.withValues(
                           alpha: isDark ? 0.12 : 0.1,
                         ),
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          _isComplete
-                              ? AppColors.successGreen
-                              : AppColors.successGreen,
+                          _isComplete ? AppColors.successGreen : accent,
                         ),
                       ),
                     ),
 
                     const SizedBox(height: AppConstants.spacingSm),
 
-                    // ── Step count hint ───────────────────────────────────
+                    // ── Hint ───────────────────────────────────────────
                     Text(
                       _isRunning
-                          ? '${(_remainingSeconds ~/ 60 + 1)} min left — keep moving!'
-                          : '10 minutes = ~1,000 steps',
+                          ? '${(_remainingSeconds ~/ 60 + 1)} min left — keep going!'
+                          : '${widget.durationMinutes} minute activity',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
@@ -264,7 +290,7 @@ class _WalkScreenState extends State<WalkScreen>
 
                     const SizedBox(height: AppConstants.spacingLg),
 
-                    // ── Start / Reset Buttons ─────────────────────────────
+                    // ── Start / Reset Buttons ──────────────────────────
                     Row(
                       children: [
                         // Start Button
@@ -283,7 +309,7 @@ class _WalkScreenState extends State<WalkScreen>
                                 ),
                                 decoration: BoxDecoration(
                                   gradient: _isComplete
-                                      ? LinearGradient(
+                                      ? const LinearGradient(
                                           colors: [
                                             AppColors.successGreen,
                                             AppColors.successGreenLight,
@@ -293,8 +319,8 @@ class _WalkScreenState extends State<WalkScreen>
                                         )
                                       : LinearGradient(
                                           colors: [
-                                            AppColors.successGreen,
-                                            AppColors.successGreenLight,
+                                            accent,
+                                            accent.withValues(alpha: 0.7),
                                           ],
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
@@ -304,12 +330,20 @@ class _WalkScreenState extends State<WalkScreen>
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.successGreen
+                                      color: (_isComplete
+                                              ? AppColors.successGreen
+                                              : accent)
                                           .withValues(alpha: 0.3),
                                       blurRadius: 16,
                                       offset: const Offset(0, 4),
                                     ),
                                   ],
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: AppColors.softTeal,
+                                      width: 3,
+                                    ),
+                                  ),
                                 ),
                                 child: Center(
                                   child: Text(
@@ -342,20 +376,26 @@ class _WalkScreenState extends State<WalkScreen>
                                   vertical: AppConstants.spacingMd,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: isDark
-                                      ? AppColors.darkCard
-                                      : AppColors.lightGrayAlt,
-                                  borderRadius: BorderRadius.circular(
-                                    AppConstants.radiusFull,
-                                  ),
-                                  border: Border.all(
                                     color: isDark
-                                        ? AppColors.textOnDarkSecondary
-                                            .withValues(alpha: 0.2)
-                                        : AppColors.textTertiary
-                                            .withValues(alpha: 0.3),
+                                        ? AppColors.darkCard
+                                        : AppColors.lightGrayAlt,
+                                    borderRadius: BorderRadius.circular(
+                                      AppConstants.radiusFull,
+                                    ),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? AppColors.textOnDarkSecondary
+                                              .withValues(alpha: 0.2)
+                                          : AppColors.textTertiary
+                                              .withValues(alpha: 0.3),
+                                    ),
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: AppColors.softTeal,
+                                        width: 3,
+                                      ),
+                                    ),
                                   ),
-                                ),
                                 child: Center(
                                   child: Text(
                                     'Reset',
@@ -378,7 +418,7 @@ class _WalkScreenState extends State<WalkScreen>
                 ),
               ),
 
-              // ── Completion Message ──────────────────────────────────────
+              // ── Completion Message ─────────────────────────────────────
               if (_isComplete) ...[
                 const SizedBox(height: AppConstants.spacingLg),
                 SoberCard(

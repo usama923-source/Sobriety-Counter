@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:quit_drinking/constants/app_colors.dart';
 
 /// A lightweight confetti celebration overlay that uses Flutter's built-in
 /// animation capabilities (no external packages). Trigger by passing a
@@ -56,14 +57,12 @@ class _ConfettiCelebrationState extends State<ConfettiCelebration>
   List<_ConfettiParticle> _generateParticles() {
     final rng = Random(widget.key.hashCode);
     final defaultColors = [
-      const Color(0xFF4CAF50), // successGreen
-      const Color(0xFFFFB74D), // softOrange
-      const Color(0xFF7FB3D5), // skyBlue
-      const Color(0xFF7EC8C3), // softTeal
-      const Color(0xFFEF5350), // softRed
-      const Color(0xFFFFD89B), // softOrangeLight
-      const Color(0xFF81C784), // successGreenLight
-      const Color(0xFFA8D0E6), // skyBlueLight
+      AppColors.softTealDark,
+      AppColors.softOrange,
+      AppColors.softTeal,
+      AppColors.softRed,
+      AppColors.softOrangeLight,
+      AppColors.softTealLight,
     ];
     final colors = widget.colors ?? defaultColors;
 

@@ -61,6 +61,13 @@ class QuotesService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Show the quote at [index] (used by favorites lists).
+  void showQuote(int index) {
+    if (index < 0 || index >= allQuotes.length) return;
+    _currentIndex = index;
+    notifyListeners();
+  }
+
   // ── Favorites ──────────────────────────────────────────────────────
 
   bool isFavorite(int index) => _favoriteIndices.contains(index);

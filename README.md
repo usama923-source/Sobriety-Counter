@@ -39,8 +39,7 @@ lib/
 │       └── result.dart            # Sealed Result type (Success/Failure)
 ├── constants/                     # Design tokens
 │   ├── app_colors.dart            # Color palette (navy, teal, sky, mint)
-│   ├── app_constants.dart         # Spacing, radius, animation durations
-│   └── app_text_styles.dart       # Google Fonts Inter typography
+│   └── app_constants.dart         # Spacing, radius, animation durations
 ├── data/                          # Static data assets
 │   └── quotes.dart                # 100 motivational quotes
 ├── models/                        # Domain models

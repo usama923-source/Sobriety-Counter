@@ -36,13 +36,15 @@ class FirebaseService {
     if (_deviceId != null && _deviceId!.isNotEmpty) return _deviceId!;
 
     final prefs = await SharedPreferences.getInstance();
-    var id = prefs.getString(_deviceIdKey);
-    if (id == null || id.isEmpty) {
-      id = _uuid.v4();
-      await prefs.setString(_deviceIdKey, id);
+    final storedId = prefs.getString(_deviceIdKey);
+    final newId = _uuid.v4();
+
+    if (storedId == null || storedId.isEmpty) {
+      await prefs.setString(_deviceIdKey, newId);
     }
-    _deviceId = id;
-    return id;
+
+    _deviceId = storedId ?? newId;
+    return storedId ?? newId;
   }
 
   /// Log the "app_open" Firebase Analytics event.

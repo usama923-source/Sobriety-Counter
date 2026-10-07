@@ -1,60 +1,42 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/quotes_provider.dart';
 import 'package:quit_drinking/data/quotes.dart';
+import 'package:quit_drinking/services/quotes_service.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 
 /// Motivation screen — displays uplifting sobriety quotes to help
 /// users push through a craving. Includes random quote cycling,
 /// favorites, and copy-to-clipboard share.
-class MotivationScreen extends StatefulWidget {
+///
+/// Uses the shared [QuotesService] so favorites persist across sessions
+/// and stay in sync with the Daily Motivation card on the home screen.
+class MotivationScreen extends ConsumerStatefulWidget {
   const MotivationScreen({super.key});
 
   @override
-  State<MotivationScreen> createState() => _MotivationScreenState();
+  ConsumerState<MotivationScreen> createState() => _MotivationScreenState();
 }
 
-class _MotivationScreenState extends State<MotivationScreen> {
-  late int _currentIndex;
-  final Set<int> _favorites = {};
+class _MotivationScreenState extends ConsumerState<MotivationScreen> {
   bool _showCopiedConfirmation = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = _seedFromDate();
-  }
+  QuotesService get _service => ref.read(quotesServiceProvider);
 
-  int _seedFromDate() {
-    final now = DateTime.now();
-    final seed = now.year * 10000 + now.month * 100 + now.day;
-    return Random(seed).nextInt(allQuotes.length);
-  }
-
-  Quote get _currentQuote => allQuotes[_currentIndex];
-  bool get _isFavorite => _favorites.contains(_currentIndex);
+  Quote get _currentQuote => _service.currentQuote;
+  bool get _isFavorite => _service.isCurrentFavorite;
+  Set<int> get _favorites => _service.favoriteIndices;
 
   void _nextQuote() {
-    if (allQuotes.length <= 1) return;
-    int newIndex;
-    do {
-      newIndex = Random().nextInt(allQuotes.length);
-    } while (newIndex == _currentIndex);
-    setState(() => _currentIndex = newIndex);
+    _service.nextQuote();
     HapticFeedback.lightImpact();
   }
 
   void _toggleFavorite() {
-    setState(() {
-      if (_favorites.contains(_currentIndex)) {
-        _favorites.remove(_currentIndex);
-      } else {
-        _favorites.add(_currentIndex);
-      }
-    });
+    _service.toggleFavorite();
     HapticFeedback.mediumImpact();
   }
 
@@ -67,11 +49,10 @@ class _MotivationScreenState extends State<MotivationScreen> {
       if (mounted) setState(() => _showCopiedConfirmation = false);
     });
   }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final quote = _currentQuote;
+    final quote = ref.watch(quotesServiceProvider).currentQuote;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightGray,
@@ -120,14 +101,14 @@ class _MotivationScreenState extends State<MotivationScreen> {
                       height: 88,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.successGreenLight.withValues(
+                        color: AppColors.softTeal.withValues(
                           alpha: isDark ? 0.15 : 0.1,
                         ),
                       ),
                       child: const Icon(
                         Icons.auto_awesome_rounded,
                         size: 48,
-                        color: AppColors.successGreenLight,
+                        color: AppColors.softTeal,
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacingLg),
@@ -176,7 +157,7 @@ class _MotivationScreenState extends State<MotivationScreen> {
                   );
                 },
                 child: SoberCard(
-                  key: ValueKey('quote_$_currentIndex'),
+                  key: ValueKey('quote_${quote.text}'),
                   padding: const EdgeInsets.all(AppConstants.spacingLg),
                   color: isDark
                       ? AppColors.darkCardAlt.withValues(alpha: 0.5)
@@ -188,7 +169,7 @@ class _MotivationScreenState extends State<MotivationScreen> {
                       Icon(
                         Icons.format_quote_rounded,
                         size: 48,
-                        color: AppColors.successGreenLight.withValues(
+                        color: AppColors.softTeal.withValues(
                           alpha: isDark ? 0.2 : 0.15,
                         ),
                       ),
@@ -288,13 +269,13 @@ class _MotivationScreenState extends State<MotivationScreen> {
                         vertical: AppConstants.spacingSm,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.successGreen.withValues(alpha: 0.1),
+                        color: AppColors.softTeal.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppConstants.radiusSm,
                         ),
                         border: Border.all(
                           color:
-                              AppColors.successGreen.withValues(alpha: 0.2),
+                              AppColors.softTeal.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Row(
@@ -303,7 +284,7 @@ class _MotivationScreenState extends State<MotivationScreen> {
                           const Icon(
                             Icons.check_rounded,
                             size: 18,
-                            color: AppColors.successGreen,
+                            color: AppColors.softTeal,
                           ),
                           const SizedBox(width: AppConstants.spacingXs),
                           Text(
@@ -375,7 +356,7 @@ class _MotivationScreenState extends State<MotivationScreen> {
                           ),
                           child: GestureDetector(
                             onTap: () => setState(
-                              () => _currentIndex = index,
+                              () => _service.showQuote(index),
                             ),
                             child: Container(
                               padding: const EdgeInsets.all(
@@ -416,7 +397,7 @@ class _MotivationScreenState extends State<MotivationScreen> {
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: isDark
-                                  ? AppColors.skyBlueLight
+                                  ? AppColors.softTealLight
                                   : AppColors.navyBlue,
                             ),
                           ),

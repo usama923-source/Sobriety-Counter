@@ -43,11 +43,11 @@ class _BreathingScreenState extends State<BreathingScreen>
   Color get _currentColor {
     switch (_currentPhase) {
       case _BreathPhase.inhale:
-        return const Color(0xFF7EC8C3); // softTeal
+        return AppColors.softTeal; // softTeal
       case _BreathPhase.hold:
-        return AppColors.skyBlueLight;
+        return AppColors.softTealLight;
       case _BreathPhase.exhale:
-        return AppColors.successGreenLight;
+        return AppColors.softTeal;
     }
   }
 
@@ -475,8 +475,8 @@ class _BreathingScreenState extends State<BreathingScreen>
                                             )
                                           : const LinearGradient(
                                               colors: [
-                                                AppColors.softOrange,
-                                                AppColors.softOrangeLight,
+                                                AppColors.navyBlue,
+                                                AppColors.softTeal,
                                               ],
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
@@ -490,7 +490,7 @@ class _BreathingScreenState extends State<BreathingScreen>
                                               ? AppColors.softRed
                                               : _isComplete
                                                   ? AppColors.successGreen
-                                                  : AppColors.softOrange)
+                                                  : AppColors.navyBlue)
                                           .withValues(alpha: 0.3),
                                       blurRadius: 16,
                                       offset: const Offset(0, 4),

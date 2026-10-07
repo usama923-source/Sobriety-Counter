@@ -1,53 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/reasons_provider.dart';
+import 'package:quit_drinking/services/reasons_service.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 
 /// My Reasons screen — full CRUD for personal sobriety reasons.
-/// Persisted in SharedPreferences under the key "my_reasons".
-class MyReasonsScreen extends StatefulWidget {
+///
+/// Uses the shared [ReasonsService] (persisted under key "my_reasons" as a
+/// JSON-encoded list of strings) so it stays in sync with the home card.
+class MyReasonsScreen extends ConsumerStatefulWidget {
   const MyReasonsScreen({super.key});
 
   @override
-  State<MyReasonsScreen> createState() => _MyReasonsScreenState();
+  ConsumerState<MyReasonsScreen> createState() => _MyReasonsScreenState();
 }
 
-class _MyReasonsScreenState extends State<MyReasonsScreen> {
-  static const _storageKey = 'my_reasons';
-  List<String> _reasons = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadReasons();
-  }
-
-  Future<void> _loadReasons() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _reasons = prefs.getStringList(_storageKey) ?? [];
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _saveReasons() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_storageKey, _reasons);
-  }
-
+class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
   Future<void> _addReason(String reason) async {
     final trimmed = reason.trim();
     if (trimmed.isEmpty) return;
-    setState(() => _reasons.insert(0, trimmed));
-    await _saveReasons();
+    await ref.read(reasonsServiceProvider).add(trimmed);
   }
 
   Future<void> _deleteReason(int index) async {
-    setState(() => _reasons.removeAt(index));
-    await _saveReasons();
+    await ref.read(reasonsServiceProvider).delete(index);
     HapticFeedback.mediumImpact();
   }
 
@@ -123,6 +102,8 @@ class _MyReasonsScreenState extends State<MyReasonsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final service = ref.watch(reasonsServiceProvider);
+    final reasons = service.reasons;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightGray,
@@ -146,7 +127,7 @@ class _MyReasonsScreenState extends State<MyReasonsScreen> {
         ),
         centerTitle: true,
       ),
-      body: _isLoading
+      body: !service.initialized
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
               child: Padding(
@@ -158,13 +139,13 @@ class _MyReasonsScreenState extends State<MyReasonsScreen> {
                   children: [
                     // ── Reasons List ──────────────────────────────────────
                     Expanded(
-                      child: _reasons.isEmpty
+                      child: reasons.isEmpty
                           ? _EmptyReasonsState(isDark: isDark)
                           : ListView.builder(
-                              itemCount: _reasons.length,
+                              itemCount: reasons.length,
                               itemBuilder: (context, index) {
                                 return _ReasonTile(
-                                  reason: _reasons[index],
+                                  reason: reasons[index],
                                   index: index,
                                   isDark: isDark,
                                   onDelete: () => _confirmDelete(context, index),
@@ -192,8 +173,8 @@ class _MyReasonsScreenState extends State<MyReasonsScreen> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
+                                  AppColors.navyBlue,
                                   AppColors.softTeal,
-                                  AppColors.softTealLight,
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,

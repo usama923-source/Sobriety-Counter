@@ -62,7 +62,7 @@ class DailyMotivationCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? AppColors.skyBlue.withValues(alpha: 0.15)
+                        ? AppColors.softTeal.withValues(alpha: 0.15)
                         : AppColors.mint,
                     borderRadius: BorderRadius.circular(AppConstants.radiusFull),
                   ),
@@ -71,7 +71,7 @@ class DailyMotivationCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
+                      color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
                     ),
                   ),
                 ),
@@ -85,7 +85,7 @@ class DailyMotivationCard extends StatelessWidget {
               Icons.format_quote_rounded,
               size: 36,
               color: isDark
-                  ? AppColors.skyBlueLight.withValues(alpha: 0.25)
+                  ? AppColors.softTealLight.withValues(alpha: 0.25)
                   : AppColors.navyBlue.withValues(alpha: 0.12),
             ),
           ),
@@ -188,7 +188,7 @@ class DailyMotivationCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
+                      color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
                     ),
                   ),
                 ),
@@ -235,7 +235,7 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = iconColor ??
-        (isDark ? AppColors.skyBlueLight : AppColors.navyBlue);
+        (isDark ? AppColors.softTealLight : AppColors.navyBlue);
 
     return Material(
       color: Colors.transparent,

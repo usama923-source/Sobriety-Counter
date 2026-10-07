@@ -22,6 +22,6 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     // Verify the app renders without crashing by checking for the app title
-    expect(find.text('Sober Today'), findsAtLeastNWidgets(1));
+    expect(find.text('QuitDrink Ai'), findsAtLeastNWidgets(1));
   });
 }

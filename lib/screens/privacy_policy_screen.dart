@@ -78,7 +78,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     const SizedBox(height: AppConstants.spacingSm),
                     Text(
                       'Your privacy matters to us. Here\'s a simple overview of '
-                      'how Quit Drinking Ai handles your data.',
+                      'how QuitDrink Ai handles your data.',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -110,7 +110,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               // ── Section 2: AI Chat ─────────────────────────────────
               _PolicySection(
                 icon: Icons.smart_toy_rounded,
-                iconColor: AppColors.skyBlue,
+                iconColor: AppColors.softTeal,
                 title: 'AI Chat',
                 body:
                     'When you use the AI Friend chat feature, your messages are '
@@ -126,7 +126,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               // ── Section 3: No Account Required ─────────────────────
               _PolicySection(
                 icon: Icons.person_off_rounded,
-                iconColor: AppColors.successGreen,
+                iconColor: AppColors.skyBlueDark,
                 title: 'No Account Required',
                 body:
                     'The app works fully offline for all core features — tracking '
@@ -157,7 +157,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 iconColor: AppColors.softOrange,
                 title: 'Children',
                 body:
-                    'Quit Drinking Ai is not intended for use by individuals '
+                    'QuitDrink Ai is not intended for use by individuals '
                     'under the age of 18. We do not knowingly collect any '
                     'information from minors.',
                 isDark: isDark,
@@ -194,7 +194,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       const SizedBox(width: AppConstants.spacingSm),
                       Expanded(
                         child: SelectableText(
-                          'support.quitdrinking@gmail.com',
+                          'support.quitdrinkai@gmail.com',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,

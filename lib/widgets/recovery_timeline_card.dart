@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/widgets/confetti_celebration.dart';
@@ -15,6 +16,9 @@ class RecoveryTimelineCard extends StatefulWidget {
 
 class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
   late int _previousDays;
+  bool _isExpanded = false;
+
+  static const int _collapsedCount = 3;
 
   @override
   void initState() {
@@ -136,24 +140,84 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
 
           const SizedBox(height: AppConstants.spacingMd),
 
-          // Milestone List
-          ...List.generate(_milestones.length, (index) {
-            final milestone = _milestones[index];
-            final isReached = milestone.isCompleted(widget.currentDays);
-            final isLast = index == _milestones.length - 1;
+          // Milestone List — collapsible
+          AnimatedCrossFade(
+            firstChild: _buildMilestoneList(
+              isDark,
+              _milestones.sublist(0, _collapsedCount),
+              startIndex: 0,
+            ),
+            secondChild: _buildMilestoneList(
+              isDark,
+              _milestones,
+              startIndex: 0,
+            ),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 300),
+            sizeCurve: Curves.easeInOut,
+          ),
 
-            return _MilestoneTile(
-              milestone: milestone,
-              isReached: isReached,
-              isLast: isLast,
-              isDark: isDark,
-              isNewlyReached:
-                  isReached && !milestone.isCompleted(_previousDays),
-            );
-          }),
+          // Show All / Show Less button
+          if (_milestones.length > _collapsedCount) ...[
+            const SizedBox(height: AppConstants.spacingSm),
+            Center(
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  setState(() => _isExpanded = !_isExpanded);
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _isExpanded ? 'Show Less' : 'Show All Milestones',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.softTeal,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      _isExpanded
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 18,
+                      color: AppColors.softTeal,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
       ),
+    );
+  }
+
+  Widget _buildMilestoneList(
+    bool isDark,
+    List<_Milestone> milestones, {
+    required int startIndex,
+  }) {
+    return Column(
+      children: List.generate(milestones.length, (index) {
+        final milestone = milestones[index];
+        final isReached = milestone.isCompleted(widget.currentDays);
+        final isLast = index == milestones.length - 1;
+
+        return _MilestoneTile(
+          milestone: milestone,
+          isReached: isReached,
+          isLast: isLast,
+          isDark: isDark,
+          isNewlyReached:
+              isReached && !milestone.isCompleted(_previousDays),
+        );
+      }),
     );
   }
 }

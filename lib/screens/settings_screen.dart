@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
-import 'package:quit_drinking/core/providers/sobriety_provider.dart';
-import 'package:quit_drinking/core/providers/quotes_provider.dart';
-import 'package:quit_drinking/core/providers/reasons_provider.dart';
-import 'package:quit_drinking/core/providers/savings_provider.dart';
-import 'package:quit_drinking/core/providers/breathing_provider.dart';
-import 'package:quit_drinking/core/providers/checkin_provider.dart';
+import 'package:quit_drinking/core/services/notification_service.dart';
+import 'package:quit_drinking/screens/onboarding/onboarding_screen.dart';
+import 'package:quit_drinking/screens/privacy_policy_screen.dart';
+import 'package:quit_drinking/screens/terms_of_service_screen.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,7 +25,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _currency = 'USD';
   bool _isLoading = true;
 
-  final List<String> _currencies = ['USD', 'EUR', 'GBP', 'PKR'];
+  final List<String> _currencies = ['USD', 'EUR', 'GBP'];
 
   @override
   void initState() {
@@ -36,9 +34,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _dailyReminder = prefs.getBool('notifications_enabled') ?? false;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _dailyReminder = prefs.getBool('reminder_enabled') ?? false;
       final savedTime = prefs.getString('reminder_time');
       if (savedTime != null) {
         final parts = savedTime.split(':');
@@ -50,26 +48,82 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         }
       }
       _currency = prefs.getString('currency') ?? 'USD';
+      // Guard against currencies that are no longer available (e.g. PKR)
+      if (!_currencies.contains(_currency)) {
+        _currency = 'USD';
+      }
       _isLoading = false;
-    });
+    } catch (_) {
+      // Any prefs read failure (e.g. corrupted storage) falls back to safe defaults.
+      _dailyReminder = false;
+      _reminderTime = const TimeOfDay(hour: 20, minute: 0);
+      _currency = 'USD';
+      _isLoading = false;
+    }
   }
 
+  /// Enable/disable the daily reminder. On enable, asks the user to pick a
+  /// time and schedules the repeating notification; on disable, cancels it.
   Future<void> _setDailyReminder(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notifications_enabled', value);
-    setState(() => _dailyReminder = value);
+    if (!value) {
+      await NotificationService().cancelReminder();
+      if (mounted) setState(() => _dailyReminder = false);
+      return;
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: _reminderTime,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.white,
+              hourMinuteColor:
+                  isDark ? AppColors.darkCardAlt : AppColors.lightGray,
+              hourMinuteTextColor:
+                  isDark ? AppColors.textOnDark : AppColors.textPrimary,
+              dayPeriodColor:
+                  isDark ? AppColors.darkCardAlt : AppColors.lightGray,
+              dayPeriodTextColor:
+                  isDark ? AppColors.textOnDark : AppColors.textPrimary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked == null) {
+      // User cancelled the picker — leave the reminder off.
+      if (mounted) setState(() => _dailyReminder = false);
+      return;
+    }
+
+    await NotificationService().scheduleDailyReminder(picked);
+    if (mounted) {
+      setState(() {
+        _dailyReminder = true;
+        _reminderTime = picked;
+      });
+    }
   }
 
+  /// Re-pick the reminder time (only visible when the reminder is enabled).
   Future<void> _setReminderTime(TimeOfDay time) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('reminder_time', '${time.hour}:${time.minute}');
-    setState(() => _reminderTime = time);
+    await NotificationService().scheduleDailyReminder(time);
+    if (mounted) setState(() => _reminderTime = time);
   }
 
   Future<void> _setCurrency(String currency) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currency', currency);
-    setState(() => _currency = currency);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('currency', currency);
+      setState(() => _currency = currency);
+    } catch (_) {
+      // Persist failure should not break the settings UI.
+    }
   }
 
   Future<void> _resetAllData() async {
@@ -111,7 +165,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               const SizedBox(height: AppConstants.spacingSm),
               Text(
-                'This will erase everything.\\nAre you sure?',
+                'This will erase all your data including sobriety date, '
+                'reasons, and chat history. Are you sure?',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 15,
@@ -123,29 +178,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               const SizedBox(height: AppConstants.spacingLg),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(ctx, false),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: isDark
-                            ? AppColors.textOnDarkSecondary
-                            : AppColors.textSecondary,
-                        side: BorderSide(
-                          color:
-                              isDark ? AppColors.darkCardAlt : AppColors.lightGrayAlt,
+                        foregroundColor: AppColors.textSecondary,
+                        side: const BorderSide(
+                          color: AppColors.textSecondary,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                          borderRadius: BorderRadius.circular(AppConstants.radiusMd),
                         ),
                         padding: const EdgeInsets.symmetric(
                           vertical: AppConstants.spacingMd,
                         ),
                       ),
-                      child: const Text('Cancel'),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: AppConstants.spacingMd),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(ctx, true),
@@ -153,13 +212,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         backgroundColor: AppColors.softRed,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                          borderRadius: BorderRadius.circular(AppConstants.radiusMd),
                         ),
                         padding: const EdgeInsets.symmetric(
                           vertical: AppConstants.spacingMd,
                         ),
                       ),
-                      child: const Text('Delete Everything'),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: const Text(
+                          'Delete Everything',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -171,33 +239,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
 
     if (confirmed == true && mounted) {
+      // Cancel any scheduled notification before wiping prefs
+      await NotificationService().cancelReminder();
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-      // Re-init all services so they pick up the cleared state
-      if (mounted) {
-        ref.read(sobrietyServiceProvider).init();
-        ref.read(quotesServiceProvider).init();
-        ref.read(reasonsServiceProvider).init();
-        ref.read(savingsServiceProvider).init();
-        ref.read(breathingServiceProvider).init();
-        // CheckInService has an _initialized guard, so force it by clearing first
-        ref.invalidate(checkinServiceProvider);
-        ref.read(checkinServiceProvider);
-        setState(() {
-          _dailyReminder = false;
-          _reminderTime = const TimeOfDay(hour: 20, minute: 0);
-          _currency = 'USD';
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('All data has been reset.'),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppConstants.radiusSm),
-            ),
-          ),
-        );
-      }
+
+      if (!mounted) return;
+      // Navigate to onboarding, removing all previous routes
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+        (route) => false,
+      );
     }
   }
 
@@ -261,7 +315,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       onChanged: (_) =>
                           ref.read(themeServiceProvider).toggleTheme(),
                       activeThumbColor: AppColors.navyBlue,
-                      activeTrackColor: AppColors.skyBlueLight.withValues(alpha: 0.5),
+                      activeTrackColor: AppColors.softTealLight.withValues(alpha: 0.5),
                     ),
                   ],
                 ),
@@ -284,14 +338,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: AppColors.skyBlue.withValues(alpha: 0.15),
+                            color: AppColors.softTeal.withValues(alpha: 0.15),
                             borderRadius:
                                 BorderRadius.circular(AppConstants.radiusSm),
                           ),
                           child: const Icon(
                             Icons.notifications_rounded,
                             size: 22,
-                            color: AppColors.skyBlue,
+                            color: AppColors.softTeal,
                           ),
                         ),
                         const SizedBox(width: AppConstants.spacingSm),
@@ -309,10 +363,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ),
                         Switch(
                           value: _dailyReminder,
-                          onChanged: _setDailyReminder,
+                          onChanged: (value) => _setDailyReminder(value),
                           activeThumbColor: AppColors.navyBlue,
                           activeTrackColor:
-                              AppColors.skyBlueLight.withValues(alpha: 0.5),
+                              AppColors.softTealLight.withValues(alpha: 0.5),
                         ),
                       ],
                     ),
@@ -418,13 +472,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.successGreen.withValues(alpha: 0.15),
+                        color: (isDark
+                                ? AppColors.softTealLight
+                                : AppColors.navyBlue)
+                            .withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.monetization_on_rounded,
                         size: 22,
-                        color: AppColors.successGreen,
+                        color: isDark
+                            ? AppColors.softTealLight
+                            : AppColors.navyBlue,
                       ),
                     ),
                     const SizedBox(width: AppConstants.spacingSm),
@@ -517,22 +576,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(width: AppConstants.spacingSm),
-                    TextButton(
-                      onPressed: _resetAllData,
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.softRed,
-                        backgroundColor: AppColors.softRed.withValues(alpha: 0.08),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                    Padding(
+                      padding: const EdgeInsets.all(AppConstants.spacingMd),
+                      child: TextButton(
+                        onPressed: _resetAllData,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.softRed,
+                          backgroundColor: AppColors.softRed.withValues(alpha: 0.08),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppConstants.radiusMd),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppConstants.spacingMd,
+                            vertical: AppConstants.spacingSm,
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppConstants.spacingMd,
-                          vertical: AppConstants.spacingSm,
+                        child: const Text(
+                          'Reset',
+                          style: TextStyle(fontWeight: FontWeight.w700),
                         ),
-                      ),
-                      child: const Text(
-                        'Reset',
-                        style: TextStyle(fontWeight: FontWeight.w700),
                       ),
                     ),
                   ],
@@ -552,7 +614,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       iconColor: AppColors.navyBlue,
                       label: 'Privacy Policy',
                       isDark: isDark,
-                      onTap: () => _launchUrl('https://sobertoday.app/privacy'),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PrivacyPolicyScreen(),
+                        ),
+                      ),
+                    ),
+                    _AboutDivider(isDark: isDark),
+                    _AboutTile(
+                      icon: Icons.gavel_rounded,
+                      iconColor: AppColors.softRed,
+                      label: 'Terms of Service',
+                      isDark: isDark,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const TermsOfServiceScreen(),
+                        ),
+                      ),
                     ),
                     _AboutDivider(isDark: isDark),
                     _AboutTile(
@@ -571,7 +649,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       label: 'Contact Us',
                       isDark: isDark,
                       onTap: () => _launchUrl(
-                        'mailto:support@sobertoday.app?subject=Sober%20Today%20Feedback',
+                        'mailto:support.quitdrinkai@gmail.com?subject=QuitDrink%20Ai%20Feedback',
                       ),
                     ),
                     _AboutDivider(isDark: isDark),

@@ -202,7 +202,7 @@ class BreathChallengeCard extends StatelessWidget {
                   },
                   color: service.isRunning
                       ? AppColors.softRed
-                      : AppColors.successGreen,
+                      : AppColors.softTeal,
                   isDark: isDark,
                   filled: true,
                 ),
@@ -235,7 +235,7 @@ class BreathChallengeCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
+                      color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
                     ),
                   ),
                 ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Core color palette for the Sober Today app.
+/// Core color palette for the QuitDrink Ai app.
 /// Designed to feel calming, premium, and motivational.
 class AppColors {
   AppColors._();
@@ -21,8 +21,8 @@ class AppColors {
   static const Color softTealDark = Color(0xFF5BB4AE);
 
   // ── Surface / Background ─────────────────────────────────────────────────
-  static const Color mint = Color(0xFFD7F5EF);
-  static const Color mintLight = Color(0xFFE8FAF6);
+  static const Color mint = Color(0xFFE8F4F8);
+  static const Color mintLight = Color(0xFFF0F8FA);
   static const Color lightGray = Color(0xFFF5F7FA);
   static const Color lightGrayAlt = Color(0xFFEDF0F5);
   static const Color white = Color(0xFFFFFFFF);
@@ -40,6 +40,8 @@ class AppColors {
   static const Color softOrangeLight = Color(0xFFFFD89B);
   static const Color softRed = Color(0xFFEF5350);
   static const Color softRedLight = Color(0xFFE57373);
+  static const Color gold = Color(0xFFFFD700);
+  static const Color goldDark = Color(0xFFFFA500);
 
   // ── Text ─────────────────────────────────────────────────────────────────
   static const Color textPrimary = Color(0xFF1A202C);

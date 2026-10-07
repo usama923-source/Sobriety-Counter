@@ -1,30 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/weight_tracker_provider.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-// ── Weight Entry Model ─────────────────────────────────────────────────
-
-class _WeightEntry {
-  final DateTime date;
-  final double weight;
-
-  _WeightEntry({required this.date, required this.weight});
-
-  Map<String, dynamic> toJson() => {
-        'date': date.millisecondsSinceEpoch,
-        'weight': weight,
-      };
-
-  factory _WeightEntry.fromJson(Map<String, dynamic> json) => _WeightEntry(
-        date: DateTime.fromMillisecondsSinceEpoch(json['date'] as int),
-        weight: (json['weight'] as num).toDouble(),
-      );
-}
 
 // ── Unit Enum ────────────────────────────────────────────────────────────
 
@@ -36,54 +16,40 @@ enum _WeightUnit { kg, lbs }
 ///
 /// Set a goal weight and current weight, log daily entries, and see
 /// progress with a motivational message about weight lost.
-class WeightTrackerScreen extends StatefulWidget {
+///
+/// Persisted data (goal, current weight, and the weight log) lives in
+/// [weightTrackerProvider]; only unit selection and text input stay local.
+class WeightTrackerScreen extends ConsumerStatefulWidget {
   const WeightTrackerScreen({super.key});
 
   @override
-  State<WeightTrackerScreen> createState() => _WeightTrackerScreenState();
+  ConsumerState<WeightTrackerScreen> createState() =>
+      _WeightTrackerScreenState();
 }
 
-class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
-  // ── Keys ────────────────────────────────────────────────────────────
-  static const String _goalWeightKey = 'goal_weight';
-  static const String _currentWeightKey = 'current_weight';
-  static const String _weightLogKey = 'weight_log';
-
-  // ── State ───────────────────────────────────────────────────────────
+class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
+  // ── Local UI State ──────────────────────────────────────────────────
   _WeightUnit _unit = _WeightUnit.kg;
-  double? _goalWeight;
-  double? _currentWeight;
-  List<_WeightEntry> _weightLog = [];
   final TextEditingController _goalController = TextEditingController();
   final TextEditingController _currentController = TextEditingController();
 
   // ── Unit helpers ────────────────────────────────────────────────────
   String get _unitLabel => _unit == _WeightUnit.kg ? 'kg' : 'lbs';
 
-  double? get _firstLoggedWeight => _weightLog.isNotEmpty
-      ? _weightLog.first.weight
-      : _currentWeight;
-
-  double? get _weightLost {
-    if (_firstLoggedWeight == null || _currentWeight == null) return null;
-    return _firstLoggedWeight! - _currentWeight!;
-  }
-
-  double? get _progress {
-    if (_goalWeight == null || _currentWeight == null) return null;
-    final start = _firstLoggedWeight ?? _currentWeight!;
-    if (start <= _goalWeight!) return 1.0; // Already at or past goal
-    final total = start - _goalWeight!;
-    final soFar = start - _currentWeight!;
-    return (soFar / total).clamp(0.0, 1.0);
-  }
-
   // ── Lifecycle ───────────────────────────────────────────────────────
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    // Populate the text fields once persisted values finish loading.
+    ref.listenManual(weightTrackerProvider, (previous, next) {
+      if (next.goalWeight != null && _goalController.text.isEmpty) {
+        _goalController.text = next.goalWeight!.toStringAsFixed(1);
+      }
+      if (next.currentWeight != null && _currentController.text.isEmpty) {
+        _currentController.text = next.currentWeight!.toStringAsFixed(1);
+      }
+    }, fireImmediately: true);
   }
 
   @override
@@ -91,50 +57,6 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
     _goalController.dispose();
     _currentController.dispose();
     super.dispose();
-  }
-
-  // ── Data Persistence ────────────────────────────────────────────────
-
-  Future<void> _loadData() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _goalWeight = prefs.getDouble(_goalWeightKey);
-      _currentWeight = prefs.getDouble(_currentWeightKey);
-
-      final logJson = prefs.getString(_weightLogKey);
-      if (logJson != null) {
-        final list = jsonDecode(logJson) as List<dynamic>;
-        _weightLog =
-            list.map((e) => _WeightEntry.fromJson(e as Map<String, dynamic>)).toList()
-              ..sort((a, b) => a.date.compareTo(b.date));
-      }
-
-      if (_goalWeight != null) {
-        _goalController.text = _goalWeight!.toStringAsFixed(1);
-      }
-      if (_currentWeight != null) {
-        _currentController.text = _currentWeight!.toStringAsFixed(1);
-      }
-
-    });
-  }
-
-  Future<void> _saveGoalWeight(double weight) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_goalWeightKey, weight);
-    setState(() => _goalWeight = weight);
-  }
-
-  Future<void> _saveCurrentWeight(double weight) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble(_currentWeightKey, weight);
-    setState(() => _currentWeight = weight);
-  }
-
-  Future<void> _saveWeightLog() async {
-    final prefs = await SharedPreferences.getInstance();
-    final json = jsonEncode(_weightLog.map((e) => e.toJson()).toList());
-    await prefs.setString(_weightLogKey, json);
   }
 
   // ── Actions ─────────────────────────────────────────────────────────
@@ -146,7 +68,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
     if (weight == null || weight <= 0) return;
 
     HapticFeedback.mediumImpact();
-    _saveGoalWeight(weight);
+    ref.read(weightTrackerProvider.notifier).setGoalWeight(weight);
     _clearFocus();
   }
 
@@ -157,29 +79,24 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
     if (weight == null || weight <= 0) return;
 
     HapticFeedback.mediumImpact();
-    _saveCurrentWeight(weight);
+    ref.read(weightTrackerProvider.notifier).setCurrentWeight(weight);
     _clearFocus();
   }
 
   void _logWeight() {
-    if (_currentWeight == null) return;
+    final currentWeight = ref.read(weightTrackerProvider).currentWeight;
+    if (currentWeight == null) return;
 
     HapticFeedback.heavyImpact();
-    setState(() {
-      _weightLog.add(_WeightEntry(
-        date: DateTime.now(),
-        weight: _currentWeight!,
-      ));
-    });
-    _saveWeightLog();
+    ref.read(weightTrackerProvider.notifier).logWeight();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Logged $_currentWeight$_unitLabel',
+          'Logged $currentWeight$_unitLabel',
         ),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.successGreen,
+        backgroundColor: AppColors.softTeal,
         duration: const Duration(seconds: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
@@ -189,34 +106,28 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   }
 
   void _toggleUnit() {
+    final wasKg = _unit == _WeightUnit.kg;
     setState(() {
-      final wasKg = _unit == _WeightUnit.kg;
       _unit = wasKg ? _WeightUnit.lbs : _WeightUnit.kg;
-
-      // Convert stored values
-      if (_goalWeight != null) {
-        _goalWeight = wasKg ? _goalWeight! * 2.20462 : _goalWeight! / 2.20462;
-        _goalController.text = _goalWeight!.toStringAsFixed(1);
-        _saveGoalWeight(_goalWeight!);
-      }
-      if (_currentWeight != null) {
-        _currentWeight = wasKg
-            ? _currentWeight! * 2.20462
-            : _currentWeight! / 2.20462;
-        _currentController.text = _currentWeight!.toStringAsFixed(1);
-        _saveCurrentWeight(_currentWeight!);
-      }
-      // Convert weight log entries
-      for (var i = 0; i < _weightLog.length; i++) {
-        _weightLog[i] = _WeightEntry(
-          date: _weightLog[i].date,
-          weight: wasKg
-              ? _weightLog[i].weight * 2.20462
-              : _weightLog[i].weight / 2.20462,
-        );
-      }
-      _saveWeightLog();
     });
+
+    // Stored values are kept in the active unit, so convert them in the
+    // provider (which owns persistence) when the unit changes.
+    final factor = wasKg ? 2.20462 : 1 / 2.20462;
+    ref
+        .read(weightTrackerProvider.notifier)
+        .convertStoredWeights(factor)
+        .then((_) {
+      if (!mounted) return;
+      final state = ref.read(weightTrackerProvider);
+      if (state.goalWeight != null) {
+        _goalController.text = state.goalWeight!.toStringAsFixed(1);
+      }
+      if (state.currentWeight != null) {
+        _currentController.text = state.currentWeight!.toStringAsFixed(1);
+      }
+    });
+
     HapticFeedback.lightImpact();
   }
 
@@ -229,6 +140,12 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final state = ref.watch(weightTrackerProvider);
+    final goalWeight = state.goalWeight;
+    final currentWeight = state.currentWeight;
+    final weightLog = state.weightLog;
+    final progress = state.progress;
+    final weightLost = state.weightLost;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightGray,
@@ -387,7 +304,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
               ),
 
               // ── Progress Section ─────────────────────────────────────
-              if (_goalWeight != null && _currentWeight != null) ...[
+              if (goalWeight != null && currentWeight != null) ...[
                 const SizedBox(height: AppConstants.spacingLg),
                 SoberCard(
                   padding: const EdgeInsets.all(AppConstants.spacingLg),
@@ -401,10 +318,12 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                       // ── Progress Header ─────────────────────────────
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.trending_up_rounded,
                             size: 20,
-                            color: AppColors.successGreen,
+                            color: isDark
+                                ? AppColors.softTealLight
+                                : AppColors.navyBlue,
                           ),
                           const SizedBox(width: AppConstants.spacingXs),
                           Text(
@@ -427,13 +346,13 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                           AppConstants.radiusFull,
                         ),
                         child: LinearProgressIndicator(
-                          value: _progress,
+                          value: progress,
                           minHeight: 14,
                           backgroundColor: AppColors.successGreen.withValues(
                             alpha: isDark ? 0.12 : 0.1,
                           ),
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            _progress == 1.0
+                            progress == 1.0
                                 ? AppColors.successGreen
                                 : AppColors.softTeal,
                           ),
@@ -446,7 +365,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${_currentWeight!.toStringAsFixed(1)}$_unitLabel',
+                            '${currentWeight.toStringAsFixed(1)}$_unitLabel',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -456,11 +375,11 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                             ),
                           ),
                           Text(
-                            '${_goalWeight!.toStringAsFixed(1)}$_unitLabel',
+                            '${goalWeight.toStringAsFixed(1)}$_unitLabel',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.successGreen,
+                              color: AppColors.softTeal,
                             ),
                           ),
                         ],
@@ -468,7 +387,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                       const SizedBox(height: AppConstants.spacingLg),
 
                       // ── Weight Lost Message ─────────────────────────
-                      if (_weightLost != null && _weightLost! > 0) ...[
+                      if (weightLost != null && weightLost > 0) ...[
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(
@@ -511,7 +430,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                                       CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'You\'ve lost ${_weightLost!.toStringAsFixed(1)}$_unitLabel since quitting!',
+                                      'You\'ve lost ${weightLost.toStringAsFixed(1)}$_unitLabel since quitting!',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
@@ -540,7 +459,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                       ],
 
                       // ── At Goal Message ─────────────────────────────
-                      if (_progress == 1.0) ...[
+                      if (progress == 1.0) ...[
                         const SizedBox(height: AppConstants.spacingSm),
                         Container(
                           width: double.infinity,
@@ -597,22 +516,22 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                       ],
 
                       // ── Initial Progress Message ────────────────────
-                      if ((_weightLost == null || _weightLost! <= 0) &&
-                          _progress != 1.0) ...[
+                      if ((weightLost == null || weightLost <= 0) &&
+                          progress != 1.0) ...[
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(
                             AppConstants.spacingMd,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.skyBlue.withValues(
+                            color: AppColors.softTeal.withValues(
                               alpha: 0.08,
                             ),
                             borderRadius: BorderRadius.circular(
                               AppConstants.radiusSm,
                             ),
                             border: Border.all(
-                              color: AppColors.skyBlue.withValues(
+                              color: AppColors.softTeal.withValues(
                                 alpha: 0.2,
                               ),
                             ),
@@ -624,14 +543,14 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                                 height: 40,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.skyBlue.withValues(
+                                  color: AppColors.softTeal.withValues(
                                     alpha: 0.15,
                                   ),
                                 ),
                                 child: const Icon(
                                   Icons.favorite_rounded,
                                   size: 22,
-                                  color: AppColors.skyBlue,
+                                  color: AppColors.softTeal,
                                 ),
                               ),
                               const SizedBox(width: AppConstants.spacingSm),
@@ -658,7 +577,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
               ],
 
               // ── Log Weight Button ────────────────────────────────────
-              if (_currentWeight != null) ...[
+              if (currentWeight != null) ...[
                 const SizedBox(height: AppConstants.spacingLg),
                 SizedBox(
                   width: double.infinity,
@@ -666,7 +585,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                     onPressed: _logWeight,
                     icon: const Icon(Icons.save_rounded, size: 20),
                     label: Text(
-                      'Log $_currentWeight$_unitLabel',
+                      'Log $currentWeight$_unitLabel',
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.softTeal,
@@ -688,7 +607,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
               ],
 
               // ── Weight Log History ──────────────────────────────────
-              if (_weightLog.isNotEmpty) ...[
+              if (weightLog.isNotEmpty) ...[
                 const SizedBox(height: AppConstants.spacingLg),
                 SoberCard(
                   padding: const EdgeInsets.all(AppConstants.spacingLg),
@@ -719,7 +638,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            '${_weightLog.length} entry${_weightLog.length == 1 ? '' : 'ies'}',
+                            '${weightLog.length} entry${weightLog.length == 1 ? '' : 'ies'}',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -731,7 +650,7 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                         ],
                       ),
                       const SizedBox(height: AppConstants.spacingMd),
-                      ..._weightLog.reversed.take(10).map((entry) {
+                      ...weightLog.reversed.take(10).map((entry) {
                         final months = [
                           'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
@@ -783,16 +702,16 @@ class _WeightTrackerScreenState extends State<WeightTrackerScreen> {
                           ),
                         );
                       }),
-                      if (_weightLog.length > 10)
+                      if (weightLog.length > 10)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            '+${_weightLog.length - 10} more entries',
+                            '+${weightLog.length - 10} more entries',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: isDark
-                                  ? AppColors.skyBlueLight
+                                  ? AppColors.softTealLight
                                   : AppColors.navyBlue,
                             ),
                           ),
@@ -846,95 +765,96 @@ class _WeightInputTile extends StatelessWidget {
                 : AppColors.textSecondary,
           ),
           const SizedBox(width: AppConstants.spacingSm),
-          Expanded(                      child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  label,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDark
-                                        ? AppColors.textOnDarkSecondary
-                                        : AppColors.textTertiary,
-                                  ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: isDark
+                        ? AppColors.textOnDarkSecondary
+                        : AppColors.textTertiary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: controller,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        textInputAction: TextInputAction.done,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: isDark
+                              ? AppColors.textOnDark
+                              : AppColors.textPrimary,
+                        ),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          hintText: '0.0',
+                          hintStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: isDark
+                                ? AppColors.textOnDarkSecondary
+                                    .withValues(alpha: 0.3)
+                                : AppColors.textTertiary
+                                    .withValues(alpha: 0.4),
+                          ),
+                          suffixText: unitLabel,
+                          suffixStyle: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? AppColors.textOnDarkSecondary
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                        onSubmitted: (_) => onSave(),
+                      ),
+                    ),
+                    const SizedBox(width: AppConstants.spacingXs),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: onSave,
+                        borderRadius: BorderRadius.circular(
+                          AppConstants.radiusSm,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.all(
+                            AppConstants.spacingXs,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.navyBlueLight
+                                : AppColors.navyBlue,
+                            borderRadius:
+                                BorderRadius.circular(
+                                  AppConstants.radiusSm,
                                 ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        controller: controller,
-                                        keyboardType: const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
-                                        textInputAction: TextInputAction.done,
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w700,
-                                          color: isDark
-                                              ? AppColors.textOnDark
-                                              : AppColors.textPrimary,
-                                        ),
-                                        decoration: InputDecoration(
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.zero,
-                                          border: InputBorder.none,
-                                          hintText: '0.0',
-                                          hintStyle: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w700,
-                                            color: isDark
-                                                ? AppColors.textOnDarkSecondary
-                                                    .withValues(alpha: 0.3)
-                                                : AppColors.textTertiary
-                                                    .withValues(alpha: 0.4),
-                                          ),
-                                          suffixText: unitLabel,
-                                          suffixStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: isDark
-                                                ? AppColors.textOnDarkSecondary
-                                                : AppColors.textSecondary,
-                                          ),
-                                        ),
-                                        onSubmitted: (_) => onSave(),
-                                      ),
-                                    ),
-                                    const SizedBox(width: AppConstants.spacingXs),
-                                    Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: onSave,
-                                        borderRadius: BorderRadius.circular(
-                                          AppConstants.radiusSm,
-                                        ),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(
-                                            AppConstants.spacingXs,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isDark
-                                                ? AppColors.navyBlueLight
-                                                : AppColors.navyBlue,
-                                            borderRadius:
-                                                BorderRadius.circular(
-                                                  AppConstants.radiusSm,
-                                                ),
-                                          ),
-                                          child: const Icon(
-                                            Icons.check_rounded,
-                                            size: 18,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                          ),
+                          child: const Icon(
+                            Icons.check_rounded,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

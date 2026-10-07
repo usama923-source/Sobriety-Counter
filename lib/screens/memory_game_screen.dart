@@ -219,7 +219,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
                       height: 64,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.skyBlue.withValues(alpha: 0.15),
+                        color: AppColors.softTeal.withValues(alpha: 0.15),
                       ),
                       child: const Text(
                         '🧠',
@@ -387,7 +387,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
             if (!isFaceUp)
               BoxShadow(
                 color: (isDark
-                        ? AppColors.navyBlueDark
+                        ? AppColors.navyBlue
                         : AppColors.navyBlue)
                     .withValues(alpha: 0.2),
                 blurRadius: 8,
@@ -540,7 +540,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
               icon: const Icon(Icons.refresh_rounded, size: 20),
               label: const Text('Play Again'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.successGreen,
+                backgroundColor: AppColors.softTeal,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),

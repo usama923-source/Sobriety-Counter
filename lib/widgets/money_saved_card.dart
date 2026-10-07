@@ -4,6 +4,7 @@ import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/services/savings_service.dart';
 import 'package:quit_drinking/services/sobriety_service.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Section 5 — Money Saved Card.
 ///
@@ -27,10 +28,22 @@ class MoneySavedCard extends StatefulWidget {
 class _MoneySavedCardState extends State<MoneySavedCard> {
   bool _showInputs = false;
 
+  /// Cached SharedPreferences instance, loaded once in [initState].
+  /// The currency is re-read from prefs on every [build] so changes made
+  /// in Settings (key: "currency") show up immediately.
+  SharedPreferences? _prefs;
+
   @override
   void initState() {
     super.initState();
     _syncDays();
+    _loadPrefs();
+  }
+
+  Future<void> _loadPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() => _prefs = prefs);
   }
 
   @override
@@ -50,6 +63,10 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = widget.savingsService;
 
+    // Read the currency on every build so a change made in Settings
+    // (key: "currency") is reflected immediately when returning home.
+    final symbol = _currencySymbol(_prefs?.getString('currency') ?? 'USD');
+
     return SoberCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,13 +78,18 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.successGreen.withValues(alpha: 0.15),
+                  color: (isDark
+                          ? AppColors.softTealLight
+                          : AppColors.navyBlue)
+                      .withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.attach_money_rounded,
                   size: 22,
-                  color: AppColors.successGreen,
+                  color: isDark
+                      ? AppColors.softTealLight
+                      : AppColors.navyBlue,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -109,7 +131,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
             crossFadeState: _showInputs
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
-            firstChild: _buildInputs(isDark),
+            firstChild: _buildInputs(isDark, symbol),
             secondChild: const SizedBox.shrink(),
           ),
 
@@ -122,6 +144,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                 _AnimatedCurrencyValue(
                   value: s.moneySaved,
                   isDark: isDark,
+                  symbol: symbol,
                 ),
                 const SizedBox(height: AppConstants.spacingXxs),
                 Text(
@@ -148,7 +171,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   icon: Icons.block_rounded,
                   label: 'Drinks Avoided',
                   value: s.drinksAvoided.toDouble(),
-                  color: AppColors.skyBlue,
+                  color: AppColors.softTeal,
                   isDark: isDark,
                   decimals: 0,
                 ),
@@ -161,7 +184,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   value: s.dailyCost,
                   color: AppColors.softOrange,
                   isDark: isDark,
-                  prefix: '\$',
+                  prefix: symbol,
                 ),
               ),
             ],
@@ -176,7 +199,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   value: s.monthlySavings,
                   color: AppColors.softTeal,
                   isDark: isDark,
-                  prefix: '\$',
+                  prefix: symbol,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -185,9 +208,9 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   icon: Icons.date_range_rounded,
                   label: 'Yearly Savings',
                   value: s.yearlySavings,
-                  color: AppColors.successGreen,
+                  color: AppColors.softTealDark,
                   isDark: isDark,
-                  prefix: '\$',
+                  prefix: symbol,
                 ),
               ),
             ],
@@ -197,7 +220,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
           const SizedBox(height: AppConstants.spacingMd),
           Center(
             child: Text(
-              'Based on ${s.drinksPerDay} drink${s.drinksPerDay == 1 ? '' : 's'} at \$${s.costPerDrink.toStringAsFixed(2)} each',
+              'Based on ${s.drinksPerDay} drink${s.drinksPerDay == 1 ? '' : 's'} at $symbol${s.costPerDrink.toStringAsFixed(2)} each',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
@@ -212,9 +235,27 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
     );
   }
 
+  /// Map a currency code (as stored in SharedPreferences key "currency")
+  /// to its display symbol. Defaults to \$ for unknown codes.
+  String _currencySymbol(String code) {
+    switch (code) {
+      case 'EUR':
+        return '€';
+      case 'GBP':
+        return '£';
+      case 'CAD':
+        return 'CA\$';
+      case 'AUD':
+        return 'A\$';
+      case 'USD':
+      default:
+        return '\$';
+    }
+  }
+
   // ── Inputs UI ─────────────────────────────────────────────────────
 
-  Widget _buildInputs(bool isDark) {
+  Widget _buildInputs(bool isDark, String symbol) {
     final s = widget.savingsService;
 
     return Column(
@@ -250,7 +291,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   ),
                 ),
                 Text(
-                  '\$${s.costPerDrink.toStringAsFixed(2)}',
+                  '$symbol${s.costPerDrink.toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -262,12 +303,12 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
             const SizedBox(height: AppConstants.spacingXs),
             SliderTheme(
               data: SliderThemeData(
-                activeTrackColor: AppColors.successGreen,
+                activeTrackColor: AppColors.softTeal,
                 inactiveTrackColor: isDark
                     ? AppColors.darkCardAlt
                     : AppColors.lightGrayAlt,
-                thumbColor: AppColors.successGreen,
-                overlayColor: AppColors.successGreen.withValues(alpha: 0.15),
+                thumbColor: AppColors.softTeal,
+                overlayColor: AppColors.softTeal.withValues(alpha: 0.15),
                 trackHeight: 6,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
               ),
@@ -276,7 +317,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                 min: 0.5,
                 max: 50,
                 divisions: 99,
-                label: '\$${s.costPerDrink.toStringAsFixed(2)}',
+                label: '$symbol${s.costPerDrink.toStringAsFixed(2)}',
                 onChanged: (v) => s.setCostPerDrink(v),
               ),
             ),
@@ -284,7 +325,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '\$0.50',
+                  '${symbol}0.50',
                   style: TextStyle(
                     fontSize: 11,
                     color: isDark
@@ -293,7 +334,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   ),
                 ),
                 Text(
-                  '\$50.00',
+                  '${symbol}50.00',
                   style: TextStyle(
                     fontSize: 11,
                     color: isDark
@@ -315,8 +356,13 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
 class _AnimatedCurrencyValue extends StatelessWidget {
   final double value;
   final bool isDark;
+  final String symbol;
 
-  const _AnimatedCurrencyValue({required this.value, required this.isDark});
+  const _AnimatedCurrencyValue({
+    required this.value,
+    required this.isDark,
+    required this.symbol,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -337,14 +383,14 @@ class _AnimatedCurrencyValue extends StatelessWidget {
       child: FittedBox(
         fit: BoxFit.scaleDown,
         child: Text(
-          '\$${_formatAmount(value)}',
-          key: ValueKey(value.toStringAsFixed(1)),
+          '$symbol${_formatAmount(value)}',
+          key: ValueKey('$symbol${value.toStringAsFixed(1)}'),
           style: TextStyle(
             fontSize: 44,
             fontWeight: FontWeight.w300,
             height: 1.0,
             letterSpacing: -1.0,
-            color: AppColors.successGreen,
+            color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
           ),
         ),
       ),
@@ -539,16 +585,16 @@ class _InputRow extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: AppColors.successGreen.withValues(alpha: 0.1),
+                    color: AppColors.softTeal.withValues(alpha: 0.1),
                     border: Border.all(
-                      color: AppColors.successGreen.withValues(alpha: 0.3),
+                      color: AppColors.softTeal.withValues(alpha: 0.3),
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
                     Icons.add_rounded,
                     size: 20,
-                    color: AppColors.successGreen,
+                    color: AppColors.softTeal,
                   ),
                 ),
               ),

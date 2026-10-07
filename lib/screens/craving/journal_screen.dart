@@ -1,31 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/journal_provider.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 
 /// Journal screen — lets users write down how they're feeling during a
-/// craving. Entries are saved to SharedPreferences with timestamps.
-class JournalScreen extends StatefulWidget {
+/// craving. Entries are loaded and saved via Riverpod [journalProvider].
+class JournalScreen extends ConsumerStatefulWidget {
   const JournalScreen({super.key});
 
   @override
-  State<JournalScreen> createState() => _JournalScreenState();
+  ConsumerState<JournalScreen> createState() => _JournalScreenState();
 }
 
-class _JournalScreenState extends State<JournalScreen> {
-  static const _storageKey = 'craving_journal_entries';
-
+class _JournalScreenState extends ConsumerState<JournalScreen> {
   final TextEditingController _controller = TextEditingController();
-  List<_JournalEntry> _entries = [];
-  bool _isLoading = true;
   bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    _loadEntries();
     // Listen for text changes so the Save button rebuilds reactively
     _controller.addListener(() => setState(() {}));
   }
@@ -34,48 +29,6 @@ class _JournalScreenState extends State<JournalScreen> {
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadEntries() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getStringList(_storageKey) ?? [];
-    setState(() {
-      _entries = raw.map((s) => _JournalEntry.fromJson(s)).toList();
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _saveEntry() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-
-    setState(() => _isSaving = true);
-    HapticFeedback.lightImpact();
-
-    final entry = _JournalEntry(
-      text: text,
-      timestamp: DateTime.now(),
-    );
-    _entries.insert(0, entry);
-    _controller.clear();
-
-    await _persistEntries();
-
-    setState(() => _isSaving = false);
-  }
-
-  Future<void> _deleteEntry(int index) async {
-    setState(() => _entries.removeAt(index));
-    await _persistEntries();
-    HapticFeedback.mediumImpact();
-  }
-
-  Future<void> _persistEntries() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      _storageKey,
-      _entries.map((e) => e.toJson()).toList(),
-    );
   }
 
   String _formatDate(DateTime dt) {
@@ -93,6 +46,8 @@ class _JournalScreenState extends State<JournalScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final journalState = ref.watch(journalProvider);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightGray,
@@ -116,7 +71,7 @@ class _JournalScreenState extends State<JournalScreen> {
         ),
         centerTitle: true,
       ),
-      body: _isLoading
+      body: journalState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
               child: Padding(
@@ -176,8 +131,7 @@ class _JournalScreenState extends State<JournalScreen> {
                             minLines: 3,
                             textCapitalization: TextCapitalization.sentences,
                             decoration: InputDecoration(
-                              hintText:
-                                  "Write what's on your mind right now…",
+                              hintText: "Write what's on your mind right now…",
                               filled: true,
                               fillColor: isDark
                                   ? AppColors.darkCard
@@ -221,7 +175,21 @@ class _JournalScreenState extends State<JournalScreen> {
                               child: InkWell(
                                 onTap: _controller.text.trim().isEmpty
                                     ? null
-                                    : _saveEntry,
+                                    : () async {
+                                        if (!_isSaving) {
+                                          _isSaving = true;
+                                          if (mounted) {
+                                            await ref
+                                                .read(journalProvider
+                                                    .notifier)
+                                                .addEntry(_controller.text.trim());
+                                            _controller.clear();
+                                            setState(() {
+                                              _isSaving = false;
+                                            });
+                                          }
+                                        }
+                                      },
                                 borderRadius: BorderRadius.circular(
                                   AppConstants.radiusFull,
                                 ),
@@ -240,8 +208,8 @@ class _JournalScreenState extends State<JournalScreen> {
                                         ? null
                                         : const LinearGradient(
                                             colors: [
-                                              AppColors.softOrange,
-                                              AppColors.softOrangeLight,
+                                              AppColors.navyBlue,
+                                              AppColors.softTeal,
                                             ],
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
@@ -265,8 +233,7 @@ class _JournalScreenState extends State<JournalScreen> {
                                         ? const SizedBox(
                                             width: 20,
                                             height: 20,
-                                            child:
-                                                CircularProgressIndicator(
+                                            child: CircularProgressIndicator(
                                               strokeWidth: 2,
                                               color: Colors.white,
                                             ),
@@ -279,7 +246,8 @@ class _JournalScreenState extends State<JournalScreen> {
                                                 Icons.save_rounded,
                                                 size: 18,
                                                 color: _controller
-                                                        .text.trim().isEmpty
+                                                        .text.trim()
+                                                        .isEmpty
                                                     ? (isDark
                                                         ? AppColors
                                                             .textOnDarkSecondary
@@ -296,7 +264,8 @@ class _JournalScreenState extends State<JournalScreen> {
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w700,
                                                   color: _controller
-                                                          .text.trim().isEmpty
+                                                          .text.trim()
+                                                          .isEmpty
                                                       ? (isDark
                                                           ? AppColors
                                                               .textOnDarkSecondary
@@ -335,7 +304,7 @@ class _JournalScreenState extends State<JournalScreen> {
                             Icons.history_rounded,
                             size: 20,
                             color: isDark
-                                ? AppColors.skyBlueLight
+                                ? AppColors.softTealLight
                                 : AppColors.navyBlue,
                           ),
                         ),
@@ -352,9 +321,9 @@ class _JournalScreenState extends State<JournalScreen> {
                             ),
                           ),
                         ),
-                        if (_entries.isNotEmpty)
+                        if (journalState.entries.isNotEmpty)
                           Text(
-                            '${_entries.length}',
+                            '${journalState.entries.length}',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
@@ -370,12 +339,12 @@ class _JournalScreenState extends State<JournalScreen> {
 
                     // ── Entries List ──────────────────────────────────
                     Expanded(
-                      child: _entries.isEmpty
+                      child: journalState.entries.isEmpty
                           ? _EmptyJournalState(isDark: isDark)
                           : ListView.builder(
-                              itemCount: _entries.length,
+                              itemCount: journalState.entries.length,
                               itemBuilder: (context, index) {
-                                final entry = _entries[index];
+                                final entry = journalState.entries[index];
                                 return _JournalEntryTile(
                                   entry: entry,
                                   index: index,
@@ -432,7 +401,7 @@ class _JournalScreenState extends State<JournalScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              _deleteEntry(index);
+              ref.read(journalProvider.notifier).deleteEntry(index);
               Navigator.pop(ctx);
             },
             style: ElevatedButton.styleFrom(
@@ -451,28 +420,6 @@ class _JournalScreenState extends State<JournalScreen> {
 }
 
 // ── Journal Entry Model ─────────────────────────────────────────────────
-
-class _JournalEntry {
-  final String text;
-  final DateTime timestamp;
-
-  const _JournalEntry({required this.text, required this.timestamp});
-
-  factory _JournalEntry.fromJson(String json) {
-    // Format: "timestamp_unix|text"
-    final parts = json.split('|');
-    if (parts.length >= 2) {
-      final ts = int.tryParse(parts[0]) ?? 0;
-      return _JournalEntry(
-        text: parts.sublist(1).join('|'),
-        timestamp: DateTime.fromMillisecondsSinceEpoch(ts),
-      );
-    }
-    return _JournalEntry(text: json, timestamp: DateTime.now());
-  }
-
-  String toJson() => '${timestamp.millisecondsSinceEpoch}|$text';
-}
 
 // ── Empty State ─────────────────────────────────────────────────────────
 
@@ -535,7 +482,7 @@ class _EmptyJournalState extends StatelessWidget {
 // ── Journal Entry Tile ──────────────────────────────────────────────────
 
 class _JournalEntryTile extends StatelessWidget {
-  final _JournalEntry entry;
+  final JournalEntry entry;
   final int index;
   final bool isDark;
   final String formattedDate;

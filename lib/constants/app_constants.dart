@@ -1,9 +1,9 @@
-/// App-wide constants used throughout Sober Today.
+/// App-wide constants used throughout QuitDrink Ai.
 class AppConstants {
   AppConstants._();
 
   /// Application name
-  static const String appName = 'Sober Today';
+  static const String appName = 'QuitDrink Ai';
   static const String appTagline = 'One day at a time.';
 
   // ── Layout ───────────────────────────────────────────────────────────────

@@ -70,14 +70,24 @@ class SobrietyService extends ChangeNotifier {
   // ── Initialization ────────────────────────────────────────────────────
 
   /// Load the quit date from [SharedPreferences] and start the timer.
+  ///
+  /// Supports both the current ISO-8601 string format ("2026-08-16T...")
+  /// and the legacy int millis format so old installs keep their data.
   Future<void> init() async {
     if (_disposed) return;
     final prefs = await SharedPreferences.getInstance();
     if (_disposed) return;
-    final millis = prefs.getInt(_quitDateKey);
-    if (millis != null) {
-      _quitDate = DateTime.fromMillisecondsSinceEpoch(millis);
+
+    final iso = prefs.getString(_quitDateKey);
+    if (iso != null && iso.isNotEmpty) {
+      _quitDate = DateTime.tryParse(iso);
+    } else {
+      final millis = prefs.getInt(_quitDateKey);
+      if (millis != null) {
+        _quitDate = DateTime.fromMillisecondsSinceEpoch(millis);
+      }
     }
+
     _startTimer();
     notifyListeners();
   }

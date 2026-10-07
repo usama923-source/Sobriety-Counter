@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/sobriety_provider.dart';
 import 'package:quit_drinking/services/checkin_service.dart';
+import 'package:quit_drinking/services/sobriety_service.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Section 10 — Daily Check-In Card.
 ///
 /// Records whether the user stayed alcohol-free or drank today (once per day).
-/// Displays current/longest streak, success percentage, weekly summary, and
-/// a monthly calendar with color-coded days.
-class DailyCheckinCard extends StatelessWidget {
+/// Tapping "I Drank Today" asks for confirmation and resets the sobriety
+/// journey. Displays current/longest streak, success percentage, weekly
+/// summary, and a monthly calendar with color-coded days.
+class DailyCheckinCard extends ConsumerWidget {
   final CheckInService service;
 
   const DailyCheckinCard({super.key, required this.service});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SoberCard(
@@ -99,7 +104,7 @@ class DailyCheckinCard extends StatelessWidget {
                   isDark: isDark,
                   isSelected: service.todayCheckedIn && !service.todaySuccessful,
                   enabled: !service.todayCheckedIn,
-                  onTap: () => service.checkIn(false),
+                  onTap: () => _showDrankDialog(context, ref),
                 ),
               ),
             ],
@@ -190,6 +195,124 @@ class DailyCheckinCard extends StatelessWidget {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return '${months[now.month - 1]} ${now.day}';
+  }
+
+  // ── Drank Dialog ───────────────────────────────────────────────────
+
+  /// Compassionate confirmation before resetting the sobriety journey.
+  /// On confirm, resets [SobrietyService]'s start date to now and refreshes
+  /// the provider so the counter resets immediately on the home screen.
+  Future<void> _showDrankDialog(BuildContext context, WidgetRef ref) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusLg),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppConstants.spacingSm),
+            // Compassionate red heart icon
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.softRed.withValues(alpha: 0.15),
+              ),
+              child: const Icon(
+                Icons.favorite_rounded,
+                size: 32,
+                color: AppColors.softRed,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+            Text(
+              "It's Okay, Don't Give Up",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                height: 1.3,
+                color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingSm),
+            Text(
+              'Every setback is a setup for a comeback. '
+              'Your journey starts again right now. '
+              'You are stronger than you think! 💪',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                height: 1.5,
+                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor:
+                          isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                      side: BorderSide(
+                        color: isDark ? AppColors.darkCardAlt : AppColors.lightGrayAlt,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppConstants.spacingMd,
+                      ),
+                    ),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: AppConstants.spacingMd),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.softRed,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppConstants.spacingMd,
+                      ),
+                    ),
+                    child: const FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text('Reset My Journey'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        'sobriety_start_date',
+        DateTime.now().toIso8601String(),
+      );
+      // Refresh sobriety service so the counter resets immediately
+      await ref.read(sobrietyServiceProvider).init();
+    }
   }
 
   Widget _buildWeeklySummary(bool isDark) {

@@ -7,13 +7,3 @@ final reasonsServiceProvider = ChangeNotifierProvider<ReasonsService>((ref) {
   service.init();
   return service;
 });
-
-/// Provider that exposes the list of reasons.
-final reasonsListProvider = Provider<List<String>>((ref) {
-  return ref.watch(reasonsServiceProvider).reasons;
-});
-
-/// Provider that exposes whether the reasons list is empty.
-final reasonsIsEmptyProvider = Provider<bool>((ref) {
-  return ref.watch(reasonsServiceProvider).isEmpty;
-});

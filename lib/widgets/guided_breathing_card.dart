@@ -41,9 +41,9 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
   late Animation<double> _scaleAnim;
 
   // ── Phase colors ──────────────────────────────────────────────────
-  static const Color _inhaleColor = Color(0xFF7EC8C3);    // softTeal
-  static const Color _holdColor = Color(0xFFA8D0E6);     // skyBlueLight
-  static const Color _exhaleColor = Color(0xFF81C784);    // successGreenLight
+  static const Color _inhaleColor = AppColors.softTeal;    // softTeal
+  static const Color _holdColor = AppColors.softTealLight;     // softTealLight
+  static const Color _exhaleColor = AppColors.softTeal;   // softTeal
 
   Color get _currentColor {
     switch (_currentPhase) {
@@ -217,14 +217,14 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
                 height: 40,
                 decoration: BoxDecoration(
                   color: isDark
-                      ? AppColors.skyBlue.withValues(alpha: 0.2)
-                      : AppColors.skyBlue.withValues(alpha: 0.15),
+                      ? AppColors.softTeal.withValues(alpha: 0.2)
+                      : AppColors.softTeal.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
                 child: const Icon(
                   Icons.self_improvement_rounded,
                   size: 22,
-                  color: AppColors.skyBlue,
+                  color: AppColors.softTeal,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),

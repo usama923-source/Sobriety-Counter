@@ -77,7 +77,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppConstants.spacingSm),
                     Text(
-                      'Please read these terms carefully before using Quit Drinking Ai.',
+                      'Please read these terms carefully before using QuitDrink Ai.',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -94,10 +94,10 @@ class TermsOfServiceScreen extends StatelessWidget {
               // ── Section 1: Acceptance ──────────────────────────────
               _TermsSection(
                 icon: Icons.check_circle_outline_rounded,
-                iconColor: AppColors.successGreen,
+                iconColor: AppColors.skyBlueDark,
                 title: 'Acceptance',
                 body:
-                    'By using Quit Drinking Ai, you agree to these terms of '
+                    'By using QuitDrink Ai, you agree to these terms of '
                     'service. If you do not agree with any part of these terms, '
                     'please refrain from using the application.',
                 isDark: isDark,
@@ -111,7 +111,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                 iconColor: AppColors.softRed,
                 title: 'Not Medical Advice',
                 body:
-                    'Quit Drinking Ai is designed for motivational and '
+                    'QuitDrink Ai is designed for motivational and '
                     'informational purposes only. It is not a substitute for '
                     'professional medical advice, diagnosis, or addiction '
                     'treatment. Always consult a qualified healthcare provider '
@@ -124,7 +124,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               // ── Section 3: AI Chat ─────────────────────────────────
               _TermsSection(
                 icon: Icons.smart_toy_rounded,
-                iconColor: AppColors.skyBlue,
+                iconColor: AppColors.softTeal,
                 title: 'AI Chat',
                 body:
                     'AI-generated responses are provided for support and '
@@ -159,7 +159,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                 title: 'User Responsibility',
                 body:
                     'You are responsible for your own sobriety journey. '
-                    'Quit Drinking Ai is a tool to help you track and stay '
+                    'QuitDrink Ai is a tool to help you track and stay '
                     'motivated — it is not a treatment program. The app '
                     'developers are not responsible for any outcomes related '
                     'to your use of the application.',
@@ -212,7 +212,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                       const SizedBox(width: AppConstants.spacingSm),
                       Expanded(
                         child: SelectableText(
-                          'support.quitdrinking@gmail.com',
+                          'support.quitdrinkai@gmail.com',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,

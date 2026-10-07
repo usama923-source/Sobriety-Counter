@@ -1,12 +1,36 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quit_drinking/theme/app_theme.dart';
-import 'package:quit_drinking/screens/home_screen.dart';
+import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
+import 'package:quit_drinking/theme/app_theme.dart';
+import 'package:quit_drinking/core/services/notification_service.dart';
+import 'package:quit_drinking/firebase_options.dart';
+import 'package:quit_drinking/screens/home_screen.dart';
+import 'package:quit_drinking/screens/onboarding/onboarding_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    // Firebase is optional (analytics + purchase logging) — continue
+    // without it so a broken config never blocks app startup.
+    debugPrint('Firebase failed to initialize (continuing without it): $e');
+  }
+
+  // Set up local notifications (daily reminder)
+  await NotificationService().initialize();
+
+  // Check whether the user has completed onboarding
+  final prefs = await SharedPreferences.getInstance();
+  final onboardingDone = prefs.getBool('onboarding_complete') ?? false;
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -16,16 +40,18 @@ void main() {
     ),
   );
   runApp(
-    const ProviderScope(
-      child: SoberTodayApp(),
+    ProviderScope(
+      child: SoberTodayApp(showOnboarding: !onboardingDone),
     ),
   );
 }
 
-/// Root widget for the Sober Today application.
+/// Root widget for the QuitDrink Ai application.
 /// Wrapped in [ProviderScope] for Riverpod state management.
 class SoberTodayApp extends ConsumerStatefulWidget {
-  const SoberTodayApp({super.key});
+  final bool showOnboarding;
+
+  const SoberTodayApp({super.key, this.showOnboarding = false});
 
   @override
   ConsumerState<SoberTodayApp> createState() => _SoberTodayAppState();
@@ -38,8 +64,8 @@ class _SoberTodayAppState extends ConsumerState<SoberTodayApp> {
   void initState() {
     super.initState();
 
-    // Animate splash screen away after a brief delay
-    Future.delayed(const Duration(milliseconds: 1200), () {
+    // Animate splash screen away after 2 seconds
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         HapticFeedback.lightImpact();
         setState(() => _showSplash = false);
@@ -52,7 +78,7 @@ class _SoberTodayAppState extends ConsumerState<SoberTodayApp> {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
-      title: 'Sober Today',
+      title: 'QuitDrink Ai',
       debugShowCheckedModeBanner: false,
 
       // ── Theme ──────────────────────────────────────────────────────────
@@ -61,14 +87,17 @@ class _SoberTodayAppState extends ConsumerState<SoberTodayApp> {
       themeMode: themeMode,
 
       // ── Home ───────────────────────────────────────────────────────────
-      home: _showSplash ? const _SplashScreen() : const HomeScreen(),
+      home: _showSplash
+          ? const _SplashScreen()
+          : (widget.showOnboarding
+              ? const OnboardingScreen()
+              : const HomeScreen()),
 
       // ── General ────────────────────────────────────────────────────────
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.noScaling,
-          ),
+          // Respect the user's system text-scaling setting for accessibility.
+          data: MediaQuery.of(context),
           child: child!,
         );
       },
@@ -94,16 +123,17 @@ class _SplashScreenState extends State<_SplashScreen>
   @override
   void initState() {
     super.initState();
+    // 2 second total: ~1.2s logo fade+scale, then ~0.8s staggered name+tagline.
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 2000),
     );
 
     _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
 
-    _scaleAnim = Tween<double>(begin: 0.8, end: 1.0).animate(
+    _scaleAnim = Tween<double>(begin: 0.6, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
     );
 

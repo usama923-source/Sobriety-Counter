@@ -82,7 +82,7 @@ class SobrietyCounterCard extends StatelessWidget {
             icon: Icons.trending_up_rounded,
             label: 'Current streak',
             value: '${service.totalDays} day${service.totalDays == 1 ? '' : 's'}',
-            valueColor: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
+            valueColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
             isDark: isDark,
           ),
           const SizedBox(height: AppConstants.spacingSm),
@@ -98,150 +98,9 @@ class SobrietyCounterCard extends StatelessWidget {
 
           // ── Milestone Badges ───────────────────────────────────────
           MilestoneBadges(milestones: service.milestonesWithStatus),
-
-          const SizedBox(height: AppConstants.spacingLg),
-
-          // ── I Drank Button ────────────────────────────────────────
-          Center(
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _showResetDialog(context, service),
-                icon: Icon(
-                  Icons.refresh_rounded,
-                  size: 18,
-                  color: isDark
-                      ? AppColors.textOnDarkSecondary.withValues(alpha: 0.7)
-                      : AppColors.textSecondary.withValues(alpha: 0.8),
-                ),
-                label: Text(
-                  'I Drank',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.textOnDarkSecondary.withValues(alpha: 0.7)
-                        : AppColors.textSecondary.withValues(alpha: 0.8),
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: isDark
-                        ? AppColors.darkCardAlt
-                        : AppColors.lightGrayAlt,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.radiusSm),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: AppConstants.spacingMd,
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     );
-  }
-
-  // ── Reset Dialog ───────────────────────────────────────────────────
-
-  Future<void> _showResetDialog(BuildContext context, SobrietyService service) async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.white,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppConstants.radiusLg),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: AppConstants.spacingSm),
-            // Compassionate icon
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.softOrange.withValues(alpha: 0.15),
-              ),
-              child: const Icon(
-                Icons.favorite_rounded,
-                size: 32,
-                color: AppColors.softOrange,
-              ),
-            ),
-            const SizedBox(height: AppConstants.spacingLg),
-            Text(
-              'It\'s okay, every day is a new chance.\nYour journey continues now.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                height: 1.5,
-                color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: AppConstants.spacingSm),
-            Text(
-              'Your sobriety timer will reset to zero.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-                height: 1.4,
-                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: AppConstants.spacingLg),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(ctx, false),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
-                      side: BorderSide(
-                        color: isDark ? AppColors.darkCardAlt : AppColors.lightGrayAlt,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppConstants.radiusSm),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingMd),
-                    ),
-                    child: const Text('Cancel'),
-                  ),
-                ),
-                const SizedBox(width: AppConstants.spacingMd),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(ctx, true),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.softOrange,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppConstants.radiusSm),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingMd),
-                    ),
-                    child: const Text('Confirm'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      await service.resetSobriety();
-    }
   }
 
   // ── No-Date State ──────────────────────────────────────────────────
@@ -256,14 +115,14 @@ class SobrietyCounterCard extends StatelessWidget {
             height: 64,
             decoration: BoxDecoration(
               color: isDark
-                  ? AppColors.skyBlue.withValues(alpha: 0.15)
+                  ? AppColors.softTeal.withValues(alpha: 0.15)
                   : AppColors.mint,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.calendar_today_rounded,
               size: 28,
-              color: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
+              color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),
@@ -294,8 +153,8 @@ class SobrietyCounterCard extends StatelessWidget {
               icon: const Icon(Icons.edit_calendar_rounded, size: 20),
               label: const Text('Set Quit Date'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
-                foregroundColor: isDark ? AppColors.navyBlueDark : AppColors.white,
+                backgroundColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+                foregroundColor: isDark ? AppColors.navyBlue : AppColors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
@@ -339,7 +198,7 @@ class SobrietyCounterCard extends StatelessWidget {
               dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
                   return Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.skyBlueLight
+                      ? AppColors.softTealLight
                       : AppColors.navyBlue;
                 }
                 return null;

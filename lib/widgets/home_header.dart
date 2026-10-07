@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
+import 'package:quit_drinking/widgets/app_logo.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 
 /// Section 1 — Header: App name, tagline, greeting, and a small motivational icon.
@@ -27,36 +28,8 @@ class HomeHeader extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingXxs),
 
-          // ── App Name + Icon ─────────────────────────────────────────
-          Row(
-            children: [
-              Text(
-                AppConstants.appName,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
-                  color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(width: AppConstants.spacingSm),
-              AnimatedContainer(
-                duration: AppConstants.animationSlow,
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.skyBlue.withValues(alpha: 0.2)
-                      : AppColors.mint,
-                  borderRadius: BorderRadius.circular(AppConstants.radiusSm),
-                ),
-                child: Icon(
-                  Icons.spa_rounded,
-                  size: AppConstants.iconMd,
-                  color: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
-                ),
-              ),
-            ],
-          ),
+          // ── App Name + Logo ─────────────────────────────────────────
+          const AppLogo(size: 56, isDark: isDark),
           const SizedBox(height: AppConstants.spacingXxs),
 
           // ── Tagline ─────────────────────────────────────────────────

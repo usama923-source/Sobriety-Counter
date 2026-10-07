@@ -118,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   isDark ? AppColors.darkSurfaceAlt : AppColors.white,
               surfaceTintColor: Colors.transparent,
               headerBackgroundColor:
-                  isDark ? AppColors.navyBlueDark : AppColors.navyBlue,
+                  AppColors.navyBlue,
               headerForegroundColor: AppColors.white,
               todayForegroundColor:
                   WidgetStateProperty.all(AppColors.navyBlue),
@@ -304,7 +304,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: AppConstants.spacingLg),
 
           Text(
-            'Welcome to\nQuit Drinking Ai',
+            'Welcome to\nQuitDrink Ai',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 32,
@@ -371,7 +371,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               vertical: AppConstants.spacingSm,
             ),
             decoration: BoxDecoration(
-              color: AppColors.successGreen.withValues(alpha: 0.08),
+              color: AppColors.softTeal.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppConstants.radiusSm),
             ),
             child: Row(
@@ -380,7 +380,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Icon(
                   Icons.lock_outline_rounded,
                   size: 16,
-                  color: AppColors.successGreen,
+                  color: AppColors.softTeal,
                 ),
                 const SizedBox(width: AppConstants.spacingXs),
                 Flexible(
@@ -390,7 +390,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       height: 1.3,
-                      color: AppColors.successGreen,
+                      color: AppColors.softTeal,
                     ),
                   ),
                 ),
@@ -416,12 +416,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.skyBlue.withValues(alpha: 0.15),
+              color: AppColors.softTeal.withValues(alpha: 0.15),
             ),
             child: const Icon(
               Icons.calendar_today_rounded,
               size: 32,
-              color: AppColors.skyBlue,
+              color: AppColors.softTeal,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),
@@ -576,12 +576,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.successGreen.withValues(alpha: 0.15),
+              color: AppColors.softTeal.withValues(alpha: 0.15),
             ),
             child: const Icon(
               Icons.monetization_on_rounded,
               size: 32,
-              color: AppColors.successGreen,
+              color: AppColors.softTeal,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),

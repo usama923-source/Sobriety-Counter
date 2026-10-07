@@ -64,9 +64,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   bool _showDisclaimer = true;
 
   /// Whether a real API key is configured (vs. the placeholder value).
-  bool get _hasRealApiKey =>
-      ApiConfig.apiKey.isNotEmpty &&
-      ApiConfig.apiKey != 'YOUR_API_KEY_HERE';
+  bool get _hasRealApiKey => ApiConfig.hasRealApiKey;
 
   // ── Welcome Messages ──────────────────────────────────────────────────
 
@@ -174,6 +172,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
     final trimmed = text.trim();
     if (trimmed.isEmpty || _isSending) return;
 
+    debugPrint('API Key exists: $_hasRealApiKey');
+    debugPrint('Sending to: ${ApiConfig.apiUrl}');
+
     HapticFeedback.lightImpact();
 
     // Add user message
@@ -255,7 +256,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
           'temperature': 0.7,
           'max_tokens': 300,
         }),
-      );
+      )
+      .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -514,7 +516,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: isDark
-                      ? [AppColors.skyBlueLight, AppColors.skyBlue]
+                      ? [AppColors.softTealLight, AppColors.softTeal]
                       : [AppColors.navyBlue, AppColors.navyBlueLight],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -544,7 +546,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                     color:
-                        _hasRealApiKey ? AppColors.successGreen : AppColors.softOrange,
+                        _hasRealApiKey ? AppColors.softTeal : AppColors.softOrange,
                   ),
                 ),
               ],
@@ -613,9 +615,14 @@ class _AIChatScreenState extends State<AIChatScreen> {
                       'If you\'re in crisis, please call a helpline.',
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         height: 1.4,
-                        color: AppColors.softOrange.withValues(alpha: 0.9),
+                        // High-contrast text colors — this is safety-critical
+                        // copy and must stay readable (softOrange on the
+                        // orange-tinted banner was ~1.7:1).
+                        color: isDark
+                            ? AppColors.textOnDark
+                            : AppColors.textPrimary,
                       ),
                     ),
                   ),
@@ -690,7 +697,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
             child: Icon(
               Icons.smart_toy_rounded,
               size: 36,
-              color: isDark ? AppColors.skyBlueLight : AppColors.navyBlue,
+              color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),
@@ -903,7 +910,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                         ? (isDark
                             ? AppColors.darkCardAlt
                             : AppColors.lightGrayAlt)
-                        : (isDark ? AppColors.skyBlueLight : AppColors.navyBlue),
+                        : (isDark ? AppColors.softTealLight : AppColors.navyBlue),
                     shape: BoxShape.circle,
                   ),
                   child: _isSending
@@ -913,7 +920,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: isDark
-                                ? AppColors.navyBlueDark
+                                ? AppColors.navyBlue
                                 : AppColors.white,
                           ),
                         )
@@ -926,7 +933,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                                       .withValues(alpha: 0.4)
                                   : AppColors.textTertiary)
                               : (isDark
-                                  ? AppColors.navyBlueDark
+                                  ? AppColors.navyBlue
                                   : AppColors.white),
                         ),
                 ),
@@ -974,7 +981,7 @@ class _MessageBubble extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: message.isUser
-                  ? (isDark ? AppColors.skyBlueLight : AppColors.navyBlue)
+                  ? (isDark ? AppColors.softTealLight : AppColors.navyBlue)
                   : (isDark ? AppColors.darkCardAlt : AppColors.white),
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(AppConstants.radiusLg),
@@ -1013,14 +1020,14 @@ class _MessageBubble extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: isDark
-                                ? AppColors.skyBlueLight
+                                ? AppColors.softTealLight
                                 : AppColors.navyBlue,
                           ),
                           child: Icon(
                             Icons.smart_toy_rounded,
                             size: 10,
                             color: isDark
-                                ? AppColors.navyBlueDark
+                                ? AppColors.navyBlue
                                 : AppColors.white,
                           ),
                         ),
@@ -1031,7 +1038,7 @@ class _MessageBubble extends StatelessWidget {
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: isDark
-                                ? AppColors.skyBlueLight
+                                ? AppColors.softTealLight
                                 : AppColors.navyBlue,
                           ),
                         ),
@@ -1047,7 +1054,7 @@ class _MessageBubble extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                     height: 1.5,
                     color: message.isUser
-                        ? (isDark ? AppColors.navyBlueDark : AppColors.white)
+                        ? (isDark ? AppColors.navyBlue : AppColors.white)
                         : (isDark ? AppColors.textOnDark : AppColors.textPrimary),
                   ),
                 ),
