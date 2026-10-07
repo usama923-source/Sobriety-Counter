@@ -75,17 +75,22 @@ class SobrietyService extends ChangeNotifier {
   /// and the legacy int millis format so old installs keep their data.
   Future<void> init() async {
     if (_disposed) return;
-    final prefs = await SharedPreferences.getInstance();
-    if (_disposed) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (_disposed) return;
 
-    final iso = prefs.getString(_quitDateKey);
-    if (iso != null && iso.isNotEmpty) {
-      _quitDate = DateTime.tryParse(iso);
-    } else {
-      final millis = prefs.getInt(_quitDateKey);
-      if (millis != null) {
-        _quitDate = DateTime.fromMillisecondsSinceEpoch(millis);
+      final iso = prefs.getString(_quitDateKey);
+      if (iso != null && iso.isNotEmpty) {
+        _quitDate = DateTime.tryParse(iso);
+      } else {
+        final millis = prefs.getInt(_quitDateKey);
+        if (millis != null) {
+          _quitDate = DateTime.fromMillisecondsSinceEpoch(millis);
+        }
       }
+    } catch (_) {
+      // Corrupted/unreadable prefs fall back to "no quit date yet".
+      _quitDate = null;
     }
 
     _startTimer();

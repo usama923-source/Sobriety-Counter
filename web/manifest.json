@@ -1,11 +1,11 @@
 {
-    "name": "quit_drinking",
-    "short_name": "quit_drinking",
+    "name": "QuitDrink Ai",
+    "short_name": "QuitDrink Ai",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Track your sobriety, resist cravings, and celebrate every alcohol-free day.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

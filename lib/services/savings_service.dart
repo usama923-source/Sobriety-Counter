@@ -47,9 +47,15 @@ class SavingsService extends ChangeNotifier {
   // ── Initialization ─────────────────────────────────────────────────
 
   Future<void> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    _drinksPerDay = prefs.getInt(_drinksPerDayKey) ?? 5;
-    _costPerDrink = prefs.getDouble(_costPerDrinkKey) ?? 5.0;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _drinksPerDay = prefs.getInt(_drinksPerDayKey) ?? 5;
+      _costPerDrink = prefs.getDouble(_costPerDrinkKey) ?? 5.0;
+    } catch (_) {
+      // Corrupted/unreadable prefs fall back to the default values.
+      _drinksPerDay = 5;
+      _costPerDrink = 5.0;
+    }
     notifyListeners();
   }
 

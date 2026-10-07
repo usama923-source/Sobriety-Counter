@@ -654,8 +654,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   RepaintBoundary(
                     child: _AnimatedCardWrapper(
                       index: 2,
-                      child: SobrietyCounterCard(
-                        service: ref.watch(sobrietyServiceProvider),
+                      // Only this card rebuilds on the once-per-second tick.
+                      child: Consumer(
+                        builder: (context, ref, _) => SobrietyCounterCard(
+                          service: ref.watch(sobrietyServiceProvider),
+                        ),
                       ),
                     ),
                   ),
@@ -724,7 +727,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       index: 8,
                       child: MoneySavedCard(
                         savingsService: ref.watch(savingsServiceProvider),
-                        sobrietyService: ref.watch(sobrietyServiceProvider),
+                        // read (not watch): this card must not rebuild on the
+                        // once-per-second sobriety counter tick.
+                        sobrietyService: ref.read(sobrietyServiceProvider),
                       ),
                     ),
                   ),
