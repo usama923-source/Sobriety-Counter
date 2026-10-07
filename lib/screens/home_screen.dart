@@ -927,7 +927,6 @@ class _DrawerProMenuItem extends StatelessWidget {
                 vertical: 4,
               ),
               decoration: BoxDecoration(
-              decoration: BoxDecoration(
                 color: AppColors.gold,
                 borderRadius: BorderRadius.circular(6),
                 boxShadow: [

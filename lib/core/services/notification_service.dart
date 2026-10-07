@@ -1,44 +1,13 @@
 import 'dart:io' show Platform;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, debugPrint;
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
-/// Debug helper: sends one handheld notification so the user can verify
-/// the plugin + permissions + channel are all wired up correctly.
-Future<void> _sendTestNotification() async {
-  if (kIsWeb) return;
-  try {
-    await _instance.initialize();
-    await _instance._plugin.zonedSchedule(
-      9999,
-      'Test Reminder',
-      'This is a test notification to confirm the daily reminder is working.',
-      tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          _dailyReminderChannelId,
-          _dailyReminderChannelName,
-          channelDescription: 'Test notification for QuitDrink Ai',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      ),
-    );
-  } catch (e) {
-    debugPrint('[NotificationService] test notification failed: $e');
-  }
-}
+import 'package:quit_drinking/core/services/firebase_service.dart';
 
 /// Service responsible for scheduling, cancelling, and displaying daily
 /// reminder notifications.
@@ -64,6 +33,39 @@ class NotificationService {
   // ── SharedPreferences keys ─────────────────────────────────────────────
   static const String _enabledKey = 'reminder_enabled';
   static const String _timeKey = 'reminder_time';
+
+  /// Debug helper: sends one handheld notification so the user can verify
+  /// the plugin + permissions + channel are all wired up correctly.
+  static Future<void> _sendTestNotification() async {
+    if (kIsWeb) return;
+    try {
+      await _instance.initialize();
+      await _instance._plugin.zonedSchedule(
+        id: 9999,
+        title: 'Test Reminder',
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        body: 'This is a test notification to confirm the daily reminder is working.',
+        scheduledDate: tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            _dailyReminderChannelId,
+            _dailyReminderChannelName,
+            channelDescription: 'Test notification for QuitDrink Ai',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint('[NotificationService] test notification failed: $e');
+    }
+  }
 
   // ── Initialization ──────────────────────────────────────────────────────
 
@@ -105,11 +107,15 @@ class NotificationService {
       final androidImpl =
           _plugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
-      if (androidImpl != null &&
-          !(await androidImpl.isExactAlarmPermissionGranted())) {
-        debugPrint(
-          '[NotificationService] exact alarm denied — using inexact schedule fallback',
-        );
+      // v22.3.1: isExactAlarmPermissionGranted() was removed; use
+      // canScheduleExactNotifications() (returns Future<bool?>).
+      if (androidImpl != null) {
+        final canExactAlarm1 = await androidImpl.canScheduleExactNotifications();
+        if (canExactAlarm1 ?? false) {
+          debugPrint(
+            '[NotificationService] exact alarm denied — using inexact schedule fallback',
+          );
+        }
       }
     }
 
@@ -181,21 +187,26 @@ class NotificationService {
       // Try exact alarm mode first, but fall back to inexact if the user
       // denied the exact-alarm permission. Repeated daily reminders at the
       // same clock time work with either mode.
-      AndroidScheduleMode scheduleMode;
+      AndroidScheduleMode scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
       if (Platform.isAndroid) {
         final androidImpl =
             _plugin.resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin>();
-        if (androidImpl != null &&
-            await androidImpl.isExactAlarmPermissionGranted()) {
-          scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
+        // v22.3.1: isExactAlarmPermissionGranted() was removed; use
+        // canScheduleExactNotifications() (returns Future<bool?>).
+        if (androidImpl != null) {
+          final canExactAlarm2 = await androidImpl.canScheduleExactNotifications();
+          if (canExactAlarm2 ?? false) {
+            scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
+          } else {
+            scheduleMode = AndroidScheduleMode.inexactAllowWhileIdle;
+            debugPrint(
+              '[NotificationService] exact alarm denied — using inexact fallback',
+            );
+          }
         } else {
-          scheduleMode = AndroidScheduleMode.inexactAllowWhileIdle;
-          debugPrint(
-            '[NotificationService] exact alarm denied — using inexact fallback',
-          );
+          scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
         }
-      } else {
         scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
       }
 
@@ -296,9 +307,13 @@ class NotificationService {
         final androidImpl =
             _plugin.resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin>();
-        if (androidImpl != null &&
-            !(await androidImpl.isExactAlarmPermissionGranted())) {
-          scheduleMode = AndroidScheduleMode.inexactAllowWhileIdle;
+        // v22.3.1: isExactAlarmPermissionGranted() was removed; use
+        // canScheduleExactNotifications() (returns Future<bool?>).
+        if (androidImpl != null) {
+          final canExactAlarm3 = await androidImpl.canScheduleExactNotifications();
+          if (!(canExactAlarm3 ?? false)) {
+            scheduleMode = AndroidScheduleMode.inexactAllowWhileIdle;
+          }
         }
       }
 
