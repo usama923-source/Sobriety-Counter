@@ -29,7 +29,7 @@ class HomeHeader extends StatelessWidget {
           const SizedBox(height: AppConstants.spacingXxs),
 
           // ── App Name + Logo ─────────────────────────────────────────
-          const AppLogo(size: 56, isDark: isDark),
+          AppLogo(size: 56, isDark: isDark),
           const SizedBox(height: AppConstants.spacingXxs),
 
           // ── Tagline ─────────────────────────────────────────────────

@@ -389,12 +389,6 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                                           : AppColors.textTertiary
                                               .withValues(alpha: 0.3),
                                     ),
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: AppColors.softTeal,
-                                        width: 3,
-                                      ),
-                                    ),
                                   ),
                                 child: Center(
                                   child: Text(

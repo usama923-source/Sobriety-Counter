@@ -184,15 +184,19 @@ class _CravingActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final widget = this;
-    return SoberCard(
-      color: action.color.withValues(alpha: isDark ? 0.1 : 0.07),
-      border: Border.all(
-        color: action.color.withValues(alpha: isDark ? 0.15 : 0.1),
-      ),
-      hasShadow: false,
+    return InkWell(
       onTap: () => _onActionTap(context),
-      child: Row(
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
+      borderRadius: BorderRadius.circular(AppConstants.radiusLg),
+      child: SoberCard(
+        color: action.color.withValues(alpha: isDark ? 0.1 : 0.07),
+        border: Border.all(
+          color: action.color.withValues(alpha: isDark ? 0.15 : 0.1),
+        ),
+        hasShadow: false,
+        enableHoverEffect: false,
+        child: Row(
         children: [
           // Icon container
           Container(
@@ -242,12 +246,13 @@ class _CravingActionTile extends StatelessWidget {
             color: action.color.withValues(alpha: 0.5),
           ),
         ],
+        ),
       ),
     );
   }
 
   void _onActionTap(BuildContext context) {
-    switch (widget.index) {
+    switch (index) {
       case 0:
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -296,9 +301,9 @@ class _CravingActionTile extends StatelessWidget {
           SnackBar(
             content: Row(
               children: [
-                Icon(widget.action.icon, size: 18, color: Colors.white),
+                Icon(action.icon, size: 18, color: Colors.white),
                 const SizedBox(width: AppConstants.spacingXs),
-                Text('${widget.action.label} — great choice!'),
+                Text('${action.label} — great choice!'),
               ],
             ),
             behavior: SnackBarBehavior.floating,

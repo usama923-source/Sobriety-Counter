@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
-import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/screens/craving/craving_actions_screen.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
