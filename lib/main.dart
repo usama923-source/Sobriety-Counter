@@ -26,6 +26,9 @@ Future<void> main() async {
   // Set up local notifications (daily reminder)
   await NotificationService().initialize();
 
+  // Re-schedule the daily reminder if the user had it enabled previously.
+  await NotificationService().syncScheduledReminder();
+
   // Check whether the user has completed onboarding
   final prefs = await SharedPreferences.getInstance();
   final onboardingDone = prefs.getBool('onboarding_complete') ?? false;

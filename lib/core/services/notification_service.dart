@@ -95,6 +95,10 @@ class NotificationService {
 
     await _plugin.initialize(settings: initSettings);
 
+    // Create the notification channel up-front so it exists before any
+    // reminder is scheduled (required on Android 8+).
+    await _createDailyChannel();
+
     // Request notification permission on Android 13+.
     // Note: exact alarm permission cannot be requested at runtime, so we
     // fall back to AndroidScheduleMode.inexactAllowWhileIdle for repeated
@@ -147,6 +151,22 @@ class NotificationService {
 
   // ── Notification Details ────────────────────────────────────────────────
 
+  /// Create the Android notification channel used for daily reminders.
+  /// Created before scheduling so the channel is guaranteed to exist.
+  Future<void> _createDailyChannel() async {
+    if (kIsWeb || !Platform.isAndroid) return;
+    const channel = AndroidNotificationChannel(
+      _dailyReminderChannelId,
+      _dailyReminderChannelName,
+      description: 'Daily reminder to check in with your sobriety journey',
+      importance: Importance.high,
+    );
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  }
+
   NotificationDetails _dailyDetails() {
     return const NotificationDetails(
       android: AndroidNotificationDetails(
@@ -196,18 +216,13 @@ class NotificationService {
         // canScheduleExactNotifications() (returns Future<bool?>).
         if (androidImpl != null) {
           final canExactAlarm2 = await androidImpl.canScheduleExactNotifications();
-          if (canExactAlarm2 ?? false) {
-            scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
-          } else {
+          if (!(canExactAlarm2 ?? false)) {
             scheduleMode = AndroidScheduleMode.inexactAllowWhileIdle;
             debugPrint(
               '[NotificationService] exact alarm denied — using inexact fallback',
             );
           }
-        } else {
-          scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
         }
-        scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
       }
 
       await _plugin.zonedSchedule(
