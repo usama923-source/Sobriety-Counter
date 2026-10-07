@@ -171,14 +171,7 @@ class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
                               vertical: AppConstants.spacingMd,
                             ),
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.navyBlue,
-                                  AppColors.softTeal,
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
+                              color: AppColors.softTeal,
                               borderRadius: BorderRadius.circular(
                                 AppConstants.radiusFull,
                               ),

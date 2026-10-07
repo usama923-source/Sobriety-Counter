@@ -308,23 +308,7 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                                   vertical: AppConstants.spacingMd,
                                 ),
                                 decoration: BoxDecoration(
-                                  gradient: _isComplete
-                                      ? const LinearGradient(
-                                          colors: [
-                                            AppColors.successGreen,
-                                            AppColors.successGreenLight,
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        )
-                                      : LinearGradient(
-                                          colors: [
-                                            accent,
-                                            accent.withValues(alpha: 0.7),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
+                                  color: AppColors.softTeal,
                                   borderRadius: BorderRadius.circular(
                                     AppConstants.radiusFull,
                                   ),

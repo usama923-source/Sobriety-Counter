@@ -455,32 +455,7 @@ class _BreathingScreenState extends State<BreathingScreen>
                                   vertical: AppConstants.spacingMd,
                                 ),
                                 decoration: BoxDecoration(
-                                  gradient: _isActive
-                                      ? const LinearGradient(
-                                          colors: [
-                                            AppColors.softRed,
-                                            AppColors.softRedLight,
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        )
-                                      : _isComplete
-                                          ? const LinearGradient(
-                                              colors: [
-                                                AppColors.successGreen,
-                                                AppColors.successGreenLight,
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            )
-                                          : const LinearGradient(
-                                              colors: [
-                                                AppColors.navyBlue,
-                                                AppColors.softTeal,
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
+                                  color: AppColors.softTeal,
                                   borderRadius: BorderRadius.circular(
                                     AppConstants.radiusFull,
                                   ),

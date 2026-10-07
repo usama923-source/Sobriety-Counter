@@ -119,8 +119,10 @@ class _SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<_SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _fadeAnim;
-  late Animation<double> _scaleAnim;
+  late Animation<double> _logoFade;
+  late Animation<double> _logoScale;
+  late Animation<double> _nameFade;
+  late Animation<double> _taglineFade;
 
   @override
   void initState() {
@@ -131,12 +133,34 @@ class _SplashScreenState extends State<_SplashScreen>
       duration: const Duration(milliseconds: 2000),
     );
 
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    // Logo fades + scales first, then the name, then the tagline. Intervals
+    // split the same 2s controller so the sequence is staggered.
+    _logoFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+      ),
     );
 
-    _scaleAnim = Tween<double>(begin: 0.6, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    _logoScale = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOutBack),
+      ),
+    );
+
+    _nameFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.5, 0.75, curve: Curves.easeOut),
+      ),
+    );
+
+    _taglineFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.75, 1.0, curve: Curves.easeOut),
+      ),
     );
 
     _controller.forward();
@@ -159,14 +183,14 @@ class _SplashScreenState extends State<_SplashScreen>
           backgroundColor:
               isDark ? const Color(0xFF121B28) : const Color(0xFFF5F7FA),
           body: Center(
-            child: FadeTransition(
-              opacity: _fadeAnim,
-              child: ScaleTransition(
-                scale: _scaleAnim,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FadeTransition(
+                  opacity: _logoFade,
+                  child: ScaleTransition(
+                    scale: _logoScale,
+                    child: Container(
                       width: 80,
                       height: 80,
                       decoration: BoxDecoration(
@@ -183,32 +207,38 @@ class _SplashScreenState extends State<_SplashScreen>
                             : const Color(0xFF1E3A5F),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Sober Today',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w700,
-                        color: isDark
-                            ? const Color(0xFFF7FAFC)
-                            : const Color(0xFF1A202C),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'One day at a time.',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                        fontStyle: FontStyle.italic,
-                        color: isDark
-                            ? const Color(0xFFB0BEC5)
-                            : const Color(0xFF718096),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 24),
+                FadeTransition(
+                  opacity: _nameFade,
+                  child: Text(
+                    'Sober Today',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w700,
+                      color: isDark
+                          ? const Color(0xFFF7FAFC)
+                          : const Color(0xFF1A202C),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                FadeTransition(
+                  opacity: _taglineFade,
+                  child: Text(
+                    'One day at a time.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w300,
+                      fontStyle: FontStyle.italic,
+                      color: isDark
+                          ? const Color(0xFFB0BEC5)
+                          : const Color(0xFF718096),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );

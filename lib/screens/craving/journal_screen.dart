@@ -203,17 +203,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                         ? (isDark
                                             ? AppColors.darkCard
                                             : AppColors.lightGrayAlt)
-                                        : null,
-                                    gradient: _controller.text.trim().isEmpty
-                                        ? null
-                                        : const LinearGradient(
-                                            colors: [
-                                              AppColors.navyBlue,
-                                              AppColors.softTeal,
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
+                                        : AppColors.softTeal,
                                     borderRadius: BorderRadius.circular(
                                       AppConstants.radiusFull,
                                     ),
