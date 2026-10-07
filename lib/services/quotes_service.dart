@@ -34,10 +34,15 @@ class QuotesService extends ChangeNotifier {
 
   /// Load saved favorites from SharedPreferences.
   Future<void> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getStringList(_favoritesKey);
-    if (raw != null) {
-      _favoriteIndices = raw.map(int.parse).toSet();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getStringList(_favoritesKey);
+      if (raw != null) {
+        _favoriteIndices = raw.map(int.tryParse).whereType<int>().toSet();
+      }
+    } catch (_) {
+      // Corrupted/unreadable cache falls back to no favorites.
+      _favoriteIndices = {};
     }
     notifyListeners();
   }
