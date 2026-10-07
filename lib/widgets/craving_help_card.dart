@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/screens/craving/craving_actions_screen.dart';
@@ -16,6 +17,7 @@ class CravingHelpCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SoberCard(
+      enableHoverEffect: false,
       color: isDark
           ? AppColors.softTeal.withValues(alpha: 0.06)
           : AppColors.mintLight,
@@ -109,58 +111,81 @@ class CravingHelpCard extends StatelessWidget {
 
 // ── Calming Craving Button ──────────────────────────────────────────────
 
-class _CalmCravingButton extends StatelessWidget {
+class _CalmCravingButton extends StatefulWidget {
   final VoidCallback onTap;
 
   const _CalmCravingButton({required this.onTap});
 
   @override
+  State<_CalmCravingButton> createState() => _CalmCravingButtonState();
+}
+
+class _CalmCravingButtonState extends State<_CalmCravingButton> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed != value) setState(() => _pressed = value);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // The Material owns the solid color and rounded shape, and clips the ink,
+    // so the ripple/highlight paints ON the button instead of behind it.
     return SizedBox(
       width: double.infinity,
-      child: Material(
-        color: AppColors.softTeal,
-        borderRadius: BorderRadius.circular(50),
-        child: InkWell(
-          onTap: onTap,
+      child: AnimatedScale(
+        scale: _pressed ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: Material(
+          color: AppColors.softTeal,
           borderRadius: BorderRadius.circular(50),
-          // No splash / highlight animation. The button keeps its solid teal
-          // background and the navigation behavior is unchanged.
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppConstants.spacingMd,
-              vertical: 12,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.self_improvement_rounded,
-                  size: 20,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: AppConstants.spacingXs),
-                Flexible(
-                  child: Text(
-                    'Tap for calming activities',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              widget.onTap();
+            },
+            onTapDown: (_) => _setPressed(true),
+            onTapUp: (_) => _setPressed(false),
+            onTapCancel: () => _setPressed(false),
+            borderRadius: BorderRadius.circular(50),
+            splashColor: Colors.white.withValues(alpha: 0.2),
+            highlightColor: Colors.white.withValues(alpha: 0.08),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.spacingMd,
+                vertical: 12,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.self_improvement_rounded,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: AppConstants.spacingXs),
+                  Flexible(
+                    child: Text(
+                      'Tap for calming activities',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: AppConstants.spacingXs),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ],
+                  const SizedBox(width: AppConstants.spacingXs),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 20,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
