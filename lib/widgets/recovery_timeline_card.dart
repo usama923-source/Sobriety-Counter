@@ -64,10 +64,10 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
                       : AppColors.successGreen.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.emoji_events_rounded,
                   size: 22,
-                  color: AppColors.successGreen,
+                  color: context.successText,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -95,10 +95,10 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
                 ),
                 child: Text(
                   '$_completedCount/$_totalCount',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.successGreen,
+                    color: context.successText,
                   ),
                 ),
               ),
@@ -134,7 +134,7 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+              color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
             ),
           ),
 
@@ -176,7 +176,7 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.softTeal,
+                        color: context.primary,
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -185,7 +185,7 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
                           ? Icons.keyboard_arrow_up_rounded
                           : Icons.keyboard_arrow_down_rounded,
                       size: 18,
-                      color: AppColors.softTeal,
+                      color: context.primary,
                     ),
                   ],
                 ),
@@ -404,7 +404,7 @@ class _MilestoneTileState extends State<_MilestoneTile>
                                   color: widget.isDark
                                       ? AppColors.textOnDarkSecondary
                                           .withValues(alpha: 0.25)
-                                      : AppColors.textTertiary
+                                      : AppColors.secondaryTextLight
                                           .withValues(alpha: 0.25),
                                   width: 1.5,
                                 ),
@@ -464,11 +464,11 @@ class _MilestoneTileState extends State<_MilestoneTile>
                               widget.milestone.icon,
                               size: 16,
                               color: widget.isReached
-                                  ? AppColors.successGreen
+                                  ? context.successText
                                   : (widget.isDark
                                       ? AppColors.textOnDarkSecondary
                                           .withValues(alpha: 0.5)
-                                      : AppColors.textTertiary),
+                                      : AppColors.secondaryTextLight),
                             ),
                             const SizedBox(width: AppConstants.spacingXs),
                             Text(
@@ -483,7 +483,7 @@ class _MilestoneTileState extends State<_MilestoneTile>
                                     : (widget.isDark
                                         ? AppColors.textOnDarkSecondary
                                             .withValues(alpha: 0.6)
-                                        : AppColors.textTertiary),
+                                        : AppColors.secondaryTextLight),
                               ),
                             ),
                             const Spacer(),
@@ -511,10 +511,10 @@ class _MilestoneTileState extends State<_MilestoneTile>
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   color: widget.isReached
-                                      ? AppColors.successGreen
+                                      ? context.successText
                                       : (widget.isDark
                                           ? AppColors.textOnDarkSecondary
-                                          : AppColors.textTertiary),
+                                          : AppColors.secondaryTextLight),
                                 ),
                               ),
                             ),
@@ -530,11 +530,11 @@ class _MilestoneTileState extends State<_MilestoneTile>
                             color: widget.isReached
                                 ? (widget.isDark
                                     ? AppColors.textOnDarkSecondary
-                                    : AppColors.textSecondary)
+                                    : AppColors.secondaryTextLight)
                                 : (widget.isDark
                                     ? AppColors.textOnDarkSecondary
                                         .withValues(alpha: 0.4)
-                                    : AppColors.textTertiary
+                                    : AppColors.secondaryTextLight
                                         .withValues(alpha: 0.6)),
                           ),
                         ),

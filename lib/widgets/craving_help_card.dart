@@ -19,10 +19,10 @@ class CravingHelpCard extends StatelessWidget {
     return SoberCard(
       enableHoverEffect: false,
       color: isDark
-          ? AppColors.softTeal.withValues(alpha: 0.06)
-          : AppColors.mintLight,
+          ? AppColors.accent.withValues(alpha: 0.08)
+          : AppColors.accent.withValues(alpha: 0.10),
       border: Border.all(
-        color: AppColors.softTeal.withValues(alpha: 0.2),
+        color: AppColors.accent.withValues(alpha: 0.30),
         width: 1.2,
       ),
       child: Column(
@@ -35,13 +35,13 @@ class CravingHelpCard extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.softTeal.withValues(alpha: 0.15),
+                  color: AppColors.accent.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
                 child: const Icon(
                   Icons.healing_rounded,
                   size: 22,
-                  color: AppColors.softTeal,
+                  color: AppColors.accent,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -67,9 +67,7 @@ class CravingHelpCard extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w400,
               height: 1.4,
-              color: isDark
-                  ? AppColors.textOnDarkSecondary
-                  : AppColors.textSecondary,
+              color: context.secondaryText,
             ),
           ),
           const SizedBox(height: AppConstants.spacingXs),
@@ -82,7 +80,7 @@ class CravingHelpCard extends StatelessWidget {
               fontStyle: FontStyle.italic,
               fontWeight: FontWeight.w400,
               height: 1.4,
-              color: AppColors.textSecondary,
+              color: context.secondaryText,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),

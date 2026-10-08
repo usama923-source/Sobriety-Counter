@@ -41,9 +41,9 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
   late Animation<double> _scaleAnim;
 
   // ── Phase colors ──────────────────────────────────────────────────
-  static const Color _inhaleColor = AppColors.softTeal;    // softTeal
-  static const Color _holdColor = AppColors.softTealLight;     // softTealLight
-  static const Color _exhaleColor = AppColors.softTeal;   // softTeal
+  static const Color _inhaleColor = AppColors.accent;
+  static const Color _holdColor = AppColors.skyBlueLight;
+  static const Color _exhaleColor = AppColors.accent;
 
   Color get _currentColor {
     switch (_currentPhase) {
@@ -216,15 +216,13 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.softTeal.withValues(alpha: 0.2)
-                      : AppColors.softTeal.withValues(alpha: 0.15),
+                  color: AppColors.accent.withValues(alpha: isDark ? 0.2 : 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
                 child: const Icon(
                   Icons.self_improvement_rounded,
                   size: 22,
-                  color: AppColors.softTeal,
+                  color: AppColors.accent,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -259,7 +257,7 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
                       size: 20,
                       color: isDark
                           ? AppColors.textOnDarkSecondary
-                          : AppColors.textTertiary,
+                          : AppColors.secondaryTextLight,
                     ),
                   ),
                 ),
@@ -325,7 +323,7 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                                    color: AppColors.onPrimaryDark,
                                   ),
                                 ),
                               ),
@@ -350,7 +348,7 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
                           height: 1.4,
                           color: isDark
                               ? AppColors.textOnDarkSecondary
-                              : AppColors.textSecondary,
+                              : AppColors.secondaryTextLight,
                         ),
                       ),
                     ),
@@ -382,7 +380,7 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: _currentColor,
+                color: context.primary,
               ),
             ),
             const SizedBox(height: AppConstants.spacingLg),
@@ -399,9 +397,8 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
               ),
               label: Text(_isActive ? 'Stop Session' : 'Start Session'),
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    _isActive ? AppColors.softRed : AppColors.softTeal,
-                foregroundColor: Colors.white,
+                backgroundColor: context.primary,
+                foregroundColor: context.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
@@ -425,7 +422,7 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
                     size: 14,
                     color: isDark
                         ? AppColors.textOnDarkSecondary.withValues(alpha: 0.5)
-                        : AppColors.textTertiary.withValues(alpha: 0.6),
+                        : AppColors.secondaryTextLight.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -435,7 +432,7 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
                       fontWeight: FontWeight.w400,
                       color: isDark
                           ? AppColors.textOnDarkSecondary.withValues(alpha: 0.5)
-                          : AppColors.textTertiary.withValues(alpha: 0.6),
+                          : AppColors.secondaryTextLight.withValues(alpha: 0.6),
                     ),
                   ),
                 ],

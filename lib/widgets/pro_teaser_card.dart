@@ -10,7 +10,6 @@ class ProTeaserCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData icon;
-  final Color color;
   final VoidCallback onTap;
 
   const ProTeaserCard({
@@ -18,7 +17,6 @@ class ProTeaserCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.color,
     required this.onTap,
   });
 
@@ -26,11 +24,11 @@ class ProTeaserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: color.withValues(alpha: 0.10),
-      surfaceTintColor: color,
+      color: context.primary.withValues(alpha: 0.08),
+      surfaceTintColor: context.primary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: color, width: 2),
+        side: BorderSide(color: context.primary, width: 2),
       ),
       child: InkWell(
         onTap: onTap,
@@ -44,12 +42,12 @@ class ProTeaserCard extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.20),
+                  color: context.primary.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   icon,
-                  color: color,
+                  color: context.primary,
                   size: 26,
                 ),
               ),
@@ -61,10 +59,10 @@ class ProTeaserCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.navyBlue,
+                        color: context.primary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -73,7 +71,7 @@ class ProTeaserCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
-                        color: Colors.grey.shade700,
+                        color: context.secondaryText,
                       ),
                     ),
                   ],

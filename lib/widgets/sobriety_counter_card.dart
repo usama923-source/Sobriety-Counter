@@ -82,7 +82,7 @@ class SobrietyCounterCard extends StatelessWidget {
             icon: Icons.trending_up_rounded,
             label: 'Current streak',
             value: '${service.totalDays} day${service.totalDays == 1 ? '' : 's'}',
-            valueColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+            valueColor: context.primary,
             isDark: isDark,
           ),
           const SizedBox(height: AppConstants.spacingSm),
@@ -90,7 +90,7 @@ class SobrietyCounterCard extends StatelessWidget {
             icon: Icons.flag_rounded,
             label: 'Next milestone',
             value: _nextMilestoneText(service),
-            valueColor: AppColors.successGreen,
+            valueColor: context.successText,
             isDark: isDark,
           ),
 
@@ -122,7 +122,7 @@ class SobrietyCounterCard extends StatelessWidget {
             child: Icon(
               Icons.calendar_today_rounded,
               size: 28,
-              color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+              color: context.primary,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),
@@ -142,7 +142,7 @@ class SobrietyCounterCard extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.w400,
               height: 1.5,
-              color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+              color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),
@@ -153,8 +153,8 @@ class SobrietyCounterCard extends StatelessWidget {
               icon: const Icon(Icons.edit_calendar_rounded, size: 20),
               label: const Text('Set Quit Date'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
-                foregroundColor: isDark ? AppColors.navyBlue : AppColors.white,
+                backgroundColor: context.primary,
+                foregroundColor: context.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
@@ -264,7 +264,7 @@ class _LiveCounterRow extends StatelessWidget {
           fontWeight: FontWeight.w300,
           color: isDark
               ? AppColors.textOnDarkSecondary.withValues(alpha: 0.4)
-              : AppColors.textTertiary.withValues(alpha: 0.5),
+              : AppColors.secondaryTextLight.withValues(alpha: 0.5),
         ),
       ),
     );
@@ -317,7 +317,7 @@ class _TimeTile extends StatelessWidget {
                 fontSize: 36,
                 fontWeight: FontWeight.w300,
                 height: 1.1,
-                color: isDark ? AppColors.textOnDark : AppColors.navyBlue,
+                color: context.primary,
               ),
             ),
           ),
@@ -330,7 +330,7 @@ class _TimeTile extends StatelessWidget {
             fontSize: 11,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.5,
-            color: isDark ? AppColors.textOnDarkSecondary : AppColors.textTertiary,
+            color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
           ),
         ),
       ],
@@ -364,7 +364,7 @@ class _InfoRow extends StatelessWidget {
           size: 16,
           color: isDark
               ? AppColors.textOnDarkSecondary.withValues(alpha: 0.6)
-              : AppColors.textTertiary,
+              : AppColors.secondaryTextLight,
         ),
         const SizedBox(width: AppConstants.spacingXs),
         Text(
@@ -372,7 +372,7 @@ class _InfoRow extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w400,
-            color: isDark ? AppColors.textOnDarkSecondary : AppColors.textTertiary,
+            color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
           ),
         ),
         Expanded(

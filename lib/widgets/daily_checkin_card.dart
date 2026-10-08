@@ -34,15 +34,13 @@ class DailyCheckinCard extends ConsumerWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.softOrange.withValues(alpha: 0.2)
-                      : AppColors.softOrange.withValues(alpha: 0.15),
+                  color: context.primary.withValues(alpha: isDark ? 0.2 : 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.edit_note_rounded,
                   size: 22,
-                  color: AppColors.softOrange,
+                  color: context.primary,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -62,7 +60,7 @@ class DailyCheckinCard extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textOnDarkSecondary : AppColors.textTertiary,
+                  color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
                 ),
               ),
             ],
@@ -124,8 +122,8 @@ class DailyCheckinCard extends ConsumerWidget {
                           : Icons.info_rounded,
                       size: 16,
                       color: service.todaySuccessful
-                          ? AppColors.successGreen
-                          : AppColors.softOrange,
+                          ? context.successText
+                          : context.secondaryText,
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -136,8 +134,8 @@ class DailyCheckinCard extends ConsumerWidget {
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                         color: service.todaySuccessful
-                            ? AppColors.successGreen
-                            : AppColors.softOrange,
+                            ? context.successText
+                            : context.secondaryText,
                       ),
                     ),
                   ],
@@ -154,21 +152,21 @@ class DailyCheckinCard extends ConsumerWidget {
                 value: '${service.successPercentage}%',
                 label: 'Success',
                 icon: Icons.trending_up_rounded,
-                color: AppColors.successGreen,
+                color: context.successText,
                 isDark: isDark,
               ),
               _MiniStat(
                 value: '${service.currentStreak}',
                 label: 'Current Streak',
                 icon: Icons.local_fire_department_rounded,
-                color: AppColors.softOrange,
+                color: context.primary,
                 isDark: isDark,
               ),
               _MiniStat(
                 value: '${service.longestStreak}',
                 label: 'Longest Streak',
                 icon: Icons.emoji_events_rounded,
-                color: AppColors.softTeal,
+                color: context.accent,
                 isDark: isDark,
               ),
             ],
@@ -252,7 +250,7 @@ class DailyCheckinCard extends ConsumerWidget {
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 height: 1.5,
-                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
               ),
             ),
             const SizedBox(height: AppConstants.spacingLg),
@@ -263,7 +261,7 @@ class DailyCheckinCard extends ConsumerWidget {
                     onPressed: () => Navigator.pop(ctx, false),
                     style: OutlinedButton.styleFrom(
                       foregroundColor:
-                          isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                          isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
                       side: BorderSide(
                         color: isDark ? AppColors.darkCardAlt : AppColors.lightGrayAlt,
                       ),
@@ -340,7 +338,7 @@ class DailyCheckinCard extends ConsumerWidget {
                   fontWeight: FontWeight.w500,
                   color: isDark
                       ? AppColors.textOnDarkSecondary
-                      : AppColors.textTertiary,
+                      : AppColors.secondaryTextLight,
                 ),
               ),
               const SizedBox(height: 4),
@@ -376,7 +374,7 @@ class DailyCheckinCard extends ConsumerWidget {
                       color: status == null
                           ? (isDark
                               ? AppColors.textOnDarkSecondary
-                              : AppColors.textTertiary)
+                              : AppColors.secondaryTextLight)
                           : Colors.white,
                     ),
                   ),
@@ -480,7 +478,7 @@ class DailyCheckinCard extends ConsumerWidget {
                   color: status == null
                       ? (isDark
                           ? AppColors.textOnDarkSecondary
-                          : AppColors.textTertiary)
+                          : AppColors.secondaryTextLight)
                       : Colors.white,
                 ),
               ),
@@ -513,7 +511,7 @@ class DailyCheckinCard extends ConsumerWidget {
                         fontWeight: FontWeight.w600,
                         color: isDark
                             ? AppColors.textOnDarkSecondary
-                            : AppColors.textTertiary,
+                            : AppColors.secondaryTextLight,
                       ),
                     ),
                   ),
@@ -555,7 +553,7 @@ class DailyCheckinCard extends ConsumerWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
               ),
             ),
           ],
@@ -583,7 +581,7 @@ class DailyCheckinCard extends ConsumerWidget {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: isDark ? AppColors.textOnDarkSecondary : AppColors.textTertiary,
+            color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
           ),
         ),
       ],
@@ -669,7 +667,7 @@ class _CheckInButton extends StatelessWidget {
                           : (isDark
                               ? AppColors.textOnDarkSecondary
                                   .withValues(alpha: 0.4)
-                              : AppColors.textTertiary)),
+                              : AppColors.secondaryTextLight)),
                 ),
               ),
             ],
@@ -729,7 +727,7 @@ class _MiniStat extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: isDark
                     ? AppColors.textOnDarkSecondary
-                    : AppColors.textSecondary,
+                    : AppColors.secondaryTextLight,
               ),
               overflow: TextOverflow.ellipsis,
               softWrap: false,

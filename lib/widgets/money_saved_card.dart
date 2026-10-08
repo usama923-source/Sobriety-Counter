@@ -78,18 +78,13 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: (isDark
-                          ? AppColors.softTealLight
-                          : AppColors.navyBlue)
-                      .withValues(alpha: 0.15),
+                  color: AppColors.accent.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.attach_money_rounded,
                   size: 22,
-                  color: isDark
-                      ? AppColors.softTealLight
-                      : AppColors.navyBlue,
+                  color: AppColors.accent,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -117,7 +112,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                       size: 20,
                       color: isDark
                           ? AppColors.textOnDarkSecondary
-                          : AppColors.textTertiary,
+                          : AppColors.secondaryTextLight,
                     ),
                   ),
                 ),
@@ -154,7 +149,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                     fontWeight: FontWeight.w400,
                     color: isDark
                         ? AppColors.textOnDarkSecondary
-                        : AppColors.textSecondary,
+                        : AppColors.secondaryTextLight,
                   ),
                 ),
               ],
@@ -171,7 +166,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   icon: Icons.block_rounded,
                   label: 'Drinks Avoided',
                   value: s.drinksAvoided.toDouble(),
-                  color: AppColors.softTeal,
+                  color: AppColors.accent,
                   isDark: isDark,
                   decimals: 0,
                 ),
@@ -182,7 +177,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   icon: Icons.today_rounded,
                   label: 'Daily Cost',
                   value: s.dailyCost,
-                  color: AppColors.softOrange,
+                  color: AppColors.accent,
                   isDark: isDark,
                   prefix: symbol,
                 ),
@@ -197,7 +192,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   icon: Icons.calendar_month_rounded,
                   label: 'Monthly Savings',
                   value: s.monthlySavings,
-                  color: AppColors.softTeal,
+                  color: AppColors.accent,
                   isDark: isDark,
                   prefix: symbol,
                 ),
@@ -208,7 +203,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                   icon: Icons.date_range_rounded,
                   label: 'Yearly Savings',
                   value: s.yearlySavings,
-                  color: AppColors.softTealDark,
+                  color: AppColors.accent,
                   isDark: isDark,
                   prefix: symbol,
                 ),
@@ -226,7 +221,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                 fontWeight: FontWeight.w400,
                 color: isDark
                     ? AppColors.textOnDarkSecondary.withValues(alpha: 0.7)
-                    : AppColors.textTertiary,
+                    : AppColors.secondaryTextLight,
               ),
             ),
           ),
@@ -287,7 +282,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? AppColors.textOnDarkSecondary
-                        : AppColors.textSecondary,
+                        : AppColors.secondaryTextLight,
                   ),
                 ),
                 Text(
@@ -303,12 +298,12 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
             const SizedBox(height: AppConstants.spacingXs),
             SliderTheme(
               data: SliderThemeData(
-                activeTrackColor: AppColors.softTeal,
+                activeTrackColor: AppColors.accent,
                 inactiveTrackColor: isDark
                     ? AppColors.darkCardAlt
                     : AppColors.lightGrayAlt,
-                thumbColor: AppColors.softTeal,
-                overlayColor: AppColors.softTeal.withValues(alpha: 0.15),
+                thumbColor: AppColors.accent,
+                overlayColor: AppColors.accent.withValues(alpha: 0.15),
                 trackHeight: 6,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
               ),
@@ -330,7 +325,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                     fontSize: 11,
                     color: isDark
                         ? AppColors.textOnDarkSecondary.withValues(alpha: 0.5)
-                        : AppColors.textTertiary.withValues(alpha: 0.6),
+                        : AppColors.secondaryTextLight.withValues(alpha: 0.6),
                   ),
                 ),
                 Text(
@@ -339,7 +334,7 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
                     fontSize: 11,
                     color: isDark
                         ? AppColors.textOnDarkSecondary.withValues(alpha: 0.5)
-                        : AppColors.textTertiary.withValues(alpha: 0.6),
+                        : AppColors.secondaryTextLight.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -390,7 +385,7 @@ class _AnimatedCurrencyValue extends StatelessWidget {
             fontWeight: FontWeight.w300,
             height: 1.0,
             letterSpacing: -1.0,
-            color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+            color: context.primary,
           ),
         ),
       ),
@@ -452,7 +447,7 @@ class _MiniStatCard extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: isDark
                         ? AppColors.textOnDarkSecondary
-                        : AppColors.textTertiary,
+                        : AppColors.secondaryTextLight,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -481,7 +476,7 @@ class _MiniStatCard extends StatelessWidget {
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 height: 1.1,
-                color: color,
+                color: context.primary,
               ),
             ),
           ),
@@ -528,7 +523,7 @@ class _InputRow extends StatelessWidget {
               fontWeight: FontWeight.w500,
               color: isDark
                   ? AppColors.textOnDarkSecondary
-                  : AppColors.textSecondary,
+                  : AppColors.secondaryTextLight,
             ),
             overflow: TextOverflow.ellipsis,
           ),
@@ -585,16 +580,16 @@ class _InputRow extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: AppColors.softTeal.withValues(alpha: 0.1),
+                    color: context.primary.withValues(alpha: 0.1),
                     border: Border.all(
-                      color: AppColors.softTeal.withValues(alpha: 0.3),
+                      color: context.primary.withValues(alpha: 0.3),
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add_rounded,
                     size: 20,
-                    color: AppColors.softTeal,
+                    color: context.primary,
                   ),
                 ),
               ),

@@ -477,7 +477,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     required IconData icon,
     required String title,
     required String subtitle,
-    required Color color,
     required VoidCallback onTap,
   }) {
     // If the user is already Pro, hide these cards entirely
@@ -489,7 +488,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       icon: icon,
       title: title,
       subtitle: subtitle,
-      color: color,
       onTap: onTap,
     );
   }
@@ -687,7 +685,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     icon: Icons.smart_toy_rounded,
                     title: 'AI Friend',
                     subtitle: '24/7 AI support during cravings',
-                    color: AppColors.softTeal,
                     onTap: () => _navigateToPro(const AIChatScreen()),
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
@@ -696,7 +693,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     icon: Icons.psychology_rounded,
                     title: 'Memory Game',
                     subtitle: 'Beat cravings with a focus game',
-                    color: AppColors.navyBlue,
                     onTap: () => _navigateToPro(const MemoryGameScreen()),
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
@@ -705,7 +701,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     icon: Icons.monitor_weight_rounded,
                     title: 'Weight Tracker',
                     subtitle: 'Track your body transformation',
-                    color: AppColors.gold,
                     onTap: () => _navigateToPro(const WeightTrackerScreen()),
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
