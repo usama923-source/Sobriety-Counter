@@ -530,7 +530,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             color: AppColors.navyBlue,
             width: 3,
           ),
-          borderRadius: BorderRadius.circular(AppConstants.radiusFull),
         ),
         child: Stack(
           clipBehavior: Clip.none,

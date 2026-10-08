@@ -134,7 +134,7 @@ class _CalmCravingButtonState extends State<_CalmCravingButton> {
     return SizedBox(
       width: double.infinity,
       child: AnimatedScale(
-        scale: _pressed ? 0.96 : 1.0,
+        scale: _pressed ? 0.94 : 1.0,
         duration: const Duration(milliseconds: 120),
         curve: Curves.easeOut,
         child: Material(
@@ -142,16 +142,18 @@ class _CalmCravingButtonState extends State<_CalmCravingButton> {
           borderRadius: BorderRadius.circular(50),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
-            onTap: () {
+            onTap: () async {
               HapticFeedback.lightImpact();
-              widget.onTap();
+              // Let the press feedback play before navigating away.
+              await Future.delayed(const Duration(milliseconds: 150));
+              if (mounted) widget.onTap();
             },
             onTapDown: (_) => _setPressed(true),
             onTapUp: (_) => _setPressed(false),
             onTapCancel: () => _setPressed(false),
             borderRadius: BorderRadius.circular(50),
-            splashColor: Colors.white.withValues(alpha: 0.2),
-            highlightColor: Colors.white.withValues(alpha: 0.08),
+            splashColor: Colors.white.withValues(alpha: 0.35),
+            highlightColor: Colors.white.withValues(alpha: 0.18),
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppConstants.spacingMd,

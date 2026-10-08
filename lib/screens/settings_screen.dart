@@ -36,29 +36,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _loadPreferences() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      _dailyReminder = prefs.getBool('reminder_enabled') ?? false;
+      final dailyReminder = prefs.getBool('reminder_enabled') ?? false;
+      var reminderTime = const TimeOfDay(hour: 20, minute: 0);
       final savedTime = prefs.getString('reminder_time');
       if (savedTime != null) {
         final parts = savedTime.split(':');
         if (parts.length == 2) {
-          _reminderTime = TimeOfDay(
+          reminderTime = TimeOfDay(
             hour: int.tryParse(parts[0]) ?? 20,
             minute: int.tryParse(parts[1]) ?? 0,
           );
         }
       }
-      _currency = prefs.getString('currency') ?? 'USD';
+      var currency = prefs.getString('currency') ?? 'USD';
       // Guard against currencies that are no longer available (e.g. PKR)
-      if (!_currencies.contains(_currency)) {
-        _currency = 'USD';
+      if (!_currencies.contains(currency)) {
+        currency = 'USD';
       }
-      _isLoading = false;
+      if (!mounted) return;
+      setState(() {
+        _dailyReminder = dailyReminder;
+        _reminderTime = reminderTime;
+        _currency = currency;
+        _isLoading = false;
+      });
     } catch (_) {
       // Any prefs read failure (e.g. corrupted storage) falls back to safe defaults.
-      _dailyReminder = false;
-      _reminderTime = const TimeOfDay(hour: 20, minute: 0);
-      _currency = 'USD';
-      _isLoading = false;
+      if (!mounted) return;
+      setState(() {
+        _dailyReminder = false;
+        _reminderTime = const TimeOfDay(hour: 20, minute: 0);
+        _currency = 'USD';
+        _isLoading = false;
+      });
     }
   }
 

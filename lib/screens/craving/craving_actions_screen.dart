@@ -186,9 +186,9 @@ class _CravingActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _onActionTap(context),
-      splashFactory: NoSplash.splashFactory,
-      highlightColor: Colors.transparent,
       borderRadius: BorderRadius.circular(AppConstants.radiusLg),
+      splashColor: AppColors.navyBlue.withValues(alpha: 0.12),
+      highlightColor: AppColors.navyBlue.withValues(alpha: 0.12),
       child: SoberCard(
         color: action.color.withValues(alpha: isDark ? 0.1 : 0.07),
         border: Border.all(

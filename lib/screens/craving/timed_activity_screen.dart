@@ -83,6 +83,11 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
 
   void _startTimer() {
     if (_isRunning) return;
+    // If the previous run finished, start over from the full duration
+    // instead of immediately re-completing at 0.
+    if (_remainingSeconds <= 0) {
+      _remainingSeconds = _totalSeconds;
+    }
     setState(() {
       _isRunning = true;
       _isComplete = false;
