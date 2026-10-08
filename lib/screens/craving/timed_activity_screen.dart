@@ -313,7 +313,7 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                                   vertical: AppConstants.spacingMd,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.softTeal,
+                                  color: context.primary,
                                   borderRadius: BorderRadius.circular(
                                     AppConstants.radiusFull,
                                   ),
@@ -329,7 +329,7 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                                   ],
                                   border: Border(
                                     bottom: BorderSide(
-                                      color: AppColors.softTeal,
+                                      color: context.primary,
                                       width: 3,
                                     ),
                                   ),
@@ -337,10 +337,10 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                                 child: Center(
                                   child: Text(
                                     _isComplete ? 'Completed' : 'Start',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                                      color: context.onPrimary,
                                       letterSpacing: 0.5,
                                     ),
                                   ),

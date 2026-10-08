@@ -455,7 +455,7 @@ class _BreathingScreenState extends State<BreathingScreen>
                                   vertical: AppConstants.spacingMd,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.softTeal,
+                                  color: context.primary,
                                   borderRadius: BorderRadius.circular(
                                     AppConstants.radiusFull,
                                   ),
@@ -480,16 +480,16 @@ class _BreathingScreenState extends State<BreathingScreen>
                                           ? Icons.stop_rounded
                                           : Icons.play_arrow_rounded,
                                       size: 20,
-                                      color: Colors.white,
+                                      color: context.onPrimary,
                                     ),
                                     const SizedBox(
                                         width: AppConstants.spacingXs),
                                     Text(
                                       _isActive ? 'Stop' : 'Start',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
-                                        color: Colors.white,
+                                        color: context.onPrimary,
                                         letterSpacing: 0.5,
                                       ),
                                     ),

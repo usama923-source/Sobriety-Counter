@@ -86,8 +86,8 @@ class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.softTeal,
-              foregroundColor: Colors.white,
+              backgroundColor: context.primary,
+              foregroundColor: context.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppConstants.radiusSm),
               ),
@@ -171,33 +171,33 @@ class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
                               vertical: AppConstants.spacingMd,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.softTeal,
+                              color: context.primary,
                               borderRadius: BorderRadius.circular(
                                 AppConstants.radiusFull,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.softTeal.withValues(alpha: 0.3),
+                                  color: context.primary.withValues(alpha: 0.3),
                                   blurRadius: 16,
                                   offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
                                   Icons.add_rounded,
                                   size: 20,
-                                  color: Colors.white,
+                                  color: context.onPrimary,
                                 ),
-                                SizedBox(width: AppConstants.spacingXs),
+                                const SizedBox(width: AppConstants.spacingXs),
                                 Text(
                                   'Add a reason',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                                    color: context.onPrimary,
                                     letterSpacing: 0.3,
                                   ),
                                 ),

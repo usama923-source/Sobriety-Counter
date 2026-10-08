@@ -203,7 +203,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                         ? (isDark
                                             ? AppColors.darkCard
                                             : AppColors.lightGrayAlt)
-                                        : AppColors.softTeal,
+                                        : context.primary,
                                     borderRadius: BorderRadius.circular(
                                       AppConstants.radiusFull,
                                     ),
@@ -220,12 +220,12 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                   ),
                                   child: Center(
                                     child: _isSaving
-                                        ? const SizedBox(
+                                        ? SizedBox(
                                             width: 20,
                                             height: 20,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              color: Colors.white,
+                                              color: context.onPrimary,
                                             ),
                                           )
                                         : Row(
@@ -243,7 +243,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                                             .textOnDarkSecondary
                                                         : AppColors
                                                             .textTertiary)
-                                                    : Colors.white,
+                                                    : context.onPrimary,
                                               ),
                                               const SizedBox(
                                                   width:
@@ -261,7 +261,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                                               .textOnDarkSecondary
                                                           : AppColors
                                                               .textTertiary)
-                                                      : Colors.white,
+                                                      : context.onPrimary,
                                                   letterSpacing: 0.3,
                                                 ),
                                               ),

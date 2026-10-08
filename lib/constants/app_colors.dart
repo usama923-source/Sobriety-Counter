@@ -50,8 +50,59 @@ class AppColors {
   static const Color textOnDark = Color(0xFFF7FAFC);
   static const Color textOnDarkSecondary = Color(0xFFB0BEC5);
 
+  // ── 60-30-10 Theme ───────────────────────────────────────────────────────
+  // 30% Primary
+  static const Color primaryLight = Color(0xFF14395C);
+  static const Color onPrimaryLight = Color(0xFFFFFFFF);
+  static const Color primaryDark = Color(0xFF9CC3E0);
+  static const Color onPrimaryDark = Color(0xFF0B1E30);
+
+  // 10% Accent (fills and icons only — never text, never under white text)
+  static const Color accent = Color(0xFF70B0D0);
+
+  // 60% Neutral backgrounds
+  static const Color bgLight = Color(0xFFF4F7FA);
+  static const Color surfaceLight = Color(0xFFFFFFFF);
+  static const Color surfaceAltLight = Color(0xFFE9EEF5);
+  static const Color bgDark = Color(0xFF0F1B2B);
+  static const Color surfaceDark = Color(0xFF16263A);
+  static const Color surfaceAltDark = Color(0xFF1E3350);
+
+  // Success text
+  static const Color successTextLight = Color(0xFF2E7D32);
+  static const Color successTextDark = Color(0xFF81C784);
+
+  // Secondary text on light surfaces
+  static const Color secondaryTextLight = Color(0xFF4A5568);
+
   // ── Shadows ──────────────────────────────────────────────────────────────
   static Color shadowLight = Colors.black.withValues(alpha: 0.06);
   static Color shadowDark = Colors.black.withValues(alpha: 0.20);
   static Color shadowAccent = const Color(0xFF1E3A5F).withValues(alpha: 0.15);
+}
+
+/// Theme-aware color helpers for the 60-30-10 palette.
+///
+/// Use these instead of repeating `isDark ? ... : ...` for these roles.
+extension AppThemeColors on BuildContext {
+  bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;
+
+  /// 30% — the single brand primary (deep navy in light, sky blue in dark).
+  Color get primary =>
+      isDarkMode ? AppColors.primaryDark : AppColors.primaryLight;
+
+  /// Text/icon color to place on top of [primary].
+  Color get onPrimary =>
+      isDarkMode ? AppColors.onPrimaryDark : AppColors.onPrimaryLight;
+
+  /// 10% — accent for fills and icons only (never text, never under white).
+  Color get accent => AppColors.accent;
+
+  /// Secondary body text color with adequate contrast in both modes.
+  Color get secondaryText =>
+      isDarkMode ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight;
+
+  /// Success text color with adequate contrast in both modes.
+  Color get successText =>
+      isDarkMode ? AppColors.successTextDark : AppColors.successTextLight;
 }

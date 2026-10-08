@@ -517,7 +517,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: AppColors.softTeal,
+          color: context.primary,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -534,11 +534,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            const Center(
+            Center(
               child: Icon(
                 Icons.smart_toy_rounded,
                 size: 26,
-                color: Colors.white,
+                color: context.onPrimary,
               ),
             ),
             // Gold crown badge overlay on top-right

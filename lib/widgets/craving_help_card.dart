@@ -138,7 +138,7 @@ class _CalmCravingButtonState extends State<_CalmCravingButton> {
         duration: const Duration(milliseconds: 120),
         curve: Curves.easeOut,
         child: Material(
-          color: AppColors.softTeal,
+          color: context.primary,
           borderRadius: BorderRadius.circular(50),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -162,10 +162,10 @@ class _CalmCravingButtonState extends State<_CalmCravingButton> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.self_improvement_rounded,
                     size: 20,
-                    color: Colors.white,
+                    color: context.onPrimary,
                   ),
                   const SizedBox(width: AppConstants.spacingXs),
                   Flexible(
@@ -173,18 +173,18 @@ class _CalmCravingButtonState extends State<_CalmCravingButton> {
                       'Tap for calming activities',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: context.onPrimary,
                       ),
                     ),
                   ),
                   const SizedBox(width: AppConstants.spacingXs),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
                     size: 20,
-                    color: Colors.white,
+                    color: context.onPrimary,
                   ),
                 ],
               ),
