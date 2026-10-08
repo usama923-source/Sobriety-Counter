@@ -355,126 +355,117 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Widget _buildDrawer(bool isDark) {
     return Drawer(
-      backgroundColor: isDark ? AppColors.darkSurface : AppColors.white,
-      child: SafeArea(
-        child: Column(
-          children: [
-            // ── App Header ────────────────────────────────────────────
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(
-                AppConstants.spacingLg,
-                AppConstants.spacingXl,
-                AppConstants.spacingLg,
-                AppConstants.spacingLg,
-              ),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [
-                          AppColors.navyBlue,
-                          AppColors.navyBlue.withValues(alpha: 0.6),
-                        ]
-                      : [
-                          AppColors.navyBlue,
-                          AppColors.navyBlueLight,
-                        ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+      backgroundColor: Colors.transparent,
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? [AppColors.bgDark, AppColors.surfaceDark]
+                : [AppColors.primaryLight, AppColors.navyBlueLight],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // ── App Header (large centered logo) ──────────────────────
+              const Padding(
+                padding: EdgeInsets.fromLTRB(
+                  AppConstants.spacingLg,
+                  AppConstants.spacingXl,
+                  AppConstants.spacingLg,
+                  AppConstants.spacingLg,
+                ),
+                child: Center(
+                  child: AppLogo(size: 96),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // App logo (reused from the drawer / home header)
-                  const AppLogo(size: 56, isDark: false),
-                ],
-              ),
-            ),
 
-            // ── Menu Items ───────────────────────────────────────────
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  const SizedBox(height: AppConstants.spacingXs),
-                  _DrawerMenuItem(
-                    icon: Icons.home_rounded,
-                    title: 'Home',
-                    isDark: isDark,
-                    onTap: () => Navigator.of(context).pop(),
-                  ),
-                  _DrawerMenuItem(
-                    icon: Icons.self_improvement_rounded,
-                    title: 'Calming Activities',
-                    isDark: isDark,
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const CravingActionsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  _DrawerProMenuItem(
-                    icon: Icons.smart_toy_rounded,
-                    title: 'AI Friend',
-                    isDark: isDark,
-                    onTapPro: () => _navigateToPro(
-                      const AIChatScreen(),
+              // ── Menu Items ───────────────────────────────────────────
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    const SizedBox(height: AppConstants.spacingXs),
+                    _DrawerMenuItem(
+                      icon: Icons.home_rounded,
+                      title: 'Home',
+                      isDark: true,
+                      onTap: () => Navigator.of(context).pop(),
                     ),
-                  ),
-                  _DrawerProMenuItem(
-                    icon: Icons.psychology_rounded,
-                    title: 'Memory Game',
-                    isDark: isDark,
-                    onTapPro: () => _navigateToPro(
-                      const MemoryGameScreen(),
+                    _DrawerMenuItem(
+                      icon: Icons.self_improvement_rounded,
+                      title: 'Calming Activities',
+                      isDark: true,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const CravingActionsScreen(),
+                          ),
+                        );
+                      },
                     ),
-                  ),
-                  _DrawerProMenuItem(
-                    icon: Icons.monitor_weight_rounded,
-                    title: 'Weight Tracker',
-                    isDark: isDark,
-                    onTapPro: () => _navigateToPro(
-                      const WeightTrackerScreen(),
+                    _DrawerProMenuItem(
+                      icon: Icons.smart_toy_rounded,
+                      title: 'AI Friend',
+                      isDark: true,
+                      onTapPro: () => _navigateToPro(
+                        const AIChatScreen(),
+                      ),
                     ),
-                  ),
-                  _DrawerProMenuItem(
-                    icon: Icons.settings_rounded,
-                    title: 'Settings',
-                    isDark: isDark,
-                    isPro: false,
-                    onTapPro: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const SettingsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-
-            // ── Footer ───────────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.all(AppConstants.spacingLg),
-              child: Text(
-                'One day at a time.',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  fontStyle: FontStyle.italic,
-                  color: isDark
-                      ? AppColors.textOnDarkSecondary.withValues(alpha: 0.4)
-                      : AppColors.textTertiary,
+                    _DrawerProMenuItem(
+                      icon: Icons.psychology_rounded,
+                      title: 'Memory Game',
+                      isDark: true,
+                      onTapPro: () => _navigateToPro(
+                        const MemoryGameScreen(),
+                      ),
+                    ),
+                    _DrawerProMenuItem(
+                      icon: Icons.monitor_weight_rounded,
+                      title: 'Weight Tracker',
+                      isDark: true,
+                      onTapPro: () => _navigateToPro(
+                        const WeightTrackerScreen(),
+                      ),
+                    ),
+                    _DrawerProMenuItem(
+                      icon: Icons.settings_rounded,
+                      title: 'Settings',
+                      isDark: true,
+                      isPro: false,
+                      onTapPro: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SettingsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
+
+              // ── Footer ───────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.all(AppConstants.spacingLg),
+                child: Text(
+                  'One day at a time.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    fontStyle: FontStyle.italic,
+                    color: AppColors.textOnDarkSecondary.withValues(alpha: 0.7),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

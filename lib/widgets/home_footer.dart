@@ -27,27 +27,7 @@ class HomeFooter extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingLg),
 
-          // ── App Info ─────────────────────────────────────────────────
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.spa_rounded,
-                size: 16,
-                color: mutedColor,
-              ),
-              const SizedBox(width: AppConstants.spacingXs),
-              Text(
-                AppConstants.appName,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: mutedColor,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppConstants.spacingXxs),
+          // ── Tagline ──────────────────────────────────────────────────
           Text(
             AppConstants.appTagline,
             style: TextStyle(

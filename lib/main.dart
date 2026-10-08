@@ -8,6 +8,7 @@ import 'package:quit_drinking/core/services/notification_service.dart';
 import 'package:quit_drinking/firebase_options.dart';
 import 'package:quit_drinking/screens/home_screen.dart';
 import 'package:quit_drinking/screens/onboarding/onboarding_screen.dart';
+import 'package:quit_drinking/widgets/app_logo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -121,7 +122,6 @@ class _SplashScreenState extends State<_SplashScreen>
   late AnimationController _controller;
   late Animation<double> _logoFade;
   late Animation<double> _logoScale;
-  late Animation<double> _nameFade;
   late Animation<double> _taglineFade;
 
   @override
@@ -149,17 +149,10 @@ class _SplashScreenState extends State<_SplashScreen>
       ),
     );
 
-    _nameFade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.5, 0.75, curve: Curves.easeOut),
-      ),
-    );
-
     _taglineFade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.75, 1.0, curve: Curves.easeOut),
+        curve: const Interval(0.5, 0.85, curve: Curves.easeOut),
       ),
     );
 
@@ -190,40 +183,10 @@ class _SplashScreenState extends State<_SplashScreen>
                   opacity: _logoFade,
                   child: ScaleTransition(
                     scale: _logoScale,
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isDark
-                            ? const Color(0xFF1E2D42)
-                            : const Color(0xFFD7F5EF),
-                      ),
-                      child: Icon(
-                        Icons.spa_rounded,
-                        size: 40,
-                        color: isDark
-                            ? const Color(0xFFA8D0E6)
-                            : const Color(0xFF1E3A5F),
-                      ),
-                    ),
+                    child: const AppLogo(size: 96),
                   ),
                 ),
                 const SizedBox(height: 24),
-                FadeTransition(
-                  opacity: _nameFade,
-                  child: Text(
-                    'QuitDrink Ai',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: isDark
-                          ? const Color(0xFFF7FAFC)
-                          : const Color(0xFF1A202C),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
                 FadeTransition(
                   opacity: _taglineFade,
                   child: Text(
