@@ -36,6 +36,18 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
   // ── Unit helpers ────────────────────────────────────────────────────
   String get _unitLabel => _unit == _WeightUnit.kg ? 'kg' : 'lbs';
 
+  /// Formats [weight] with at most one decimal and the active unit.
+  ///
+  /// Whole numbers drop the decimal ("80 kg") while fractions keep one
+  /// digit ("80.5 kg").
+  String _formatWeight(double weight) {
+    final rounded = double.parse(weight.toStringAsFixed(1));
+    final text = rounded == rounded.roundToDouble()
+        ? rounded.toStringAsFixed(0)
+        : rounded.toStringAsFixed(1);
+    return '$text $_unitLabel';
+  }
+
   // ── Lifecycle ───────────────────────────────────────────────────────
 
   @override
@@ -93,7 +105,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Logged $currentWeight$_unitLabel',
+          'Logged ${_formatWeight(currentWeight)}',
         ),
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.softTeal,
@@ -145,6 +157,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
     final currentWeight = state.currentWeight;
     final weightLog = state.weightLog;
     final progress = state.progress;
+    final goalAchieved = state.goalAchieved;
     final weightLost = state.weightLost;
 
     return Scaffold(
@@ -352,7 +365,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                             alpha: isDark ? 0.12 : 0.1,
                           ),
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            progress == 1.0
+                            goalAchieved
                                 ? AppColors.successGreen
                                 : AppColors.softTeal,
                           ),
@@ -365,7 +378,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${currentWeight.toStringAsFixed(1)}$_unitLabel',
+                            _formatWeight(currentWeight),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -375,7 +388,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                             ),
                           ),
                           Text(
-                            '${goalWeight.toStringAsFixed(1)}$_unitLabel',
+                            _formatWeight(goalWeight),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -430,7 +443,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                                       CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'You\'ve lost ${weightLost.toStringAsFixed(1)}$_unitLabel since quitting!',
+                                      'You\'ve lost ${_formatWeight(weightLost)} since quitting!',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
@@ -459,7 +472,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                       ],
 
                       // ── At Goal Message ─────────────────────────────
-                      if (progress == 1.0) ...[
+                      if (goalAchieved) ...[
                         const SizedBox(height: AppConstants.spacingSm),
                         Container(
                           width: double.infinity,
@@ -516,8 +529,8 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                       ],
 
                       // ── Initial Progress Message ────────────────────
-                      if ((weightLost == null || weightLost <= 0) &&
-                          progress != 1.0) ...[
+                      if (!goalAchieved &&
+                          (weightLost == null || weightLost <= 0)) ...[
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(
@@ -585,7 +598,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                     onPressed: _logWeight,
                     icon: const Icon(Icons.save_rounded, size: 20),
                     label: Text(
-                      'Log $currentWeight$_unitLabel',
+                      'Log ${_formatWeight(currentWeight)}',
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.softTeal,
@@ -688,7 +701,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                                 ),
                                 const Spacer(),
                                 Text(
-                                  '${entry.weight.toStringAsFixed(1)}$_unitLabel',
+                                  _formatWeight(entry.weight),
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,

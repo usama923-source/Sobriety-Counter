@@ -36,12 +36,14 @@ class WeightEntry {
 class WeightTrackerState {
   final double? goalWeight;
   final double? currentWeight;
+  final double? startWeight;
   final List<WeightEntry> weightLog;
   final bool isLoading;
 
   const WeightTrackerState({
     this.goalWeight,
     this.currentWeight,
+    this.startWeight,
     this.weightLog = const [],
     this.isLoading = true,
   });
@@ -50,31 +52,67 @@ class WeightTrackerState {
   double? get firstLoggedWeight =>
       weightLog.isNotEmpty ? weightLog.first.weight : currentWeight;
 
-  /// Total weight lost since the first logged entry.
-  double? get weightLost {
-    if (firstLoggedWeight == null || currentWeight == null) return null;
-    return firstLoggedWeight! - currentWeight!;
+  /// The weight the user was at when they set their goal.
+  ///
+  /// Falls back to the first logged weight (or the current weight) for data
+  /// saved before this field existed.
+  double? get startWeightValue =>
+      startWeight ?? firstLoggedWeight ?? currentWeight;
+
+  /// True when the goal is lower than the starting weight (a loss goal).
+  bool get isLossGoal {
+    final start = startWeight;
+    if (start == null || goalWeight == null) return false;
+    return goalWeight! < start;
   }
 
-  /// Progress toward the goal weight, clamped to 0..1.
+  /// True when the goal is higher than the starting weight (a gain goal).
+  bool get isGainGoal {
+    final start = startWeight;
+    if (start == null || goalWeight == null) return false;
+    return goalWeight! > start;
+  }
+
+  /// Total weight lost since the starting weight (negative for a gain goal).
+  double? get weightLost {
+    final start = startWeightValue;
+    if (start == null || currentWeight == null) return null;
+    return start - currentWeight!;
+  }
+
+  /// Progress from the start weight toward the goal, clamped to 0..1.
+  ///
+  /// Returns 0 when there is no distance to travel (goal == start).
   double? get progress {
     if (goalWeight == null || currentWeight == null) return null;
-    final start = firstLoggedWeight ?? currentWeight!;
-    if (start <= goalWeight!) return 1.0; // Already at or past goal
-    final total = start - goalWeight!;
-    final soFar = start - currentWeight!;
-    return (soFar / total).clamp(0.0, 1.0);
+    final start = startWeightValue;
+    if (start == null) return null;
+    final total = (goalWeight! - start).abs();
+    if (total == 0) return 0.0;
+    final moved =
+        isGainGoal ? currentWeight! - start : start - currentWeight!;
+    return (moved / total).clamp(0.0, 1.0);
+  }
+
+  /// Whether the current weight has actually reached the goal.
+  bool get goalAchieved {
+    if (goalWeight == null || currentWeight == null) return false;
+    if (isLossGoal) return currentWeight! <= goalWeight!;
+    if (isGainGoal) return currentWeight! >= goalWeight!;
+    return false; // goal == start: nothing to progress toward
   }
 
   WeightTrackerState copyWith({
     double? goalWeight,
     double? currentWeight,
+    double? startWeight,
     List<WeightEntry>? weightLog,
     bool? isLoading,
   }) {
     return WeightTrackerState(
       goalWeight: goalWeight ?? this.goalWeight,
       currentWeight: currentWeight ?? this.currentWeight,
+      startWeight: startWeight ?? this.startWeight,
       weightLog: weightLog ?? this.weightLog,
       isLoading: isLoading ?? this.isLoading,
     );
@@ -89,6 +127,7 @@ class WeightTrackerNotifier extends StateNotifier<WeightTrackerState> {
 
   static const String _goalWeightKey = 'goal_weight';
   static const String _currentWeightKey = 'current_weight';
+  static const String _startWeightKey = 'start_weight';
   static const String _weightLogKey = 'weight_log';
 
   /// Load persisted values from SharedPreferences and update state.
@@ -115,16 +154,24 @@ class WeightTrackerNotifier extends StateNotifier<WeightTrackerState> {
     state = WeightTrackerState(
       goalWeight: prefs.getDouble(_goalWeightKey),
       currentWeight: prefs.getDouble(_currentWeightKey),
+      startWeight: prefs.getDouble(_startWeightKey),
       weightLog: log,
       isLoading: false,
     );
   }
 
   /// Set and persist the goal weight.
+  ///
+  /// The current weight at this moment is captured as the explicit starting
+  /// weight, so direction (loss vs gain) is measured against it.
   Future<void> setGoalWeight(double weight) async {
-    state = state.copyWith(goalWeight: weight);
+    final start = state.currentWeight;
+    state = state.copyWith(goalWeight: weight, startWeight: start);
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_goalWeightKey, weight);
+    if (state.startWeight != null) {
+      await prefs.setDouble(_startWeightKey, state.startWeight!);
+    }
   }
 
   /// Set and persist the current weight.
@@ -163,6 +210,8 @@ class WeightTrackerNotifier extends StateNotifier<WeightTrackerState> {
       goalWeight: state.goalWeight == null ? null : state.goalWeight! * factor,
       currentWeight:
           state.currentWeight == null ? null : state.currentWeight! * factor,
+      startWeight:
+          state.startWeight == null ? null : state.startWeight! * factor,
       weightLog: convertedLog,
     );
 
@@ -172,6 +221,9 @@ class WeightTrackerNotifier extends StateNotifier<WeightTrackerState> {
     }
     if (state.currentWeight != null) {
       await prefs.setDouble(_currentWeightKey, state.currentWeight!);
+    }
+    if (state.startWeight != null) {
+      await prefs.setDouble(_startWeightKey, state.startWeight!);
     }
     await prefs.setString(
       _weightLogKey,

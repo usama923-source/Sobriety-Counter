@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // ── Card Model ───────────────────────────────────────────────────────────
 
@@ -15,6 +17,33 @@ class _MemoryCard {
   bool isMatched = false;
 
   _MemoryCard({required this.emoji});
+}
+
+// ── Game Record Model ────────────────────────────────────────────────────
+
+/// A single completed-game result persisted in SharedPreferences.
+class _GameRecord {
+  final DateTime date;
+  final int flips;
+  final int seconds;
+
+  const _GameRecord({
+    required this.date,
+    required this.flips,
+    required this.seconds,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'date': date.millisecondsSinceEpoch,
+        'flips': flips,
+        'seconds': seconds,
+      };
+
+  factory _GameRecord.fromJson(Map<String, dynamic> json) => _GameRecord(
+        date: DateTime.fromMillisecondsSinceEpoch(json['date'] as int),
+        flips: (json['flips'] as num).toInt(),
+        seconds: (json['seconds'] as num).toInt(),
+      );
 }
 
 // ── Screen ───────────────────────────────────────────────────────────────
@@ -51,10 +80,27 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
   int _elapsedSeconds = 0;
   Timer? _gameTimer;
 
-  String get _formattedTime {
-    final minutes = _elapsedSeconds ~/ 60;
-    final seconds = _elapsedSeconds % 60;
+  // ── History ────────────────────────────────────────────────────────
+  static const String _historyKey = 'memory_game_history';
+  static const int _historyLimit = 50;
+  List<_GameRecord> _history = [];
+
+  String get _formattedTime => _formatSeconds(_elapsedSeconds);
+
+  String _formatSeconds(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  /// Best result so far (fewest flips, then fastest time), if any.
+  _GameRecord? get _bestRecord {
+    if (_history.isEmpty) return null;
+    final sorted = [..._history]..sort((a, b) {
+        final byFlips = a.flips.compareTo(b.flips);
+        return byFlips != 0 ? byFlips : a.seconds.compareTo(b.seconds);
+      });
+    return sorted.first;
   }
 
   // ── Lifecycle ──────────────────────────────────────────────────────
@@ -63,6 +109,55 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
   void initState() {
     super.initState();
     _initGame();
+    _loadHistory();
+  }
+
+  // ── History Persistence ─────────────────────────────────────────────
+
+  Future<void> _loadHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_historyKey);
+      if (raw == null) return;
+      final list = jsonDecode(raw) as List<dynamic>;
+      final loaded = list
+          .map((e) => _GameRecord.fromJson(e as Map<String, dynamic>))
+          .toList();
+      if (mounted) {
+        setState(() => _history = loaded);
+      }
+    } catch (e) {
+      debugPrint('[MemoryGame] Failed to load history: $e');
+    }
+  }
+
+  Future<void> _saveResult() async {
+    try {
+      final updated = [
+        ..._history,
+        _GameRecord(
+          date: DateTime.now(),
+          flips: _flipCount,
+          seconds: _elapsedSeconds,
+        ),
+      ];
+      // Keep only the most recent [_historyLimit] games.
+      final trimmed = updated.length > _historyLimit
+          ? updated.sublist(updated.length - _historyLimit)
+          : updated;
+
+      if (mounted) {
+        setState(() => _history = trimmed);
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+        _historyKey,
+        jsonEncode(trimmed.map((e) => e.toJson()).toList()),
+      );
+    } catch (e) {
+      debugPrint('[MemoryGame] Failed to save result: $e');
+    }
   }
 
   @override
@@ -158,6 +253,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
     HapticFeedback.heavyImpact();
 
     setState(() => _isComplete = true);
+    _saveResult();
   }
 
   void _restart() {
@@ -275,6 +371,15 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
                             label: '$_matchCount/${_emojis.length}',
                             isDark: isDark,
                           ),
+                          if (_bestRecord != null) ...[
+                            const SizedBox(width: AppConstants.spacingMd),
+                            _StatChip(
+                              icon: Icons.emoji_events_rounded,
+                              label:
+                                  'Best ${_bestRecord!.flips} flips | ${_formatSeconds(_bestRecord!.seconds)}',
+                              isDark: isDark,
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -321,6 +426,119 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
                         vertical: AppConstants.spacingMd,
                       ),
                     ),
+                  ),
+                ),
+              ],
+
+              // ── History ──────────────────────────────────────────────
+              if (_history.isNotEmpty) ...[
+                const SizedBox(height: AppConstants.spacingLg),
+                SoberCard(
+                  padding: const EdgeInsets.all(AppConstants.spacingLg),
+                  color: isDark
+                      ? AppColors.darkCardAlt.withValues(alpha: 0.5)
+                      : AppColors.white,
+                  hasShadow: true,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.history_rounded,
+                            size: 20,
+                            color: AppColors.navyBlue,
+                          ),
+                          const SizedBox(width: AppConstants.spacingXs),
+                          Text(
+                            'Recent Games',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? AppColors.textOnDark
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            '${_history.length} played',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: isDark
+                                  ? AppColors.textOnDarkSecondary
+                                  : AppColors.textTertiary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppConstants.spacingMd),
+                      ..._history.reversed.take(10).map((record) {
+                        const months = [
+                          'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+                        ];
+                        final dateStr =
+                            '${months[record.date.month - 1]} ${record.date.day}';
+                        final isBest = identical(record, _bestRecord) ||
+                            (record.flips == _bestRecord!.flips &&
+                                record.seconds == _bestRecord!.seconds &&
+                                record.date == _bestRecord!.date);
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppConstants.spacingXs,
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppConstants.spacingMd,
+                              vertical: AppConstants.spacingSm,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.darkCard
+                                  : AppColors.lightGray,
+                              borderRadius: BorderRadius.circular(
+                                AppConstants.radiusSm,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                if (isBest) ...[
+                                  const Icon(
+                                    Icons.emoji_events_rounded,
+                                    size: 16,
+                                    color: AppColors.gold,
+                                  ),
+                                  const SizedBox(width: 4),
+                                ],
+                                Text(
+                                  dateStr,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark
+                                        ? AppColors.textOnDarkSecondary
+                                        : AppColors.textSecondary,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '${record.flips} flips \u00b7 ${_formatSeconds(record.seconds)}',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: isDark
+                                        ? AppColors.textOnDark
+                                        : AppColors.textPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
                   ),
                 ),
               ],
