@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -206,25 +207,25 @@ class _AIChatScreenState extends State<AIChatScreen> {
       setState(() => _isLoading = true);
     }
 
-    try {
-      if (!_hasRealApiKey) {
-        // ── Placeholder mode — simulate a response ────────────────────
-        await Future.delayed(const Duration(milliseconds: 800));
-        final aiText = _getSimulatedResponse(userMessage);
+    // ── Placeholder mode — no real API key, simulate a response ──────
+    if (!_hasRealApiKey) {
+      await Future.delayed(const Duration(milliseconds: 800));
+      final aiText = _getSimulatedResponse(userMessage);
 
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _messages.add(_ChatMessage(
-              text: aiText,
-              isUser: false,
-              timestamp: DateTime.now(),
-            ));
-          });
-        }
-        return;
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _messages.add(_ChatMessage(
+            text: aiText,
+            isUser: false,
+            timestamp: DateTime.now(),
+          ));
+        });
       }
+      return;
+    }
 
+    try {
       // ── Real API Call (Groq / OpenAI-compatible) ────────────────────
 
       final response = await http.post(
@@ -276,32 +277,60 @@ class _AIChatScreenState extends State<AIChatScreen> {
             ));
           });
         }
-      } else {
-        final errorBody = response.body.length > 200
-            ? response.body.substring(0, 200)
-            : response.body;
-        throw Exception(
-          'API error (${response.statusCode}): $errorBody',
-        );
+        return;
       }
-    } catch (e) {
-      debugPrint('[AIChat] Error: $e');
+
+      // ── Non-200 — log the status and Groq error body (never the key) ─
+      final errorBody = response.body.length > 200
+          ? response.body.substring(0, 200)
+          : response.body;
+      debugPrint('[AIChat] HTTP ${response.statusCode}: $errorBody');
+
+      // Show a short, specific message — never the raw response body.
+      final String message;
+      if (response.statusCode == 401) {
+        message = 'The AI service key is invalid';
+      } else if (response.statusCode == 404) {
+        message = "The AI model isn't available";
+      } else if (response.statusCode == 429) {
+        message = 'Too many requests, try again in a minute';
+      } else {
+        message = 'Something went wrong (code ${response.statusCode})';
+      }
 
       if (mounted) {
         setState(() => _isLoading = false);
+        _showError(message);
+      }
+    } on TimeoutException catch (e) {
+      debugPrint('[AIChat] Request timed out: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showError('The AI took too long to answer');
+      }
+    } catch (e) {
+      // A connection failure means the device has no internet — keep the
+      // offline simulated reply so the user still gets a response.
+      if (e is http.ClientException) {
+        debugPrint('[AIChat] Offline: $e');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _messages.add(_ChatMessage(
+              text: _getSimulatedResponse(userMessage),
+              isUser: false,
+              timestamp: DateTime.now(),
+            ));
+          });
+          _showError('No internet connection. Using offline replies.');
+        }
+        return;
+      }
 
-        // If API failed, fall back to simulated response so the user
-        // still gets a reply
-        final fallbackText = _getSimulatedResponse(userMessage);
-        _messages.add(_ChatMessage(
-          text: fallbackText,
-          isUser: false,
-          timestamp: DateTime.now(),
-        ));
-
-        _showError(
-          'AI service is temporarily unavailable. Using offline responses.',
-        );
+      debugPrint('[AIChat] Unexpected error: $e');
+      if (mounted) {
+        setState(() => _isLoading = false);
+        _showError('Something went wrong');
       }
     }
   }
