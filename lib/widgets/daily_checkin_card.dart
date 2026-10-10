@@ -145,8 +145,10 @@ class DailyCheckinCard extends ConsumerWidget {
 
           const SizedBox(height: AppConstants.spacingLg),
 
-          // Stats row
+          // Stats row — even spacing, each stat flexes so narrow screens
+          // shrink rather than overflow.
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _MiniStat(
                 value: '${service.successPercentage}%',
@@ -155,6 +157,7 @@ class DailyCheckinCard extends ConsumerWidget {
                 color: context.successText,
                 isDark: isDark,
               ),
+              const SizedBox(width: AppConstants.spacingSm),
               _MiniStat(
                 value: '${service.currentStreak}',
                 label: 'Current Streak',
@@ -162,6 +165,7 @@ class DailyCheckinCard extends ConsumerWidget {
                 color: context.primary,
                 isDark: isDark,
               ),
+              const SizedBox(width: AppConstants.spacingSm),
               _MiniStat(
                 value: '${service.longestStreak}',
                 label: 'Longest Streak',

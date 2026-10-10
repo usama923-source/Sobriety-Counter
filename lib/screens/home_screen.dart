@@ -648,7 +648,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: AppConstants.spacingSm),
+                  const SizedBox(height: AppConstants.spacingLg),
+
+                  // AI Friend (Pro) — right after the sobriety card.
+                  _buildProTeaserCard(
+                    icon: Icons.smart_toy_rounded,
+                    title: 'AI Friend',
+                    subtitle: '24/7 AI support during cravings',
+                    onTap: () => _navigateToPro(const AIChatScreen()),
+                  ),
+                  const SizedBox(height: AppConstants.spacingLg),
 
                   RepaintBoundary(
                     child: _AnimatedCardWrapper(
@@ -678,15 +687,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
 
-                  // ── Locked Pro teaser cards ─────────────────────────
-                  _buildProTeaserCard(
-                    icon: Icons.smart_toy_rounded,
-                    title: 'AI Friend',
-                    subtitle: '24/7 AI support during cravings',
-                    onTap: () => _navigateToPro(const AIChatScreen()),
-                  ),
-                  const SizedBox(height: AppConstants.spacingLg),
-
+                  // Memory Game (Pro) — right after Craving Help.
                   _buildProTeaserCard(
                     icon: Icons.psychology_rounded,
                     title: 'Memory Game',
@@ -694,16 +695,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     onTap: () => _navigateToPro(const MemoryGameScreen()),
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
-
-                  _buildProTeaserCard(
-                    icon: Icons.monitor_weight_rounded,
-                    title: 'Weight Tracker',
-                    subtitle: 'Track your body transformation',
-                    onTap: () => _navigateToPro(const WeightTrackerScreen()),
-                  ),
-                  const SizedBox(height: AppConstants.spacingLg),
-
-                  // ── End Pro teaser cards ────────────────────────────
 
                   RepaintBoundary(
                     child: _AnimatedCardWrapper(
@@ -723,6 +714,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       index: 9,
                       child: const GuidedBreathingCard(),
                     ),
+                  ),
+                  const SizedBox(height: AppConstants.spacingLg),
+
+                  // Weight Tracker (Pro) — right after Guided Breathing.
+                  _buildProTeaserCard(
+                    icon: Icons.monitor_weight_rounded,
+                    title: 'Weight Tracker',
+                    subtitle: 'Track your body transformation',
+                    onTap: () => _navigateToPro(const WeightTrackerScreen()),
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
 
