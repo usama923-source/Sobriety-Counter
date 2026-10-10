@@ -7,8 +7,37 @@ import 'package:quit_drinking/constants/app_constants.dart';
 class AppTheme {
   AppTheme._();
 
+  /// The single source of truth for typography.
+  ///
+  /// Montserrat is used for the display / headline / title styles and Lato for
+  /// the body / label styles. Component themes below derive their families
+  /// from this text theme, so the fonts apply app-wide (app bars, buttons,
+  /// chips, snackbars, tooltips, inputs) without re-declaring a font family.
+  static TextTheme _textTheme(Brightness brightness) {
+    final base = brightness == Brightness.dark
+        ? GoogleFonts.latoTextTheme(ThemeData.dark().textTheme)
+        : GoogleFonts.latoTextTheme();
+
+    TextStyle? heading(TextStyle? style, FontWeight weight) =>
+        GoogleFonts.montserrat(textStyle: style, fontWeight: weight);
+
+    return base.copyWith(
+      displayLarge: heading(base.displayLarge, FontWeight.w700),
+      displayMedium: heading(base.displayMedium, FontWeight.w700),
+      displaySmall: heading(base.displaySmall, FontWeight.w700),
+      headlineLarge: heading(base.headlineLarge, FontWeight.w700),
+      headlineMedium: heading(base.headlineMedium, FontWeight.w600),
+      headlineSmall: heading(base.headlineSmall, FontWeight.w600),
+      titleLarge: heading(base.titleLarge, FontWeight.w700),
+      titleMedium: heading(base.titleMedium, FontWeight.w600),
+      titleSmall: heading(base.titleSmall, FontWeight.w600),
+      // body* and label* keep Lato from [base].
+    );
+  }
+
   // ── Light Theme ──────────────────────────────────────────────────────────
   static ThemeData get light {
+    final textTheme = _textTheme(Brightness.light);
     final colorScheme = ColorScheme.light(
       primary: AppColors.brandPrimary,
       onPrimary: AppColors.white,
@@ -41,12 +70,7 @@ class AppTheme {
       brightness: Brightness.light,
 
       // ── Text Theme ──────────────────────────────────────────────────────
-      textTheme: GoogleFonts.latoTextTheme().copyWith(
-        displayLarge: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
-        displayMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
-        titleLarge: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
-        titleMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
-      ),
+      textTheme: textTheme,
 
       // ── AppBar ──────────────────────────────────────────────────────────
       appBarTheme: AppBarTheme(
@@ -55,7 +79,7 @@ class AppTheme {
         backgroundColor: AppColors.brandPrimary,
         foregroundColor: AppColors.white,
         centerTitle: true,
-        titleTextStyle: TextStyle(
+        titleTextStyle: textTheme.titleLarge?.copyWith(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: AppColors.white,
@@ -167,11 +191,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
           borderSide: const BorderSide(color: AppColors.softRed, width: 2),
         ),
-        labelStyle: TextStyle(
+        labelStyle: textTheme.bodySmall?.copyWith(
           fontSize: 14,
           color: AppColors.textSecondary,
         ),
-        hintStyle: TextStyle(
+        hintStyle: textTheme.bodySmall?.copyWith(
           fontSize: 14,
           color: AppColors.textTertiary,
         ),
@@ -183,7 +207,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
         ),
-        contentTextStyle: TextStyle(
+        contentTextStyle: textTheme.bodyMedium?.copyWith(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
@@ -197,11 +221,11 @@ class AppTheme {
         selectedItemColor: AppColors.primaryLight,
         unselectedItemColor: AppColors.textTertiary,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: TextStyle(
+        selectedLabelStyle: textTheme.labelSmall?.copyWith(
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: TextStyle(
+        unselectedLabelStyle: textTheme.labelSmall?.copyWith(
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
@@ -230,7 +254,7 @@ class AppTheme {
       // ── Chip ────────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceAltLight,
-        labelStyle: TextStyle(
+        labelStyle: textTheme.labelMedium?.copyWith(
           fontSize: 13,
           fontWeight: FontWeight.w500,
           color: AppColors.primaryLight,
@@ -280,7 +304,7 @@ class AppTheme {
           color: AppColors.primaryLight,
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
         ),
-        textStyle: TextStyle(
+        textStyle: textTheme.bodySmall?.copyWith(
           fontSize: 13,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
@@ -291,6 +315,7 @@ class AppTheme {
 
   // ── Dark Theme ───────────────────────────────────────────────────────────
   static ThemeData get dark {
+    final textTheme = _textTheme(Brightness.dark);
     final colorScheme = ColorScheme.dark(
       primary: AppColors.brandLightBlue,
       onPrimary: AppColors.brandPrimaryDark,
@@ -323,12 +348,7 @@ class AppTheme {
       brightness: Brightness.dark,
 
       // ── Text Theme ──────────────────────────────────────────────────────
-      textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme).copyWith(
-        displayLarge: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
-        displayMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
-        titleLarge: GoogleFonts.montserrat(fontWeight: FontWeight.w700),
-        titleMedium: GoogleFonts.montserrat(fontWeight: FontWeight.w600),
-      ),
+      textTheme: textTheme,
 
       // ── AppBar ──────────────────────────────────────────────────────────
       appBarTheme: AppBarTheme(
@@ -337,7 +357,7 @@ class AppTheme {
         backgroundColor: AppColors.brandLightBlue,
         foregroundColor: AppColors.brandPrimaryDark,
         centerTitle: true,
-        titleTextStyle: TextStyle(
+        titleTextStyle: textTheme.titleLarge?.copyWith(
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: AppColors.brandPrimaryDark,
@@ -376,7 +396,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.radiusMd),
           ),
-          textStyle: TextStyle(
+          textStyle: textTheme.labelLarge?.copyWith(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.1,
@@ -398,7 +418,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.radiusMd),
           ),
-          textStyle: TextStyle(
+          textStyle: textTheme.labelLarge?.copyWith(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.1,
@@ -418,7 +438,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.radiusSm),
           ),
-          textStyle: TextStyle(
+          textStyle: textTheme.labelLarge?.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.1,
@@ -464,11 +484,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
           borderSide: const BorderSide(color: AppColors.softRedLight, width: 2),
         ),
-        labelStyle: TextStyle(
+        labelStyle: textTheme.bodySmall?.copyWith(
           fontSize: 14,
           color: AppColors.textOnDarkSecondary,
         ),
-        hintStyle: TextStyle(
+        hintStyle: textTheme.bodySmall?.copyWith(
           fontSize: 14,
           color: AppColors.textOnDarkSecondary.withValues(alpha: 0.6),
         ),
@@ -480,7 +500,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
         ),
-        contentTextStyle: TextStyle(
+        contentTextStyle: textTheme.bodyMedium?.copyWith(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
@@ -494,11 +514,11 @@ class AppTheme {
         selectedItemColor: AppColors.primaryDark,
         unselectedItemColor: AppColors.textOnDarkSecondary,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: TextStyle(
+        selectedLabelStyle: textTheme.labelSmall?.copyWith(
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: TextStyle(
+        unselectedLabelStyle: textTheme.labelSmall?.copyWith(
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
@@ -527,7 +547,7 @@ class AppTheme {
       // ── Chip ────────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceAltDark,
-        labelStyle: TextStyle(
+        labelStyle: textTheme.labelMedium?.copyWith(
           fontSize: 13,
           fontWeight: FontWeight.w500,
           color: AppColors.primaryDark,
@@ -579,7 +599,7 @@ class AppTheme {
           color: AppColors.surfaceAltDark,
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
         ),
-        textStyle: TextStyle(
+        textStyle: textTheme.bodySmall?.copyWith(
           fontSize: 13,
           fontWeight: FontWeight.w500,
           color: AppColors.textOnDark,
