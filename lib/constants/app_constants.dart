@@ -4,7 +4,9 @@ class AppConstants {
 
   /// Application name
   static const String appName = 'QuitDrink Ai';
-  static const String appTagline = 'One day at a time.';
+
+  /// Brand tagline — the single source of truth for the app's tagline text.
+  static const String tagline = 'Find your calm, anytime.';
 
   // ── Layout ───────────────────────────────────────────────────────────────
   static const double maxContentWidth = 1200.0;

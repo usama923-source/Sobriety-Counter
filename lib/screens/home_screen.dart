@@ -455,7 +455,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               Padding(
                 padding: const EdgeInsets.all(AppConstants.spacingLg),
                 child: Text(
-                  'One day at a time.',
+                  AppConstants.tagline,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,

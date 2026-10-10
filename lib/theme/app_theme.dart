@@ -10,18 +10,18 @@ class AppTheme {
   // ── Light Theme ──────────────────────────────────────────────────────────
   static ThemeData get light {
     final colorScheme = ColorScheme.light(
-      primary: AppColors.primaryLight,
-      onPrimary: AppColors.onPrimaryLight,
+      primary: AppColors.brandPrimary,
+      onPrimary: AppColors.white,
       primaryContainer: AppColors.surfaceAltLight,
-      onPrimaryContainer: AppColors.primaryLight,
-      secondary: AppColors.accent,
-      onSecondary: AppColors.onPrimaryDark,
+      onPrimaryContainer: AppColors.brandPrimary,
+      secondary: AppColors.brandLightBlue,
+      onSecondary: AppColors.brandPrimaryDark,
       secondaryContainer: AppColors.surfaceAltLight,
-      onSecondaryContainer: AppColors.onPrimaryDark,
-      tertiary: AppColors.accent,
-      onTertiary: AppColors.onPrimaryDark,
+      onSecondaryContainer: AppColors.brandPrimary,
+      tertiary: AppColors.brandLightBlue,
+      onTertiary: AppColors.brandPrimaryDark,
       tertiaryContainer: AppColors.surfaceAltLight,
-      onTertiaryContainer: AppColors.primaryLight,
+      onTertiaryContainer: AppColors.brandPrimary,
       error: AppColors.softRed,
       onError: AppColors.white,
       errorContainer: AppColors.softRedLight.withValues(alpha: 0.2),
@@ -31,7 +31,7 @@ class AppTheme {
       onSurfaceVariant: AppColors.secondaryTextLight,
       outline: AppColors.textTertiary,
       outlineVariant: AppColors.surfaceAltLight,
-      surfaceTint: AppColors.primaryLight,
+      surfaceTint: AppColors.brandPrimary,
       shadow: AppColors.shadowLight,
     );
 
@@ -52,19 +52,19 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0.5,
-        backgroundColor: AppColors.surfaceLight,
-        foregroundColor: AppColors.primaryLight,
+        backgroundColor: AppColors.brandPrimary,
+        foregroundColor: AppColors.white,
         centerTitle: true,
         titleTextStyle: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: AppColors.primaryLight,
+          color: AppColors.white,
         ),
       ),
 
       // ── Card ────────────────────────────────────────────────────────────
       cardTheme: CardThemeData(
-        elevation: 0,
+        elevation: 2,
         color: AppColors.surfaceLight,
         surfaceTintColor: AppColors.surfaceLight,
         shadowColor: AppColors.shadowLight,
@@ -82,8 +82,8 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.onPrimaryLight,
+          backgroundColor: AppColors.brandPrimary,
+          foregroundColor: AppColors.white,
           disabledBackgroundColor: AppColors.surfaceAltLight,
           disabledForegroundColor: AppColors.textTertiary,
           shadowColor: AppColors.shadowAccent,
@@ -132,8 +132,8 @@ class AppTheme {
       // ── Floating Action Button ──────────────────────────────────────────
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         elevation: 0,
-        backgroundColor: AppColors.primaryLight,
-        foregroundColor: AppColors.onPrimaryLight,
+        backgroundColor: AppColors.brandPrimary,
+        foregroundColor: AppColors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusMd),
         ),
@@ -292,18 +292,18 @@ class AppTheme {
   // ── Dark Theme ───────────────────────────────────────────────────────────
   static ThemeData get dark {
     final colorScheme = ColorScheme.dark(
-      primary: AppColors.primaryDark,
-      onPrimary: AppColors.onPrimaryDark,
+      primary: AppColors.brandLightBlue,
+      onPrimary: AppColors.brandPrimaryDark,
       primaryContainer: AppColors.surfaceAltDark,
-      onPrimaryContainer: AppColors.primaryDark,
-      secondary: AppColors.accent,
-      onSecondary: AppColors.onPrimaryDark,
+      onPrimaryContainer: AppColors.brandLightBlue,
+      secondary: AppColors.brandLightBlue,
+      onSecondary: AppColors.brandPrimaryDark,
       secondaryContainer: AppColors.surfaceAltDark,
-      onSecondaryContainer: AppColors.primaryDark,
-      tertiary: AppColors.accent,
-      onTertiary: AppColors.onPrimaryDark,
+      onSecondaryContainer: AppColors.brandLightBlue,
+      tertiary: AppColors.brandLightBlue,
+      onTertiary: AppColors.brandPrimaryDark,
       tertiaryContainer: AppColors.surfaceAltDark,
-      onTertiaryContainer: AppColors.primaryDark,
+      onTertiaryContainer: AppColors.brandLightBlue,
       error: AppColors.softRedLight,
       onError: AppColors.onPrimaryDark,
       errorContainer: AppColors.softRed.withValues(alpha: 0.2),
@@ -313,7 +313,7 @@ class AppTheme {
       onSurfaceVariant: AppColors.textOnDarkSecondary,
       outline: AppColors.textOnDarkSecondary.withValues(alpha: 0.5),
       outlineVariant: AppColors.surfaceAltDark,
-      surfaceTint: AppColors.accent,
+      surfaceTint: AppColors.brandLightBlue,
       shadow: AppColors.shadowDark,
     );
 
@@ -334,13 +334,13 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0.5,
-        backgroundColor: AppColors.bgDark,
-        foregroundColor: AppColors.textOnDark,
+        backgroundColor: AppColors.brandLightBlue,
+        foregroundColor: AppColors.brandPrimaryDark,
         centerTitle: true,
         titleTextStyle: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: AppColors.textOnDark,
+          color: AppColors.brandPrimaryDark,
         ),
       ),
 
@@ -364,8 +364,8 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: AppColors.primaryDark,
-          foregroundColor: AppColors.onPrimaryDark,
+          backgroundColor: AppColors.brandLightBlue,
+          foregroundColor: AppColors.brandPrimaryDark,
           disabledBackgroundColor: AppColors.surfaceAltDark,
           disabledForegroundColor: AppColors.textOnDarkSecondary.withValues(alpha: 0.5),
           shadowColor: AppColors.shadowDark,
@@ -429,8 +429,8 @@ class AppTheme {
       // ── Floating Action Button ──────────────────────────────────────────
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         elevation: 0,
-        backgroundColor: AppColors.primaryDark,
-        foregroundColor: AppColors.onPrimaryDark,
+        backgroundColor: AppColors.brandLightBlue,
+        foregroundColor: AppColors.brandPrimaryDark,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusMd),
         ),

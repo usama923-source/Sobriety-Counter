@@ -29,7 +29,7 @@ class HomeFooter extends StatelessWidget {
 
           // ── Tagline ──────────────────────────────────────────────────
           Text(
-            AppConstants.appTagline,
+            AppConstants.tagline,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,

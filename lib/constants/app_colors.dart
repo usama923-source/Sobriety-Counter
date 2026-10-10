@@ -5,6 +5,20 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
+  // ── Brand ────────────────────────────────────────────────────────────────
+  /// The brand's core navy — primary fills and text in light mode.
+  static const Color brandPrimary = Color(0xFF113251);
+
+  /// Darker brand navy — text/foreground placed on [brandLightBlue].
+  static const Color brandPrimaryDark = Color(0xFF0B2238);
+
+  /// Brand navy gradient end only — never used as a solid primary fill.
+  static const Color brandPrimaryLight = Color(0xFF1A4570);
+
+  /// Brand light blue — fills, icons and tinted backgrounds only.
+  /// Never use white text on this; use [brandPrimary] instead.
+  static const Color brandLightBlue = Color(0xFF73B1D6);
+
   // ── Primary ──────────────────────────────────────────────────────────────
   static const Color navyBlue = Color(0xFF1E3A5F);
   static const Color navyBlueLight = Color(0xFF2C5282);
@@ -52,16 +66,17 @@ class AppColors {
 
   // ── 60-30-10 Theme ───────────────────────────────────────────────────────
   // 30% Primary
-  static const Color primaryLight = Color(0xFF14395C);
-  static const Color onPrimaryLight = Color(0xFFFFFFFF);
-  static const Color primaryDark = Color(0xFF9CC3E0);
-  static const Color onPrimaryDark = Color(0xFF0B1E30);
+  static const Color primaryLight = brandPrimary;
+  static const Color onPrimaryLight = white;
+  static const Color primaryDark = brandLightBlue;
+  static const Color onPrimaryDark = brandPrimaryDark;
 
   // 10% Accent (fills and icons only — never text, never under white text)
-  static const Color accent = Color(0xFF70B0D0);
+  static const Color accent = brandLightBlue;
 
   // 60% Neutral backgrounds
-  static const Color bgLight = Color(0xFFF4F7FA);
+  // Light scaffold: white overlaid with [brandPrimary] at 6% alpha.
+  static const Color bgLight = Color(0xFFEEF1F4);
   static const Color surfaceLight = Color(0xFFFFFFFF);
   static const Color surfaceAltLight = Color(0xFFE9EEF5);
   static const Color bgDark = Color(0xFF0F1B2B);

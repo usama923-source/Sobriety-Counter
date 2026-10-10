@@ -34,7 +34,7 @@ class HomeHeader extends StatelessWidget {
 
           // ── Tagline ─────────────────────────────────────────────────
           Text(
-            AppConstants.appTagline,
+            AppConstants.tagline,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w300,

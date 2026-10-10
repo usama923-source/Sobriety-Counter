@@ -376,7 +376,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: AppConstants.spacingMd),
 
           Text(
-            'Your personal sobriety companion.\nOne day at a time.',
+            'Your personal sobriety companion.\n${AppConstants.tagline}',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,

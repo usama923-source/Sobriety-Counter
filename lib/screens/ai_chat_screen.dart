@@ -348,7 +348,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
 
     if (lower.contains('thank')) {
       return 'You\'re so welcome! I\'m here for you anytime — 24/7. '
-          'Keep going, one day at a time. You\'re doing amazing. 💜';
+          'Keep going — find your calm, anytime. You\'re doing amazing. 💜';
     }
 
     if (lower.contains('story') || lower.contains('calm')) {

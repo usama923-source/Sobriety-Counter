@@ -7,7 +7,7 @@ class Quote {
 
 const List<Quote> allQuotes = [
   Quote('Sobriety delivers everything alcohol promised.', 'Unknown'),
-  Quote('One day at a time. One moment at a time. You\'ve got this.', 'Unknown'),
+  Quote('Find your calm, anytime. One moment at a time. You\'ve got this.', 'Unknown'),
   Quote('The journey of a thousand miles begins with a single step.', 'Lao Tzu'),
   Quote('Strength does not come from winning. Your struggles develop your strengths.', 'Arnold Schwarzenegger'),
   Quote('Fall seven times, stand up eight.', 'Japanese Proverb'),
