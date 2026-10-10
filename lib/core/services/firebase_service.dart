@@ -8,7 +8,7 @@ import 'package:uuid/uuid.dart';
 /// Responsibilities:
 /// - Generates and persists a UUID device ID on first launch
 ///   (SharedPreferences key: "device_id")
-/// - Logs the "app_open" and "pro_purchase" analytics events
+/// - Logs the "app_open", "pro_purchase" and "reminder_scheduled" events
 ///
 /// All methods are safe to call before/without Firebase initialization —
 /// failures are caught and logged so the app never crashes on Firebase issues.
@@ -52,6 +52,19 @@ class FirebaseService {
       await FirebaseAnalytics.instance.logEvent(name: 'app_open');
     } catch (e) {
       debugPrint('[FirebaseService] logAppOpen failed (non-fatal): $e');
+    }
+  }
+
+  /// Log the "reminder_scheduled" Firebase Analytics event.
+  ///
+  /// Fired once when the user sets a daily reminder.
+  Future<void> logReminderScheduled() async {
+    try {
+      await FirebaseAnalytics.instance.logEvent(name: 'reminder_scheduled');
+    } catch (e) {
+      debugPrint(
+        '[FirebaseService] logReminderScheduled failed (non-fatal): $e',
+      );
     }
   }
 

@@ -1,10 +1,11 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
 import 'package:quit_drinking/theme/app_theme.dart';
+import 'package:quit_drinking/core/services/firebase_service.dart';
 import 'package:quit_drinking/core/services/notification_service.dart';
 import 'package:quit_drinking/firebase_options.dart';
 import 'package:quit_drinking/screens/home_screen.dart';
@@ -19,6 +20,8 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // Log the app-open event once per launch. Never blocks startup.
+    await FirebaseService().logAppOpen();
   } catch (e) {
     // Firebase is optional (analytics + purchase logging) — continue
     // without it so a broken config never blocks app startup.

@@ -115,7 +115,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 body:
                     'We use Firebase Analytics (Google) to understand how the app '
                     'is used. It records basic events such as when the app is '
-                    'opened and when the Pro upgrade is unlocked. These events '
+                    'opened and when a daily reminder is set. These events '
                     'contain no name, email, or contact details, and are not used '
                     'to advertise to you.',
                 isDark: isDark,
@@ -129,11 +129,11 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 iconColor: AppColors.gold,
                 title: 'Pro Purchases',
                 body:
-                    'When you unlock Pro, a record is written to Google Cloud '
-                    'Firestore. It contains a random device identifier generated '
-                    'on your device, the purchase date, amount, and currency. The '
-                    'device identifier is not your name or email and is not used '
-                    'to identify you personally.',
+                    'Unlocking Pro is stored on your device and is not tied to '
+                    'any account or personal details. When real billing is '
+                    'added, purchase records will be handled by the store '
+                    'billing system (Google Play or the App Store) under their '
+                    'own privacy policies.',
                 isDark: isDark,
               ),
 

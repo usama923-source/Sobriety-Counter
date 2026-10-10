@@ -240,11 +240,11 @@ class NotificationService {
       await prefs.setBool(_enabledKey, true);
       await prefs.setString(_timeKey, '${time.hour}:${time.minute}');
 
-      // Sync the reminder to the backend (analytics + logging). If the
-      // backend request fails, the local reminder is still valid, so we just
-      // log the failure.
+      // Record the reminder as its own analytics event. If the analytics
+      // request fails, the local reminder is still valid, so we just log the
+      // failure.
       try {
-        await FirebaseService().logAppOpen();
+        await FirebaseService().logReminderScheduled();
       } catch (e) {
         debugPrint('[NotificationService] could not log reminder enable: $e');
       }
