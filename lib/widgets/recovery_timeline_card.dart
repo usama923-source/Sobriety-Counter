@@ -59,15 +59,14 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.successGreen.withValues(alpha: 0.2)
-                      : AppColors.successGreen.withValues(alpha: 0.15),
+                  color: AppColors.brandLightBlue
+                      .withValues(alpha: isDark ? 0.22 : 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.emoji_events_rounded,
                   size: 22,
-                  color: context.successText,
+                  color: AppColors.brandLightBlue,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -88,9 +87,8 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.successGreen.withValues(alpha: 0.15)
-                      : AppColors.successGreen.withValues(alpha: 0.1),
+                  color: AppColors.brandLightBlue
+                      .withValues(alpha: isDark ? 0.18 : 0.14),
                   borderRadius: BorderRadius.circular(AppConstants.radiusFull),
                 ),
                 child: Text(
@@ -98,7 +96,7 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: context.successText,
+                    color: context.primary,
                   ),
                 ),
               ),
@@ -120,7 +118,7 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
                   backgroundColor:
                       isDark ? AppColors.darkCardAlt : AppColors.lightGrayAlt,
                   valueColor:
-                      const AlwaysStoppedAnimation<Color>(AppColors.successGreen),
+                      AlwaysStoppedAnimation<Color>(context.primary),
                   minHeight: 8,
                 );
               },
@@ -393,13 +391,13 @@ class _MilestoneTileState extends State<_MilestoneTile>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: widget.isReached
-                              ? AppColors.successGreen
+                              ? context.primary
                               : (widget.isDark
                                   ? AppColors.darkCardAlt
                                   : AppColors.lightGrayAlt),
                           border: widget.isReached
                               ? Border.all(
-                                  color: AppColors.successGreen, width: 2.5)
+                                  color: context.primary, width: 2.5)
                               : Border.all(
                                   color: widget.isDark
                                       ? AppColors.textOnDarkSecondary
@@ -410,8 +408,8 @@ class _MilestoneTileState extends State<_MilestoneTile>
                                 ),
                         ),
                         child: widget.isReached
-                            ? const Icon(Icons.check,
-                                size: 10, color: Colors.white)
+                            ? Icon(Icons.check,
+                                size: 10, color: context.onPrimary)
                             : null,
                       ),
                       if (!widget.isLast)
@@ -424,10 +422,8 @@ class _MilestoneTileState extends State<_MilestoneTile>
                                 end: Alignment.bottomCenter,
                                 colors: widget.isReached
                                     ? [
-                                        AppColors.successGreen
-                                            .withValues(alpha: 0.6),
-                                        AppColors.successGreen
-                                            .withValues(alpha: 0.15),
+                                        context.primary.withValues(alpha: 0.6),
+                                        context.primary.withValues(alpha: 0.15),
                                       ]
                                     : [
                                         widget.isDark
@@ -464,7 +460,7 @@ class _MilestoneTileState extends State<_MilestoneTile>
                               widget.milestone.icon,
                               size: 16,
                               color: widget.isReached
-                                  ? context.successText
+                                  ? context.primary
                                   : (widget.isDark
                                       ? AppColors.textOnDarkSecondary
                                           .withValues(alpha: 0.5)
@@ -496,8 +492,8 @@ class _MilestoneTileState extends State<_MilestoneTile>
                               ),
                               decoration: BoxDecoration(
                                 color: widget.isReached
-                                    ? AppColors.successGreen
-                                        .withValues(alpha: 0.15)
+                                    ? AppColors.brandLightBlue
+                                        .withValues(alpha: 0.18)
                                     : (widget.isDark
                                         ? AppColors.darkCardAlt
                                         : AppColors.lightGrayAlt),
@@ -511,7 +507,7 @@ class _MilestoneTileState extends State<_MilestoneTile>
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   color: widget.isReached
-                                      ? context.successText
+                                      ? context.primary
                                       : (widget.isDark
                                           ? AppColors.textOnDarkSecondary
                                           : AppColors.secondaryTextLight),

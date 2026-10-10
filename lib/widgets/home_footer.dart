@@ -11,7 +11,7 @@ class HomeFooter extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mutedColor = isDark
         ? AppColors.textOnDarkSecondary.withValues(alpha: 0.4)
-        : AppColors.textTertiary.withValues(alpha: 0.6);
+        : AppColors.secondaryTextLight.withValues(alpha: 0.7);
 
     return Padding(
       padding: const EdgeInsets.symmetric(

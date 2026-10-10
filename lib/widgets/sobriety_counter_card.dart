@@ -38,7 +38,7 @@ class SobrietyCounterCard extends StatelessWidget {
           : LinearGradient(
               colors: [
                 AppColors.white,
-                AppColors.mint.withValues(alpha: 0.25),
+                AppColors.brandLightBlue.withValues(alpha: 0.10),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -90,7 +90,7 @@ class SobrietyCounterCard extends StatelessWidget {
             icon: Icons.flag_rounded,
             label: 'Next milestone',
             value: _nextMilestoneText(service),
-            valueColor: context.successText,
+            valueColor: context.primary,
             isDark: isDark,
           ),
 
@@ -114,15 +114,14 @@ class SobrietyCounterCard extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.softTeal.withValues(alpha: 0.15)
-                  : AppColors.mint,
+              color: AppColors.brandLightBlue
+                  .withValues(alpha: isDark ? 0.18 : 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.calendar_today_rounded,
               size: 28,
-              color: context.primary,
+              color: AppColors.brandLightBlue,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),
@@ -185,7 +184,7 @@ class SobrietyCounterCard extends StatelessWidget {
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               headerBackgroundColor: Theme.of(context).brightness == Brightness.dark
                   ? AppColors.darkCardAlt
-                  : AppColors.navyBlue,
+                  : AppColors.brandPrimary,
               headerForegroundColor: AppColors.white,
               dayForegroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
@@ -197,9 +196,7 @@ class SobrietyCounterCard extends StatelessWidget {
               }),
               dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
                 if (states.contains(WidgetState.selected)) {
-                  return Theme.of(context).brightness == Brightness.dark
-                      ? AppColors.softTealLight
-                      : AppColors.navyBlue;
+                  return AppColors.brandPrimary;
                 }
                 return null;
               }),

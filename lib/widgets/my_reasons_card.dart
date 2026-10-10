@@ -53,7 +53,7 @@ class MyReasonsCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? AppColors.textOnDarkSecondary : AppColors.textTertiary,
+                  color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
                 ),
               ),
             ],
@@ -76,11 +76,13 @@ class MyReasonsCard extends StatelessWidget {
               icon: const Icon(Icons.add_rounded, size: 20),
               label: const Text('Add a reason'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+                foregroundColor: isDark
+                    ? AppColors.brandLightBlue
+                    : AppColors.brandPrimary,
                 side: BorderSide(
                   color: isDark
-                      ? AppColors.softTealLight.withValues(alpha: 0.4)
-                      : AppColors.navyBlue.withValues(alpha: 0.3),
+                      ? AppColors.brandLightBlue.withValues(alpha: 0.4)
+                      : AppColors.brandPrimary.withValues(alpha: 0.3),
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
@@ -154,7 +156,7 @@ class MyReasonsCard extends StatelessWidget {
             child: Text(
               'Cancel',
               style: TextStyle(
-                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
               ),
             ),
           ),
@@ -167,8 +169,8 @@ class MyReasonsCard extends StatelessWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
-              foregroundColor: isDark ? AppColors.navyBlue : AppColors.white,
+              backgroundColor: AppColors.brandPrimary,
+              foregroundColor: AppColors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppConstants.radiusSm),
               ),
@@ -199,7 +201,7 @@ class _EmptyState extends StatelessWidget {
             size: 48,
             color: isDark
                 ? AppColors.textOnDarkSecondary.withValues(alpha: 0.3)
-                : AppColors.textTertiary.withValues(alpha: 0.4),
+                : AppColors.secondaryTextLight.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppConstants.spacingSm),
           Text(
@@ -218,7 +220,7 @@ class _EmptyState extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w400,
               height: 1.5,
-              color: isDark ? AppColors.textOnDarkSecondary : AppColors.textTertiary,
+              color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
             ),
           ),
         ],
@@ -276,7 +278,7 @@ class _ReasonsList extends StatelessWidget {
         content: Text(
           'Are you sure you want to remove this reason?',
           style: TextStyle(
-            color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+            color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
           ),
         ),
         actions: [
@@ -285,7 +287,7 @@ class _ReasonsList extends StatelessWidget {
             child: Text(
               'Cancel',
               style: TextStyle(
-                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
               ),
             ),
           ),
@@ -368,7 +370,7 @@ class _ReasonChip extends StatelessWidget {
             child: Text(
               'Cancel',
               style: TextStyle(
-                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                color: isDark ? AppColors.textOnDarkSecondary : AppColors.secondaryTextLight,
               ),
             ),
           ),
@@ -381,8 +383,8 @@ class _ReasonChip extends StatelessWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDark ? AppColors.softTealLight : AppColors.navyBlue,
-              foregroundColor: isDark ? AppColors.navyBlue : AppColors.white,
+              backgroundColor: AppColors.brandPrimary,
+              foregroundColor: AppColors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppConstants.radiusSm),
               ),
@@ -420,7 +422,7 @@ class _ReasonChip extends StatelessWidget {
                 width: 6,
                 height: 6,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+                  color: isDark ? AppColors.brandLightBlue : AppColors.brandPrimary,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -450,7 +452,7 @@ class _ReasonChip extends StatelessWidget {
                     child: Icon(
                       Icons.edit_rounded,
                       size: 18,
-                      color: isDark ? AppColors.softTeal : AppColors.navyBlue,
+                      color: isDark ? AppColors.brandLightBlue : AppColors.brandPrimary,
                     ),
                   ),
                 ),

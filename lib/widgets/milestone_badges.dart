@@ -28,16 +28,15 @@ class MilestoneBadges extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: completed
-                ? (isDark
-                    ? AppColors.successGreen.withValues(alpha: 0.2)
-                    : AppColors.successGreen.withValues(alpha: 0.12))
+                ? AppColors.brandLightBlue
+                    .withValues(alpha: isDark ? 0.22 : 0.16)
                 : (isDark
                     ? AppColors.darkCardAlt
                     : AppColors.lightGrayAlt),
             borderRadius: BorderRadius.circular(AppConstants.radiusFull),
             border: completed
                 ? Border.all(
-                    color: AppColors.successGreen.withValues(alpha: 0.4),
+                    color: AppColors.brandLightBlue.withValues(alpha: 0.5),
                     width: 1.2,
                   )
                 : null,
@@ -49,10 +48,10 @@ class MilestoneBadges extends StatelessWidget {
                 completed ? m.completedIcon : m.icon,
                 size: 16,
                 color: completed
-                    ? AppColors.successGreen
+                    ? AppColors.brandPrimary
                     : (isDark
                         ? AppColors.textOnDarkSecondary
-                        : AppColors.textTertiary),
+                        : AppColors.secondaryTextLight),
               ),
               const SizedBox(width: AppConstants.spacingXxs + 2),
               Text(
@@ -61,10 +60,10 @@ class MilestoneBadges extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: completed ? FontWeight.w700 : FontWeight.w500,
                   color: completed
-                      ? AppColors.successGreen
+                      ? AppColors.brandPrimary
                       : (isDark
                           ? AppColors.textOnDarkSecondary
-                          : AppColors.textTertiary),
+                          : AppColors.secondaryTextLight),
                 ),
               ),
             ],

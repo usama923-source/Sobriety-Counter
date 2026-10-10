@@ -166,11 +166,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.navyBlue,
+        color: AppColors.brandPrimary,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.navyBlue.withValues(alpha: 0.35),
+            color: AppColors.brandPrimary.withValues(alpha: 0.35),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -217,7 +217,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             onRefresh: _onRefresh,
             displacement: 80,
             edgeOffset: 0,
-            color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+            color: isDark ? AppColors.brandLightBlue : AppColors.brandPrimary,
             backgroundColor: isDark ? AppColors.darkSurface : AppColors.white,
             child: _buildBody(isDark),
           ),
@@ -240,8 +240,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           child: CircularProgressIndicator(
                             strokeWidth: 3,
                             color: isDark
-                                ? AppColors.softTealLight
-                                : AppColors.navyBlue,
+                                ? AppColors.brandLightBlue
+                                : AppColors.brandPrimary,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -252,7 +252,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             fontWeight: FontWeight.w500,
                             color: isDark
                                 ? AppColors.textOnDarkSecondary
-                                : AppColors.textSecondary,
+                                : AppColors.secondaryTextLight,
                           ),
                         ),
                       ],
@@ -274,7 +274,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   height: 24,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+                    color: isDark ? AppColors.brandLightBlue : AppColors.brandPrimary,
                   ),
                 ),
               ),
@@ -329,7 +329,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             ),
             secondChild: Icon(
               Icons.dark_mode_rounded,
-              color: isDark ? AppColors.textOnDark : AppColors.navyBlue,
+              color: isDark ? AppColors.textOnDark : AppColors.brandPrimary,
             ),
           ),
           tooltip: isDark ? 'Light mode' : 'Dark mode',
@@ -342,7 +342,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ),
           icon: Icon(
             Icons.settings_rounded,
-            color: isDark ? AppColors.textOnDark : AppColors.textSecondary,
+            color: isDark ? AppColors.textOnDark : AppColors.secondaryTextLight,
           ),
           tooltip: 'Settings',
         ),
@@ -355,117 +355,115 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   Widget _buildDrawer(bool isDark) {
     return Drawer(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isDark
-                ? [AppColors.bgDark, AppColors.surfaceDark]
-                : [AppColors.primaryLight, AppColors.navyBlueLight],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // ── App Header (large centered logo) ──────────────────────
-              const Padding(
-                padding: EdgeInsets.fromLTRB(
-                  AppConstants.spacingLg,
-                  AppConstants.spacingXl,
-                  AppConstants.spacingLg,
-                  AppConstants.spacingLg,
-                ),
-                child: Center(
-                  child: AppLogo(size: 96),
-                ),
-              ),
-
-              // ── Menu Items ───────────────────────────────────────────
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    const SizedBox(height: AppConstants.spacingXs),
-                    _DrawerMenuItem(
-                      icon: Icons.home_rounded,
-                      title: 'Home',
-                      isDark: true,
-                      onTap: () => Navigator.of(context).pop(),
-                    ),
-                    _DrawerMenuItem(
-                      icon: Icons.self_improvement_rounded,
-                      title: 'Calming Activities',
-                      isDark: true,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const CravingActionsScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    _DrawerProMenuItem(
-                      icon: Icons.smart_toy_rounded,
-                      title: 'AI Friend',
-                      isDark: true,
-                      onTapPro: () => _navigateToPro(
-                        const AIChatScreen(),
-                      ),
-                    ),
-                    _DrawerProMenuItem(
-                      icon: Icons.psychology_rounded,
-                      title: 'Memory Game',
-                      isDark: true,
-                      onTapPro: () => _navigateToPro(
-                        const MemoryGameScreen(),
-                      ),
-                    ),
-                    _DrawerProMenuItem(
-                      icon: Icons.monitor_weight_rounded,
-                      title: 'Weight Tracker',
-                      isDark: true,
-                      onTapPro: () => _navigateToPro(
-                        const WeightTrackerScreen(),
-                      ),
-                    ),
-                    _DrawerProMenuItem(
-                      icon: Icons.settings_rounded,
-                      title: 'Settings',
-                      isDark: true,
-                      isPro: false,
-                      onTapPro: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const SettingsScreen(),
-                          ),
-                        );
-                      },
-                    ),
+      // Only the header carries a background; the body is plain surface.
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.white,
+      child: SafeArea(
+        child: Column(
+          children: [
+            // ── Header — gradient with logo + tagline ────────────────
+            Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.brandPrimary,
+                    AppColors.brandPrimaryLight,
                   ],
                 ),
               ),
-
-              // ── Footer ───────────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.all(AppConstants.spacingLg),
-                child: Text(
-                  AppConstants.tagline,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.textOnDarkSecondary.withValues(alpha: 0.7),
-                  ),
-                ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.spacingLg,
+                vertical: AppConstants.spacingXl,
               ),
-            ],
-          ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const AppLogo(size: 88),
+                  const SizedBox(height: AppConstants.spacingMd),
+                  const Text(
+                    AppConstants.tagline,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Menu Items ───────────────────────────────────────────
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  const SizedBox(height: AppConstants.spacingXs),
+                  _DrawerMenuItem(
+                    icon: Icons.home_rounded,
+                    title: 'Home',
+                    isDark: isDark,
+                    isSelected: true,
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                  _DrawerMenuItem(
+                    icon: Icons.self_improvement_rounded,
+                    title: 'Calming Activities',
+                    isDark: isDark,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CravingActionsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  _DrawerProMenuItem(
+                    icon: Icons.smart_toy_rounded,
+                    title: 'AI Friend',
+                    isDark: isDark,
+                    onTapPro: () => _navigateToPro(
+                      const AIChatScreen(),
+                    ),
+                  ),
+                  _DrawerProMenuItem(
+                    icon: Icons.psychology_rounded,
+                    title: 'Memory Game',
+                    isDark: isDark,
+                    onTapPro: () => _navigateToPro(
+                      const MemoryGameScreen(),
+                    ),
+                  ),
+                  _DrawerProMenuItem(
+                    icon: Icons.monitor_weight_rounded,
+                    title: 'Weight Tracker',
+                    isDark: isDark,
+                    onTapPro: () => _navigateToPro(
+                      const WeightTrackerScreen(),
+                    ),
+                  ),
+                  _DrawerProMenuItem(
+                    icon: Icons.settings_rounded,
+                    title: 'Settings',
+                    isDark: isDark,
+                    isPro: false,
+                    onTapPro: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -506,17 +504,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         width: 56,
         height: 56,
         decoration: BoxDecoration(
-          color: context.primary,
+          color: AppColors.brandPrimary,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.navyBlue.withValues(alpha: 0.35),
+              color: AppColors.brandPrimary.withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
-            color: AppColors.navyBlue,
+            color: AppColors.brandPrimary,
             width: 3,
           ),
         ),
@@ -527,7 +525,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               child: Icon(
                 Icons.smart_toy_rounded,
                 size: 26,
-                color: context.onPrimary,
+                color: AppColors.white,
               ),
             ),
             // Gold crown badge overlay on top-right
@@ -844,6 +842,7 @@ class _DrawerMenuItem extends StatelessWidget {
   final bool isDark;
   final VoidCallback onTap;
   final Widget? trailing;
+  final bool isSelected;
 
   const _DrawerMenuItem({
     required this.icon,
@@ -851,22 +850,32 @@ class _DrawerMenuItem extends StatelessWidget {
     required this.isDark,
     required this.onTap,
     this.trailing,
+    this.isSelected = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Navy content in light mode, light content in dark mode. The selected
+    // item gets a light-blue tint with navy (light) / light-blue (dark) text.
+    final Color foreground = isDark
+        ? (isSelected ? AppColors.brandLightBlue : AppColors.textOnDark)
+        : AppColors.brandPrimary;
+
     return ListTile(
+      selected: isSelected,
+      selectedTileColor:
+          AppColors.brandLightBlue.withValues(alpha: isDark ? 0.18 : 0.22),
       leading: Icon(
         icon,
         size: 22,
-        color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+        color: foreground,
       ),
       title: Text(
         title,
         style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+          color: foreground,
         ),
       ),
       trailing: trailing,
@@ -936,9 +945,7 @@ class _DrawerProMenuItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
-                      color: isDark
-                          ? AppColors.navyBlue
-                          : Colors.white,
+                      color: AppColors.brandPrimary,
                       letterSpacing: 0.5,
                     ),
                   ),

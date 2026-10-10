@@ -54,7 +54,7 @@ class ProUpgradeSheet extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDark
                   ? AppColors.textOnDarkSecondary.withValues(alpha: 0.3)
-                  : AppColors.textTertiary.withValues(alpha: 0.4),
+                  : AppColors.secondaryTextLight.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -108,7 +108,7 @@ class ProUpgradeSheet extends StatelessWidget {
               height: 1.4,
               color: isDark
                   ? AppColors.textOnDarkSecondary
-                  : AppColors.textSecondary,
+                  : AppColors.secondaryTextLight,
             ),
           ),
           const SizedBox(height: AppConstants.spacingXl),
@@ -186,7 +186,7 @@ class ProUpgradeSheet extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 color: isDark
                     ? AppColors.textOnDarkSecondary
-                    : AppColors.textSecondary,
+                    : AppColors.secondaryTextLight,
               ),
             ),
           ),
@@ -269,7 +269,7 @@ class _FeatureRow extends StatelessWidget {
                   height: 1.3,
                   color: isDark
                       ? AppColors.textOnDarkSecondary
-                      : AppColors.textSecondary,
+                      : AppColors.secondaryTextLight,
                 ),
               ),
             ],

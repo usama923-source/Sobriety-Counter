@@ -32,15 +32,14 @@ class DailyMotivationCard extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.softOrange.withValues(alpha: 0.2)
-                      : AppColors.softOrange.withValues(alpha: 0.15),
+                  color: AppColors.brandLightBlue
+                      .withValues(alpha: isDark ? 0.22 : 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
                 child: const Icon(
                   Icons.auto_awesome_rounded,
                   size: 20,
-                  color: AppColors.softOrange,
+                  color: AppColors.brandLightBlue,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingSm),
@@ -61,9 +60,8 @@ class DailyMotivationCard extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? AppColors.softTeal.withValues(alpha: 0.15)
-                        : AppColors.mint,
+                    color: AppColors.brandLightBlue
+                        .withValues(alpha: isDark ? 0.18 : 0.14),
                     borderRadius: BorderRadius.circular(AppConstants.radiusFull),
                   ),
                   child: Text(
@@ -71,7 +69,7 @@ class DailyMotivationCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+                      color: isDark ? AppColors.brandLightBlue : AppColors.brandPrimary,
                     ),
                   ),
                 ),
@@ -84,9 +82,8 @@ class DailyMotivationCard extends StatelessWidget {
             child: Icon(
               Icons.format_quote_rounded,
               size: 36,
-              color: isDark
-                  ? AppColors.softTealLight.withValues(alpha: 0.25)
-                  : AppColors.navyBlue.withValues(alpha: 0.12),
+              color: AppColors.brandLightBlue
+                  .withValues(alpha: isDark ? 0.25 : 0.30),
             ),
           ),
           const SizedBox(height: AppConstants.spacingSm),
@@ -115,7 +112,9 @@ class DailyMotivationCard extends StatelessWidget {
                 fontWeight: FontWeight.w400,
                 fontStyle: FontStyle.italic,
                 height: 1.6,
-                color: isDark ? AppColors.textOnDarkSecondary : AppColors.textSecondary,
+                color: isDark
+                    ? AppColors.textOnDarkSecondary
+                    : AppColors.secondaryTextLight,
               ),
             ),
           ),
@@ -131,7 +130,7 @@ class DailyMotivationCard extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: isDark
                     ? AppColors.textOnDarkSecondary.withValues(alpha: 0.7)
-                    : AppColors.textTertiary,
+                    : AppColors.secondaryTextLight,
               ),
             ),
           ),
@@ -188,7 +187,7 @@ class DailyMotivationCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+                      color: isDark ? AppColors.brandLightBlue : AppColors.brandPrimary,
                     ),
                   ),
                 ),
@@ -235,7 +234,7 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = iconColor ??
-        (isDark ? AppColors.softTealLight : AppColors.navyBlue);
+        (isDark ? AppColors.brandLightBlue : AppColors.brandPrimary);
 
     return Material(
       color: Colors.transparent,
