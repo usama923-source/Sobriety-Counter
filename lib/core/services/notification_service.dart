@@ -115,7 +115,7 @@ class NotificationService {
       // canScheduleExactNotifications() (returns Future<bool?>).
       if (androidImpl != null) {
         final canExactAlarm1 = await androidImpl.canScheduleExactNotifications();
-        if (canExactAlarm1 ?? false) {
+        if (!(canExactAlarm1 ?? false)) {
           debugPrint(
             '[NotificationService] exact alarm denied — using inexact schedule fallback',
           );

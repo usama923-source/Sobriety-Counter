@@ -1,16 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-/// Thin wrapper around Firebase (Analytics + Firestore) for this app.
+/// Thin wrapper around Firebase Analytics for this app.
 ///
 /// Responsibilities:
 /// - Generates and persists a UUID device ID on first launch
 ///   (SharedPreferences key: "device_id")
-/// - Logs the "app_open" analytics event
-/// - Records Pro purchases into the Firestore "pro_purchases" collection
+/// - Logs the "app_open" and "pro_purchase" analytics events
 ///
 /// All methods are safe to call before/without Firebase initialization —
 /// failures are caught and logged so the app never crashes on Firebase issues.
@@ -57,19 +55,14 @@ class FirebaseService {
     }
   }
 
-  /// Record a Pro purchase in Firestore and log an analytics event.
+  /// Log the "pro_purchase" Firebase Analytics event.
   ///
-  /// Writes a document to the "pro_purchases" collection:
-  /// { deviceId, purchaseDate, amount: 2.99, currency: 'USD' }
+  /// The Firestore write to "pro_purchases" was removed because
+  /// firestore.rules denies client writes. Real billing will record the
+  /// purchase server-side later.
   Future<void> logProPurchase() async {
     try {
-      final id = await getOrCreateDeviceId();
-      await FirebaseFirestore.instance.collection('pro_purchases').add({
-        'deviceId': id,
-        'purchaseDate': FieldValue.serverTimestamp(),
-        'amount': 2.99,
-        'currency': 'USD',
-      });
+      await getOrCreateDeviceId();
       await FirebaseAnalytics.instance.logEvent(name: 'pro_purchase');
     } catch (e) {
       debugPrint('[FirebaseService] logProPurchase failed (non-fatal): $e');

@@ -445,7 +445,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 const SizedBox(width: AppConstants.spacingXs),
                 Flexible(
                   child: Text(
-                    'We don\'t collect or share your personal data. Everything stays on your device.',
+                    'Your data stays on your device — except anonymous '
+                    'usage analytics, a random device ID for Pro status, and '
+                    'AI chat messages sent to the AI provider.',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

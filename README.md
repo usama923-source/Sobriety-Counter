@@ -111,7 +111,7 @@ SharedPreferences (persistence)
 
 ### Typography
 
-- **Font**: Inter (Google Fonts)
+- **Fonts**: Montserrat (display/headline/title) + Lato (body/label) — Google Fonts
 - **Scale**: Material 3 type scale (display → label)
 - **Special**: Counter (72px, w200), Quote (18px, w300 italic)
 
