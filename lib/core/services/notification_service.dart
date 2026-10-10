@@ -43,7 +43,9 @@ class NotificationService {
       await _instance._plugin.zonedSchedule(
         id: 9999,
         title: 'Test Reminder',
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: await _instance._resolveScheduleMode(
+          logWhenInexact: true,
+        ),
         body: 'This is a test notification to confirm the daily reminder is working.',
         scheduledDate: tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
         notificationDetails: const NotificationDetails(
@@ -107,21 +109,9 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
-    if (Platform.isAndroid) {
-      final androidImpl =
-          _plugin.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
-      // v22.3.1: isExactAlarmPermissionGranted() was removed; use
-      // canScheduleExactNotifications() (returns Future<bool?>).
-      if (androidImpl != null) {
-        final canExactAlarm1 = await androidImpl.canScheduleExactNotifications();
-        if (!(canExactAlarm1 ?? false)) {
-          debugPrint(
-            '[NotificationService] exact alarm denied — using inexact schedule fallback',
-          );
-        }
-      }
-    }
+    // Report (and fall back from) inexact scheduling when exact alarms are
+    // not permitted on this device.
+    await _resolveScheduleMode(logWhenInexact: true);
 
     // Request permissions on iOS/macOS
     if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
@@ -188,6 +178,39 @@ class NotificationService {
     );
   }
 
+  /// Resolve the [AndroidScheduleMode] to use for a scheduled notification.
+  ///
+  /// Returns [AndroidScheduleMode.exactAllowWhileIdle] by default, falling
+  /// back to [AndroidScheduleMode.inexactAllowWhileIdle] on Android when the
+  /// user has not granted the exact-alarm permission. [logWhenInexact]
+  /// controls whether that fallback is reported to the debug log.
+  ///
+  /// v22.3.1 removed isExactAlarmPermissionGranted(); this uses
+  /// canScheduleExactNotifications(), which returns `Future<bool?>`.
+  Future<AndroidScheduleMode> _resolveScheduleMode({
+    bool logWhenInexact = false,
+  }) async {
+    if (!Platform.isAndroid) return AndroidScheduleMode.exactAllowWhileIdle;
+
+    final androidImpl =
+        _plugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+    if (androidImpl == null) return AndroidScheduleMode.exactAllowWhileIdle;
+
+    final canScheduleExact =
+        await androidImpl.canScheduleExactNotifications();
+    if (canScheduleExact ?? false) {
+      return AndroidScheduleMode.exactAllowWhileIdle;
+    }
+
+    if (logWhenInexact) {
+      debugPrint(
+        '[NotificationService] exact alarm denied — using inexact fallback',
+      );
+    }
+    return AndroidScheduleMode.inexactAllowWhileIdle;
+  }
+
   // ── Scheduling ──────────────────────────────────────────────────────────
 
   /// Schedule a daily notification at [time] local time and persist the
@@ -207,23 +230,7 @@ class NotificationService {
       // Try exact alarm mode first, but fall back to inexact if the user
       // denied the exact-alarm permission. Repeated daily reminders at the
       // same clock time work with either mode.
-      AndroidScheduleMode scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
-      if (Platform.isAndroid) {
-        final androidImpl =
-            _plugin.resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>();
-        // v22.3.1: isExactAlarmPermissionGranted() was removed; use
-        // canScheduleExactNotifications() (returns Future<bool?>).
-        if (androidImpl != null) {
-          final canExactAlarm2 = await androidImpl.canScheduleExactNotifications();
-          if (!(canExactAlarm2 ?? false)) {
-            scheduleMode = AndroidScheduleMode.inexactAllowWhileIdle;
-            debugPrint(
-              '[NotificationService] exact alarm denied — using inexact fallback',
-            );
-          }
-        }
-      }
+      final scheduleMode = await _resolveScheduleMode(logWhenInexact: true);
 
       await _plugin.zonedSchedule(
         id: _dailyReminderId,
@@ -317,20 +324,7 @@ class NotificationService {
       final scheduledDate = _nextInstanceOfTime(hour, minute);
 
       // Fall back to inexact mode if exact alarm permission was denied.
-      AndroidScheduleMode scheduleMode = AndroidScheduleMode.exactAllowWhileIdle;
-      if (Platform.isAndroid) {
-        final androidImpl =
-            _plugin.resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>();
-        // v22.3.1: isExactAlarmPermissionGranted() was removed; use
-        // canScheduleExactNotifications() (returns Future<bool?>).
-        if (androidImpl != null) {
-          final canExactAlarm3 = await androidImpl.canScheduleExactNotifications();
-          if (!(canExactAlarm3 ?? false)) {
-            scheduleMode = AndroidScheduleMode.inexactAllowWhileIdle;
-          }
-        }
-      }
+      final scheduleMode = await _resolveScheduleMode();
 
       await _plugin.zonedSchedule(
         id: _dailyReminderId,

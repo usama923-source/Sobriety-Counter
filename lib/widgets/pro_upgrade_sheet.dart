@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/theme_provider.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Displays a gold crown icon, title, subtitle, a list of Pro features,
 /// and a gold-gradient "Unlock Pro — \$2.99" button. On confirm, sets
 /// the SharedPreferences key "is_pro" to true.
-class ProUpgradeSheet extends StatelessWidget {
+class ProUpgradeSheet extends ConsumerWidget {
   final bool isDark;
 
   const ProUpgradeSheet({
@@ -33,7 +35,7 @@ class ProUpgradeSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SoberCard(
       margin: EdgeInsets.zero,
       borderRadius: AppConstants.radiusXl,
@@ -152,7 +154,7 @@ class ProUpgradeSheet extends StatelessWidget {
               ],
             ),
             child: ElevatedButton.icon(
-              onPressed: () => _handleUpgrade(context),
+              onPressed: () => _handleUpgrade(context, ref),
               icon: const Icon(Icons.star_rounded, size: 20),
               label: const Text('Unlock Pro — \$2.99'),
               style: ElevatedButton.styleFrom(
@@ -195,7 +197,7 @@ class ProUpgradeSheet extends StatelessWidget {
     );
   }
 
-  Future<void> _handleUpgrade(BuildContext context) async {
+  Future<void> _handleUpgrade(BuildContext context, WidgetRef ref) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('is_pro', true);
@@ -204,6 +206,9 @@ class ProUpgradeSheet extends StatelessWidget {
     }
 
     if (!context.mounted) return;
+    // Drop the cached Pro state so the locked home cards disappear
+    // immediately instead of after a restart.
+    ref.invalidate(isProProvider);
     Navigator.of(context).pop(true);
   }
 }

@@ -23,25 +23,30 @@ QuitDrink Ai is a premium Flutter application designed to help individuals track
 
 ```
 lib/
+├── config/                        # Credentials (api_config.dart is gitignored)
+│   ├── api_config.dart            # Groq API key, endpoint, model name
+│   └── api_config.example.dart    # Template to copy into api_config.dart
 ├── core/                          # Shared infrastructure
 │   ├── providers/                 # Riverpod state providers
 │   │   ├── breathing_provider.dart
 │   │   ├── checkin_provider.dart
+│   │   ├── journal_provider.dart
 │   │   ├── quotes_provider.dart
 │   │   ├── reasons_provider.dart
 │   │   ├── savings_provider.dart
 │   │   ├── sobriety_provider.dart
-│   │   └── theme_provider.dart
-│   ├── storage/                   # Persistence abstraction
-│   │   └── local_storage.dart     # SharedPreferences with Result pattern
-│   └── utils/
-│       ├── error_handler.dart     # Centralized error handling
-│       └── result.dart            # Sealed Result type (Success/Failure)
+│   │   ├── theme_provider.dart    # ThemeMode + isProProvider
+│   │   └── weight_tracker_provider.dart
+│   └── services/                  # Platform integrations (singletons)
+│       ├── firebase_service.dart  # Device ID + Analytics events
+│       └── notification_service.dart  # Daily reminder scheduling
 ├── constants/                     # Design tokens
-│   ├── app_colors.dart            # Color palette (navy, teal, sky, mint)
+│   ├── app_colors.dart            # Brand palette + role tokens
 │   └── app_constants.dart         # Spacing, radius, animation durations
 ├── data/                          # Static data assets
 │   └── quotes.dart                # 100 motivational quotes
+├── firebase_options.dart          # Firebase app config (generated)
+├── main.dart                      # Entry point, splash, app shell
 ├── models/                        # Domain models
 │   └── milestone.dart             # Milestone thresholds and metadata
 ├── services/                      # Business logic (ChangeNotifier)
@@ -52,30 +57,42 @@ lib/
 │   ├── savings_service.dart       # Money saved calculations
 │   ├── sobriety_service.dart      # Quit date, live counter, milestones
 │   └── theme_service.dart         # Dark/light theme mode
+├── screens/                       # Full-page routes
+│   ├── ai_chat_screen.dart        # AI Friend chat (Groq API)
+│   ├── home_screen.dart           # Main scrollable home screen
+│   ├── memory_game_screen.dart    # Pro focus game with score history
+│   ├── privacy_policy_screen.dart
+│   ├── settings_screen.dart
+│   ├── terms_of_service_screen.dart
+│   ├── weight_tracker_screen.dart # Pro weight tracker
+│   ├── craving/                   # Craving support flows
+│   │   ├── breathing_screen.dart
+│   │   ├── craving_actions_screen.dart
+│   │   ├── journal_screen.dart
+│   │   ├── motivation_screen.dart
+│   │   ├── my_reasons_screen.dart
+│   │   └── timed_activity_screen.dart
+│   └── onboarding/
+│       └── onboarding_screen.dart
 ├── theme/
 │   └── app_theme.dart             # Full Material 3 theme (light + dark)
-├── utils/
-│   └── responsive_helper.dart     # Responsive layout breakpoints
-├── widgets/                       # Reusable UI components
-│   ├── breath_challenge_card.dart
-│   ├── confetti_celebration.dart  # Custom particle confetti system
-│   ├── craving_help_card.dart
-│   ├── daily_checkin_card.dart
-│   ├── daily_motivation_card.dart
-│   ├── empty_state.dart           # Animated empty states
-│   ├── guided_breathing_card.dart
-│   ├── home_footer.dart
-│   ├── home_header.dart
-│   ├── milestone_badges.dart
-│   ├── money_saved_card.dart
-│   ├── my_reasons_card.dart
-│   ├── recovery_timeline_card.dart
-│   ├── section_header.dart
-│   ├── sober_button.dart
-│   ├── sober_card.dart            # Premium card with shadows + haptics
-│   └── sobriety_counter_card.dart
-└── screens/
-    └── home_screen.dart           # Main scrollable home screen
+└── widgets/                       # Reusable UI components
+    ├── app_logo.dart              # Circular brand logo
+    ├── confetti_celebration.dart  # Custom particle confetti system
+    ├── craving_help_card.dart
+    ├── daily_checkin_card.dart
+    ├── daily_motivation_card.dart
+    ├── guided_breathing_card.dart
+    ├── home_footer.dart
+    ├── home_header.dart
+    ├── milestone_badges.dart
+    ├── money_saved_card.dart
+    ├── my_reasons_card.dart
+    ├── pro_teaser_card.dart       # Locked Pro feature card
+    ├── pro_upgrade_sheet.dart     # Pro upgrade bottom sheet
+    ├── recovery_timeline_card.dart
+    ├── sober_card.dart            # Premium card with shadows + haptics
+    └── sobriety_counter_card.dart
 ```
 
 ## State Management
@@ -101,13 +118,15 @@ SharedPreferences (persistence)
 
 ### Colors
 
-| Token | Light | Dark | Usage |
-|-------|-------|------|-------|
-| Navy Blue | `#1E3A5F` | — | Primary, headings |
-| Sky Blue | `#7FB3D5` | `#A8D0E6` | Secondary, dark mode primary |
-| Soft Teal | `#7EC8C3` | — | Accent, success |
-| Mint | `#D7F5EF` | — | Light backgrounds |
-| Success Green | `#4CAF50` | — | Milestones, streaks |
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `brandPrimary` | `#113251` | Primary fills, headings, text on light blue |
+| `brandPrimaryDark` | `#0B2238` | Deeper navy, text on light-blue fills |
+| `brandPrimaryLight` | `#1A4570` | Gradients, raised navy surfaces |
+| `brandLightBlue` | `#73B1D6` | Accent, dark-mode primary, highlights |
+| `white` / `darkSurface` | `#FFFFFF` / `#121B28` | Page backgrounds |
+| `successGreen` | `#4CAF50` | Check-in check marks only |
+| `softRed` | `#EF5350` | "Drank today" and error states |
 
 ### Typography
 
