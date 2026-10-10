@@ -7,9 +7,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// in SharedPreferences. Computes streaks, success percentage, and monthly data.
 class CheckInService extends ChangeNotifier {
   static const _storeKey = 'checkin_history';
+  static const _badgesKey = 'checkin_streak_badges';
+
+  /// Streak lengths (in consecutive sober days) that earn a badge.
+  static const List<int> streakBadgeThresholds = [3, 7, 14, 30];
 
   /// dateKey -> true if stayed sober, false if drank
   final Map<String, bool> _history = {};
+
+  /// Badge thresholds the user has earned (permanent once reached).
+  final Set<int> _earnedBadges = <int>{};
 
   bool _initialized = false;
   final bool _disposed = false;
@@ -39,6 +46,12 @@ class CheckInService extends ChangeNotifier {
   /// Number of unsuccessful (drank) days.
   int get drankDays =>
       _history.values.where((v) => !v).length;
+
+  /// Earned streak badges (subset of [streakBadgeThresholds]).
+  Set<int> get earnedBadges => Set.unmodifiable(_earnedBadges);
+
+  /// Whether the streak badge for [days] consecutive sober days is earned.
+  bool hasBadge(int days) => _earnedBadges.contains(days);
 
   /// Overall success percentage (0–100).
   int get successPercentage {
@@ -155,7 +168,9 @@ class CheckInService extends ChangeNotifier {
     if (todayCheckedIn) return; // Only one check-in per day
 
     _history[_todayKey] = sober;
+    _awardBadges();
     await _save();
+    await _saveBadges();
     notifyListeners();
   }
 
@@ -184,6 +199,16 @@ class CheckInService extends ChangeNotifier {
         }
       }
     }
+    // Load earned streak badges (safe defaults on any failure).
+    _loadBadges(prefs);
+
+    // Retroactively award badges already reached by past check-ins.
+    final badgesBefore = _earnedBadges.length;
+    _awardBadges();
+    if (_earnedBadges.length != badgesBefore) {
+      await _saveBadges();
+    }
+
     _initialized = true;
     notifyListeners();
   }
@@ -194,6 +219,44 @@ class CheckInService extends ChangeNotifier {
         .map((e) => '${e.key}:${e.value ? '1' : '0'}')
         .join(',');
     await prefs.setString(_storeKey, serialized);
+  }
+
+  /// Reads earned badges from [prefs]. Corrupt values are ignored.
+  void _loadBadges(SharedPreferences prefs) {
+    try {
+      final raw = prefs.getString(_badgesKey);
+      if (raw == null || raw.isEmpty) return;
+      for (final part in raw.split(',')) {
+        final value = int.tryParse(part.trim());
+        if (value != null && streakBadgeThresholds.contains(value)) {
+          _earnedBadges.add(value);
+        }
+      }
+    } catch (e) {
+      debugPrint('[CheckIn] Failed to load streak badges: $e');
+    }
+  }
+
+  /// Awards every streak badge newly reached by the longest streak.
+  void _awardBadges() {
+    try {
+      final best = longestStreak;
+      for (final threshold in streakBadgeThresholds) {
+        if (best >= threshold) _earnedBadges.add(threshold);
+      }
+    } catch (e) {
+      debugPrint('[CheckIn] Failed to award streak badges: $e');
+    }
+  }
+
+  Future<void> _saveBadges() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final sorted = _earnedBadges.toList()..sort();
+      await prefs.setString(_badgesKey, sorted.join(','));
+    } catch (e) {
+      debugPrint('[CheckIn] Failed to save streak badges: $e');
+    }
   }
 
   // ── Helpers ────────────────────────────────────────────────────────

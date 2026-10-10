@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/widgets/confetti_celebration.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -73,6 +74,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
   List<int> _flippedIndices = [];
   bool _isProcessing = false;
   bool _isComplete = false;
+  bool _isNewBest = false;
   int _matchCount = 0;
   int _flipCount = 0;
 
@@ -179,6 +181,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
     _flippedIndices = [];
     _isProcessing = false;
     _isComplete = false;
+    _isNewBest = false;
     _matchCount = 0;
     _flipCount = 0;
     _elapsedSeconds = 0;
@@ -252,7 +255,17 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
     _gameTimer = null;
     HapticFeedback.heavyImpact();
 
-    setState(() => _isComplete = true);
+    // Compare against the best recorded before this game is saved.
+    final previousBest = _bestRecord;
+    final isNewBest = previousBest == null ||
+        _flipCount < previousBest.flips ||
+        (_flipCount == previousBest.flips &&
+            _elapsedSeconds < previousBest.seconds);
+
+    setState(() {
+      _isComplete = true;
+      _isNewBest = isNewBest;
+    });
     _saveResult();
   }
 
@@ -315,7 +328,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
                       height: 64,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.softTeal.withValues(alpha: 0.15),
+                        color: AppColors.brandLightBlue.withValues(alpha: 0.15),
                       ),
                       child: const Text(
                         '🧠',
@@ -444,10 +457,10 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.history_rounded,
                             size: 20,
-                            color: AppColors.navyBlue,
+                            color: context.primary,
                           ),
                           const SizedBox(width: AppConstants.spacingXs),
                           Text(
@@ -508,7 +521,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
                                   const Icon(
                                     Icons.emoji_events_rounded,
                                     size: 16,
-                                    color: AppColors.gold,
+                                    color: AppColors.brandLightBlue,
                                   ),
                                   const SizedBox(width: 4),
                                 ],
@@ -579,18 +592,20 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
           color: isFaceUp
               ? (isDark ? AppColors.darkCard : Colors.white)
-              : (isDark ? AppColors.navyBlue.withValues(alpha: 0.6) : AppColors.navyBlue),
+              : (isDark
+                  ? AppColors.brandPrimary.withValues(alpha: 0.6)
+                  : AppColors.brandPrimary),
           gradient: isFaceUp
               ? null
               : LinearGradient(
                   colors: isDark
                       ? [
-                          AppColors.navyBlue.withValues(alpha: 0.6),
-                          AppColors.navyBlueLight.withValues(alpha: 0.4),
+                          AppColors.brandPrimary.withValues(alpha: 0.6),
+                          AppColors.brandPrimaryLight.withValues(alpha: 0.4),
                         ]
                       : [
-                          AppColors.navyBlue,
-                          AppColors.navyBlueLight,
+                          AppColors.brandPrimary,
+                          AppColors.brandPrimaryLight,
                         ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -598,16 +613,13 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
           boxShadow: [
             if (card.isMatched)
               BoxShadow(
-                color: AppColors.successGreen.withValues(alpha: 0.3),
+                color: AppColors.brandLightBlue.withValues(alpha: 0.35),
                 blurRadius: 12,
                 spreadRadius: 1,
               ),
             if (!isFaceUp)
               BoxShadow(
-                color: (isDark
-                        ? AppColors.navyBlue
-                        : AppColors.navyBlue)
-                    .withValues(alpha: 0.2),
+                color: AppColors.brandPrimary.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -654,7 +666,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
   // ── Win Screen ─────────────────────────────────────────────────────
 
   Widget _buildWinScreen(bool isDark) {
-    return Padding(
+    final content = Padding(
       padding: const EdgeInsets.symmetric(
         vertical: AppConstants.spacingLg,
       ),
@@ -668,15 +680,15 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
               shape: BoxShape.circle,
               gradient: const LinearGradient(
                 colors: [
-                  AppColors.successGreen,
-                  AppColors.successGreenLight,
+                  AppColors.brandPrimary,
+                  AppColors.brandPrimaryLight,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.successGreen.withValues(alpha: 0.3),
+                  color: AppColors.brandPrimary.withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -701,6 +713,45 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
               color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
             ),
           ),
+
+          // ── New best celebration ──────────────────────────────
+          if (_isNewBest) ...[
+            const SizedBox(height: AppConstants.spacingSm),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.spacingMd,
+                vertical: AppConstants.spacingXs,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.brandLightBlue.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+                border: Border.all(
+                  color: AppColors.brandLightBlue.withValues(alpha: 0.5),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.auto_awesome_rounded,
+                    size: 16,
+                    color: AppColors.brandLightBlue,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'New best!',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: isDark
+                          ? AppColors.brandLightBlue
+                          : AppColors.brandPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: AppConstants.spacingSm),
 
           // Completion time
@@ -710,10 +761,11 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
               vertical: AppConstants.spacingSm,
             ),
             decoration: BoxDecoration(
-              color: AppColors.successGreen.withValues(alpha: 0.08),
+              color: AppColors.brandLightBlue
+                  .withValues(alpha: isDark ? 0.18 : 0.12),
               borderRadius: BorderRadius.circular(AppConstants.radiusSm),
               border: Border.all(
-                color: AppColors.successGreen.withValues(alpha: 0.2),
+                color: AppColors.brandLightBlue.withValues(alpha: 0.4),
               ),
             ),
             child: Row(
@@ -722,15 +774,17 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
                 const Icon(
                   Icons.timer_rounded,
                   size: 18,
-                  color: AppColors.successGreen,
+                  color: AppColors.brandLightBlue,
                 ),
                 const SizedBox(width: AppConstants.spacingXs),
                 Text(
                   'Completed in $_formattedTime',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.successGreen,
+                    color: isDark
+                        ? AppColors.brandLightBlue
+                        : AppColors.brandPrimary,
                   ),
                 ),
               ],
@@ -758,8 +812,8 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
               icon: const Icon(Icons.refresh_rounded, size: 20),
               label: const Text('Play Again'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.softTeal,
-                foregroundColor: Colors.white,
+                backgroundColor: context.primary,
+                foregroundColor: context.onPrimary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                 ),
@@ -775,6 +829,13 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
           ),
         ],
       ),
+    );
+
+    return ConfettiOverlay(
+      show: _isNewBest,
+      particleCount: 50,
+      duration: const Duration(seconds: 3),
+      child: content,
     );
   }
 }

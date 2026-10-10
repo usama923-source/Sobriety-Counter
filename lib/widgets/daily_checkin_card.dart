@@ -4,7 +4,10 @@ import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/core/providers/sobriety_provider.dart';
 import 'package:quit_drinking/services/checkin_service.dart';
+import 'package:quit_drinking/models/milestone.dart';
 import 'package:quit_drinking/services/sobriety_service.dart';
+import 'package:quit_drinking/widgets/confetti_celebration.dart';
+import 'package:quit_drinking/widgets/milestone_badges.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,16 +17,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Tapping "I Drank Today" asks for confirmation and resets the sobriety
 /// journey. Displays current/longest streak, success percentage, weekly
 /// summary, and a monthly calendar with color-coded days.
-class DailyCheckinCard extends ConsumerWidget {
+class DailyCheckinCard extends ConsumerStatefulWidget {
   final CheckInService service;
 
   const DailyCheckinCard({super.key, required this.service});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DailyCheckinCard> createState() => _DailyCheckinCardState();
+}
+
+class _DailyCheckinCardState extends ConsumerState<DailyCheckinCard> {
+  /// Set right after a successful check-in so the confetti fires once.
+  bool _celebrate = false;
+
+  CheckInService get service => widget.service;
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return SoberCard(
+    final card = SoberCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -90,7 +103,7 @@ class DailyCheckinCard extends ConsumerWidget {
                   isDark: isDark,
                   isSelected: service.todayCheckedIn && service.todaySuccessful,
                   enabled: !service.todayCheckedIn,
-                  onTap: () => service.checkIn(true),
+                  onTap: _checkInSober,
                 ),
               ),
               const SizedBox(width: AppConstants.spacingMd),
@@ -129,7 +142,7 @@ class DailyCheckinCard extends ConsumerWidget {
                     Text(
                       service.todaySuccessful
                           ? 'Checked in! Great job staying sober today.'
-                          : 'Checked in. Tomorrow is a new day!',
+                          : 'Tomorrow is a fresh start. You\'re still here, and that matters.',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -178,6 +191,11 @@ class DailyCheckinCard extends ConsumerWidget {
 
           const SizedBox(height: AppConstants.spacingLg),
 
+          // Streak badges — 3, 7, 14 and 30 consecutive sober days.
+          _buildStreakBadges(isDark),
+
+          const SizedBox(height: AppConstants.spacingLg),
+
           // Weekly Summary
           _buildWeeklySummary(isDark),
 
@@ -188,6 +206,13 @@ class DailyCheckinCard extends ConsumerWidget {
         ],
       ),
     );
+
+    return ConfettiOverlay(
+      show: _celebrate,
+      particleCount: 50,
+      duration: const Duration(seconds: 3),
+      child: card,
+    );
   }
 
   String _todayDate() {
@@ -197,6 +222,41 @@ class DailyCheckinCard extends ConsumerWidget {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return '${months[now.month - 1]} ${now.day}';
+  }
+
+  /// Records a sober check-in and fires the gentle celebration once.
+  Future<void> _checkInSober() async {
+    await service.checkIn(true);
+    if (!mounted) return;
+    setState(() => _celebrate = true);
+  }
+
+  /// Streak badges row — earned at 3, 7, 14 and 30 consecutive sober days.
+  Widget _buildStreakBadges(bool isDark) {
+    final badges = Milestone.all
+        .where((m) =>
+            CheckInService.streakBadgeThresholds.contains(m.dayThreshold))
+        .map((m) => (
+              milestone: m,
+              completed: service.hasBadge(m.dayThreshold),
+            ))
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Streak Badges',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: AppConstants.spacingSm),
+        MilestoneBadges(milestones: badges),
+      ],
+    );
   }
 
   // ── Drank Dialog ───────────────────────────────────────────────────

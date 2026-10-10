@@ -22,6 +22,7 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
 
     // Verify the app renders without crashing by checking for the app title
-    expect(find.text('QuitDrink Ai'), findsAtLeastNWidgets(1));
+    // (the home header renders the wordmark in uppercase).
+    expect(find.text('QUIT DRINK AI'), findsAtLeastNWidgets(1));
   });
 }
