@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
 import 'package:quit_drinking/theme/app_theme.dart';
@@ -178,7 +179,7 @@ class _SplashScreenState extends State<_SplashScreen>
       builder: (context, _) {
         return Scaffold(
           backgroundColor:
-              isDark ? const Color(0xFF121B28) : const Color(0xFFF5F7FA),
+              isDark ? AppColors.darkSurface : AppColors.lightGray,
           body: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -200,8 +201,8 @@ class _SplashScreenState extends State<_SplashScreen>
                       fontWeight: FontWeight.w300,
                       fontStyle: FontStyle.italic,
                       color: isDark
-                          ? const Color(0xFFB0BEC5)
-                          : const Color(0xFF718096),
+                          ? AppColors.textOnDarkSecondary
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ),

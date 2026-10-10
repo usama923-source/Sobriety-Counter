@@ -99,14 +99,14 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                 height: 36,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.softOrange.withValues(
+                                  color: AppColors.brandLightBlue.withValues(
                                     alpha: isDark ? 0.15 : 0.1,
                                   ),
                                 ),
                                 child: const Icon(
                                   Icons.edit_note_rounded,
                                   size: 20,
-                                  color: AppColors.softOrange,
+                                  color: AppColors.brandPrimary,
                                 ),
                               ),
                               const SizedBox(width: AppConstants.spacingSm),
@@ -147,7 +147,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                   AppConstants.radiusSm,
                                 ),
                                 borderSide: BorderSide(
-                                  color: AppColors.softOrange,
+                                  color: AppColors.brandPrimary,
                                   width: 1.5,
                                 ),
                               ),
@@ -211,7 +211,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                         ? null
                                         : [
                                             BoxShadow(
-                                              color: AppColors.softOrange
+                                              color: AppColors.brandPrimary
                                                   .withValues(alpha: 0.3),
                                               blurRadius: 16,
                                               offset: const Offset(0, 4),
@@ -286,7 +286,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                           height: 36,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.navyBlue.withValues(
+                            color: AppColors.brandPrimary.withValues(
                               alpha: isDark ? 0.15 : 0.1,
                             ),
                           ),
@@ -294,8 +294,8 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                             Icons.history_rounded,
                             size: 20,
                             color: isDark
-                                ? AppColors.softTealLight
-                                : AppColors.navyBlue,
+                                ? AppColors.brandLightBlue
+                                : AppColors.brandPrimary,
                           ),
                         ),
                         const SizedBox(width: AppConstants.spacingSm),
@@ -429,7 +429,7 @@ class _EmptyJournalState extends StatelessWidget {
             height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.softOrange.withValues(
+              color: AppColors.brandLightBlue.withValues(
                 alpha: isDark ? 0.12 : 0.08,
               ),
             ),

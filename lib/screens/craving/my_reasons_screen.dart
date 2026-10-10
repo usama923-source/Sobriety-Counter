@@ -286,7 +286,7 @@ class _EmptyReasonsState extends StatelessWidget {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.softTeal.withValues(alpha: isDark ? 0.12 : 0.08),
+              color: AppColors.brandPrimary.withValues(alpha: isDark ? 0.12 : 0.08),
             ),
             child: Icon(
               Icons.favorite_border_rounded,

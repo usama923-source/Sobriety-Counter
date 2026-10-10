@@ -120,8 +120,8 @@ class _SoberCardState extends State<SoberCard> {
           },
           borderRadius: BorderRadius.circular(
               widget.borderRadius ?? AppConstants.radiusLg),
-          splashColor: AppColors.navyBlue.withValues(alpha: 0.05),
-          highlightColor: AppColors.navyBlue.withValues(alpha: 0.02),
+          splashColor: AppColors.brandPrimary.withValues(alpha: 0.05),
+          highlightColor: AppColors.brandPrimary.withValues(alpha: 0.02),
           child: card,
         ),
       );

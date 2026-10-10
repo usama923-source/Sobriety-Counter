@@ -325,7 +325,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 : CrossFadeState.showSecond,
             firstChild: const Icon(
               Icons.light_mode_rounded,
-              color: AppColors.softOrangeLight,
+              color: AppColors.brandLightBlue,
             ),
             secondChild: Icon(
               Icons.dark_mode_rounded,

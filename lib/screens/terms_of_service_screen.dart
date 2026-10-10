@@ -94,7 +94,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               // ── Section 1: Acceptance ──────────────────────────────
               _TermsSection(
                 icon: Icons.check_circle_outline_rounded,
-                iconColor: AppColors.skyBlueDark,
+                iconColor: AppColors.brandLightBlue,
                 title: 'Acceptance',
                 body:
                     'By using QuitDrink Ai, you agree to these terms of '
@@ -124,7 +124,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               // ── Section 3: AI Chat ─────────────────────────────────
               _TermsSection(
                 icon: Icons.smart_toy_rounded,
-                iconColor: AppColors.softTeal,
+                iconColor: AppColors.brandPrimary,
                 title: 'AI Chat',
                 body:
                     'AI-generated responses are provided for support and '
@@ -140,7 +140,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               // ── Section 4: Pro Features ────────────────────────────
               _TermsSection(
                 icon: Icons.star_rounded,
-                iconColor: AppColors.softOrange,
+                iconColor: AppColors.brandPrimary,
                 title: 'Pro Features',
                 body:
                     'Pro features are available as a one-time in-app purchase. '
@@ -155,7 +155,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               // ── Section 5: User Responsibility ─────────────────────
               _TermsSection(
                 icon: Icons.person_outline_rounded,
-                iconColor: AppColors.navyBlue,
+                iconColor: AppColors.brandPrimary,
                 title: 'User Responsibility',
                 body:
                     'You are responsible for your own sobriety journey. '
@@ -171,7 +171,7 @@ class TermsOfServiceScreen extends StatelessWidget {
               // ── Section 6: Changes ─────────────────────────────────
               _TermsSection(
                 icon: Icons.update_rounded,
-                iconColor: AppColors.softTeal,
+                iconColor: AppColors.brandPrimary,
                 title: 'Changes',
                 body:
                     'We may update these terms of service at any time. '

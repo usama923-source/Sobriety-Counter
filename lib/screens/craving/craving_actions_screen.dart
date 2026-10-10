@@ -66,12 +66,12 @@ class CravingActionsScreen extends StatelessWidget {
                       height: 56,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.softTeal.withValues(alpha: 0.15),
+                        color: AppColors.brandPrimary.withValues(alpha: 0.15),
                       ),
                       child: const Icon(
                         Icons.self_improvement_rounded,
                         size: 28,
-                        color: AppColors.softTeal,
+                        color: AppColors.brandPrimary,
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacingSm),
@@ -129,43 +129,43 @@ const _cravingActions = [
     icon: Icons.water_drop_rounded,
     label: 'Drink Water',
     description: 'Hydrate yourself — thirst often feels like a craving',
-    color: AppColors.softTeal,
+    color: AppColors.brandPrimary,
   ),
   _CravingAction(
     icon: Icons.directions_walk_rounded,
     label: 'Go for a Walk',
     description: 'Step outside, get fresh air, and clear your mind',
-    color: AppColors.skyBlueDark,
+    color: AppColors.brandLightBlue,
   ),
   _CravingAction(
     icon: Icons.list_alt_rounded,
     label: 'Read My Reasons',
     description: 'Remind yourself why you started this journey',
-    color: AppColors.softTeal,
+    color: AppColors.brandPrimary,
   ),
   _CravingAction(
     icon: Icons.air_rounded,
     label: 'Start Breathing Exercise',
     description: 'Take 5 deep breaths — in through your nose, out through your mouth',
-    color: AppColors.softOrange,
+    color: AppColors.brandPrimary,
   ),
   _CravingAction(
     icon: Icons.edit_note_rounded,
     label: 'Journal Your Feeling',
     description: 'Write down what you\'re feeling right now',
-    color: AppColors.navyBlueLight,
+    color: AppColors.brandPrimaryLight,
   ),
   _CravingAction(
     icon: Icons.smart_toy_rounded,
     label: 'Talk to AI Friend',
     description: 'Chat with a supportive AI companion',
-    color: AppColors.navyBlue,
+    color: AppColors.brandPrimary,
   ),
   _CravingAction(
     icon: Icons.format_quote_rounded,
     label: 'Read Motivation',
     description: 'Read an inspiring quote to get you through this moment',
-    color: AppColors.softTealDark,
+    color: AppColors.brandPrimaryLight,
   ),
 ];
 
@@ -187,8 +187,8 @@ class _CravingActionTile extends StatelessWidget {
     return InkWell(
       onTap: () => _onActionTap(context),
       borderRadius: BorderRadius.circular(AppConstants.radiusLg),
-      splashColor: AppColors.navyBlue.withValues(alpha: 0.12),
-      highlightColor: AppColors.navyBlue.withValues(alpha: 0.12),
+      splashColor: AppColors.brandPrimary.withValues(alpha: 0.12),
+      highlightColor: AppColors.brandPrimary.withValues(alpha: 0.12),
       child: SoberCard(
         color: action.color.withValues(alpha: isDark ? 0.1 : 0.07),
         border: Border.all(
@@ -259,7 +259,7 @@ class _CravingActionTile extends StatelessWidget {
             builder: (_) => const TimedActivityScreen(
               title: 'Drink Water',
               message: 'Drinking water reduces cravings.\nThirst often feels like a craving.',
-              color: AppColors.softTeal,
+              color: AppColors.brandPrimary,
               icon: Icons.water_drop_rounded,
               durationMinutes: 5,
             ),
@@ -271,7 +271,7 @@ class _CravingActionTile extends StatelessWidget {
             builder: (_) => const TimedActivityScreen(
               title: 'Go for a Walk',
               message: 'A short walk can reduce cravings\nby up to 60%. Step outside!',
-              color: AppColors.successGreen,
+              color: AppColors.brandPrimary,
               icon: Icons.directions_walk_rounded,
               durationMinutes: 10,
             ),

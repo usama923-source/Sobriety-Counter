@@ -95,7 +95,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               // ── Section 1: Data We Collect ─────────────────────────
               _PolicySection(
                 icon: Icons.storage_rounded,
-                iconColor: AppColors.navyBlue,
+                iconColor: AppColors.brandPrimary,
                 title: 'Data Stored on Your Device',
                 body:
                     'Your sobriety date, the reasons you save, your weight '
@@ -110,7 +110,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               // ── Section 2: Analytics ───────────────────────────────
               _PolicySection(
                 icon: Icons.insights_rounded,
-                iconColor: AppColors.skyBlueDark,
+                iconColor: AppColors.brandLightBlue,
                 title: 'Analytics',
                 body:
                     'We use Firebase Analytics (Google) to understand how the app '
@@ -142,7 +142,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               // ── Section 4: AI Chat ─────────────────────────────────
               _PolicySection(
                 icon: Icons.smart_toy_rounded,
-                iconColor: AppColors.softTeal,
+                iconColor: AppColors.brandPrimary,
                 title: 'AI Chat',
                 body:
                     'When you use the AI Friend chat feature, your messages are '
@@ -158,7 +158,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               // ── Section 3: No Account Required ─────────────────────
               _PolicySection(
                 icon: Icons.person_off_rounded,
-                iconColor: AppColors.skyBlueDark,
+                iconColor: AppColors.brandLightBlue,
                 title: 'No Account Required',
                 body:
                     'The app works fully offline for all core features — tracking '
@@ -173,7 +173,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               // ── Section 4: No Data Selling ─────────────────────────
               _PolicySection(
                 icon: Icons.verified_rounded,
-                iconColor: AppColors.softTeal,
+                iconColor: AppColors.brandPrimary,
                 title: 'We Don\'t Sell Your Data',
                 body:
                     'We do not sell or rent your personal data. We share data only '
@@ -187,7 +187,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               // ── Section 5: Children ────────────────────────────────
               _PolicySection(
                 icon: Icons.family_restroom_rounded,
-                iconColor: AppColors.softOrange,
+                iconColor: AppColors.brandPrimary,
                 title: 'Children',
                 body:
                     'QuitDrink Ai is not intended for use by individuals '

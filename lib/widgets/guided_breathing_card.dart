@@ -42,7 +42,7 @@ class _GuidedBreathingCardState extends State<GuidedBreathingCard>
 
   // ── Phase colors ──────────────────────────────────────────────────
   static const Color _inhaleColor = AppColors.accent;
-  static const Color _holdColor = AppColors.skyBlueLight;
+  static const Color _holdColor = AppColors.brandLightBlue;
   static const Color _exhaleColor = AppColors.accent;
 
   Color get _currentColor {

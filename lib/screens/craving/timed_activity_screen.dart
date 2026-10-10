@@ -186,7 +186,7 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                                   : widget.icon,
                               size: 48,
                               color: _isComplete
-                                  ? AppColors.successGreen
+                                  ? AppColors.brandPrimary
                                   : accent,
                             ),
                           ),
@@ -272,7 +272,7 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                           alpha: isDark ? 0.12 : 0.1,
                         ),
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          _isComplete ? AppColors.successGreen : accent,
+                          _isComplete ? AppColors.brandPrimary : accent,
                         ),
                       ),
                     ),
@@ -320,7 +320,7 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                                   boxShadow: [
                                     BoxShadow(
                                       color: (_isComplete
-                                              ? AppColors.successGreen
+                                              ? AppColors.brandPrimary
                                               : accent)
                                           .withValues(alpha: 0.3),
                                       blurRadius: 16,
@@ -406,9 +406,9 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                 const SizedBox(height: AppConstants.spacingLg),
                 SoberCard(
                   padding: const EdgeInsets.all(AppConstants.spacingLg),
-                  color: AppColors.successGreen.withValues(alpha: 0.08),
+                  color: AppColors.brandPrimary.withValues(alpha: 0.08),
                   border: Border.all(
-                    color: AppColors.successGreen.withValues(alpha: 0.2),
+                    color: AppColors.brandPrimary.withValues(alpha: 0.2),
                     width: 1.2,
                   ),
                   hasShadow: false,
@@ -419,12 +419,12 @@ class _TimedActivityScreenState extends State<TimedActivityScreen>
                         height: 44,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.successGreen.withValues(alpha: 0.15),
+                          color: AppColors.brandPrimary.withValues(alpha: 0.15),
                         ),
                         child: const Icon(
                           Icons.celebration_rounded,
                           size: 24,
-                          color: AppColors.successGreen,
+                          color: AppColors.brandPrimary,
                         ),
                       ),
                       const SizedBox(width: AppConstants.spacingSm),

@@ -43,11 +43,11 @@ class _BreathingScreenState extends State<BreathingScreen>
   Color get _currentColor {
     switch (_currentPhase) {
       case _BreathPhase.inhale:
-        return AppColors.softTeal; // softTeal
+        return AppColors.brandPrimary;
       case _BreathPhase.hold:
-        return AppColors.softTealLight;
+        return AppColors.brandLightBlue;
       case _BreathPhase.exhale:
-        return AppColors.softTeal;
+        return AppColors.brandPrimary;
     }
   }
 
@@ -251,14 +251,14 @@ class _BreathingScreenState extends State<BreathingScreen>
                       height: 88,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.softOrange.withValues(
+                        color: AppColors.brandLightBlue.withValues(
                           alpha: isDark ? 0.15 : 0.1,
                         ),
                       ),
                       child: const Icon(
                         Icons.self_improvement_rounded,
                         size: 48,
-                        color: AppColors.softOrange,
+                        color: AppColors.brandPrimary,
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacingLg),
@@ -464,8 +464,8 @@ class _BreathingScreenState extends State<BreathingScreen>
                                       color: (_isActive
                                               ? AppColors.softRed
                                               : _isComplete
-                                                  ? AppColors.successGreen
-                                                  : AppColors.navyBlue)
+                                                  ? AppColors.brandLightBlue
+                                                  : AppColors.brandPrimary)
                                           .withValues(alpha: 0.3),
                                       blurRadius: 16,
                                       offset: const Offset(0, 4),
@@ -559,9 +559,9 @@ class _BreathingScreenState extends State<BreathingScreen>
                 const SizedBox(height: AppConstants.spacingLg),
                 SoberCard(
                   padding: const EdgeInsets.all(AppConstants.spacingLg),
-                  color: AppColors.successGreen.withValues(alpha: 0.08),
+                  color: AppColors.brandPrimary.withValues(alpha: 0.08),
                   border: Border.all(
-                    color: AppColors.successGreen.withValues(alpha: 0.2),
+                    color: AppColors.brandPrimary.withValues(alpha: 0.2),
                     width: 1.2,
                   ),
                   hasShadow: false,
@@ -573,12 +573,12 @@ class _BreathingScreenState extends State<BreathingScreen>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color:
-                              AppColors.successGreen.withValues(alpha: 0.15),
+                              AppColors.brandPrimary.withValues(alpha: 0.15),
                         ),
                         child: const Icon(
                           Icons.celebration_rounded,
                           size: 24,
-                          color: AppColors.successGreen,
+                          color: AppColors.brandPrimary,
                         ),
                       ),
                       const SizedBox(width: AppConstants.spacingSm),

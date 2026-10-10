@@ -545,8 +545,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: isDark
-                      ? [AppColors.softTealLight, AppColors.softTeal]
-                      : [AppColors.navyBlue, AppColors.navyBlueLight],
+                      ? [AppColors.brandLightBlue, AppColors.brandPrimary]
+                      : [AppColors.brandPrimary, AppColors.brandPrimaryLight],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -574,8 +574,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
-                    color:
-                        _hasRealApiKey ? AppColors.softTeal : AppColors.softOrange,
+                    color: isDark
+                        ? (_hasRealApiKey
+                            ? AppColors.brandLightBlue
+                            : AppColors.textOnDarkSecondary)
+                        : (_hasRealApiKey
+                            ? AppColors.brandPrimary
+                            : AppColors.secondaryTextLight),
                   ),
                 ),
               ],
@@ -594,13 +599,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
                 horizontal: AppConstants.spacingMd,
                 vertical: AppConstants.spacingXs,
               ),
-              color: AppColors.softOrange.withValues(alpha: 0.15),
+              color: AppColors.brandLightBlue.withValues(alpha: 0.15),
               child: Row(
                 children: [
                   Icon(
                     Icons.info_outline_rounded,
                     size: 16,
-                    color: AppColors.softOrange,
+                    color: AppColors.brandPrimary,
                   ),
                   const SizedBox(width: AppConstants.spacingXs),
                   Expanded(
@@ -609,7 +614,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w400,
-                        color: AppColors.softOrange.withValues(alpha: 0.9),
+                        color: AppColors.brandPrimary,
                       ),
                     ),
                   ),
@@ -625,7 +630,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                 horizontal: AppConstants.spacingMd,
                 vertical: AppConstants.spacingXs,
               ),
-              color: AppColors.softOrange.withValues(alpha: 0.12),
+              color: AppColors.brandLightBlue.withValues(alpha: 0.12),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -634,7 +639,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                     child: Icon(
                       Icons.info_outline_rounded,
                       size: 16,
-                      color: AppColors.softOrange,
+                      color: AppColors.brandPrimary,
                     ),
                   ),
                   const SizedBox(width: AppConstants.spacingXs),
@@ -647,7 +652,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                         fontWeight: FontWeight.w600,
                         height: 1.4,
                         // High-contrast text colors — this is safety-critical
-                        // copy and must stay readable (softOrange on the
+                        // copy and must stay readable (brandLightBlue on the
                         // orange-tinted banner was ~1.7:1).
                         color: isDark
                             ? AppColors.textOnDark
@@ -662,7 +667,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                       child: Icon(
                         Icons.close_rounded,
                         size: 18,
-                        color: AppColors.softOrange.withValues(alpha: 0.6),
+                        color: AppColors.brandPrimary,
                       ),
                     ),
                   ),
@@ -721,12 +726,12 @@ class _AIChatScreenState extends State<AIChatScreen> {
             height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.navyBlue.withValues(alpha: isDark ? 0.15 : 0.1),
+              color: AppColors.brandPrimary.withValues(alpha: isDark ? 0.15 : 0.1),
             ),
             child: Icon(
               Icons.smart_toy_rounded,
               size: 36,
-              color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+              color: isDark ? AppColors.brandLightBlue : AppColors.brandPrimary,
             ),
           ),
           const SizedBox(height: AppConstants.spacingLg),
@@ -796,8 +801,8 @@ class _AIChatScreenState extends State<AIChatScreen> {
                     ),
                     border: Border.all(
                       color: isDark
-                          ? AppColors.navyBlue.withValues(alpha: 0.3)
-                          : AppColors.navyBlue.withValues(alpha: 0.15),
+                          ? AppColors.brandPrimary.withValues(alpha: 0.3)
+                          : AppColors.brandPrimary.withValues(alpha: 0.15),
                     ),
                   ),
                   child: Text(
@@ -939,7 +944,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                         ? (isDark
                             ? AppColors.darkCardAlt
                             : AppColors.lightGrayAlt)
-                        : (isDark ? AppColors.softTealLight : AppColors.navyBlue),
+                        : (isDark ? AppColors.brandLightBlue : AppColors.brandPrimary),
                     shape: BoxShape.circle,
                   ),
                   child: _isSending
@@ -949,7 +954,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: isDark
-                                ? AppColors.navyBlue
+                                ? AppColors.brandPrimary
                                 : AppColors.white,
                           ),
                         )
@@ -962,7 +967,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                                       .withValues(alpha: 0.4)
                                   : AppColors.textTertiary)
                               : (isDark
-                                  ? AppColors.navyBlue
+                                  ? AppColors.brandPrimary
                                   : AppColors.white),
                         ),
                 ),
@@ -1010,7 +1015,7 @@ class _MessageBubble extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: message.isUser
-                  ? (isDark ? AppColors.softTealLight : AppColors.navyBlue)
+                  ? (isDark ? AppColors.brandLightBlue : AppColors.brandPrimary)
                   : (isDark ? AppColors.darkCardAlt : AppColors.white),
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(AppConstants.radiusLg),
@@ -1049,14 +1054,14 @@ class _MessageBubble extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: isDark
-                                ? AppColors.softTealLight
-                                : AppColors.navyBlue,
+                                ? AppColors.brandLightBlue
+                                : AppColors.brandPrimary,
                           ),
                           child: Icon(
                             Icons.smart_toy_rounded,
                             size: 10,
                             color: isDark
-                                ? AppColors.navyBlue
+                                ? AppColors.brandPrimary
                                 : AppColors.white,
                           ),
                         ),
@@ -1067,8 +1072,8 @@ class _MessageBubble extends StatelessWidget {
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: isDark
-                                ? AppColors.softTealLight
-                                : AppColors.navyBlue,
+                                ? AppColors.brandLightBlue
+                                : AppColors.brandPrimary,
                           ),
                         ),
                       ],
@@ -1083,7 +1088,7 @@ class _MessageBubble extends StatelessWidget {
                     fontWeight: FontWeight.w400,
                     height: 1.5,
                     color: message.isUser
-                        ? (isDark ? AppColors.navyBlue : AppColors.white)
+                        ? (isDark ? AppColors.brandPrimary : AppColors.white)
                         : (isDark ? AppColors.textOnDark : AppColors.textPrimary),
                   ),
                 ),

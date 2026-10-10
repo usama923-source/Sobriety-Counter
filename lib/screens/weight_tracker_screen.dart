@@ -108,7 +108,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
           'Logged ${_formatWeight(currentWeight)}',
         ),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.softTeal,
+        backgroundColor: AppColors.brandPrimary,
         duration: const Duration(seconds: 2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
@@ -207,12 +207,12 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                       height: 64,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.softTeal.withValues(alpha: 0.15),
+                        color: AppColors.brandPrimary.withValues(alpha: 0.15),
                       ),
                       child: const Icon(
                         Icons.monitor_weight_rounded,
                         size: 34,
-                        color: AppColors.softTeal,
+                        color: AppColors.brandPrimary,
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacingSm),
@@ -335,8 +335,8 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                             Icons.trending_up_rounded,
                             size: 20,
                             color: isDark
-                                ? AppColors.softTealLight
-                                : AppColors.navyBlue,
+                                ? AppColors.brandLightBlue
+                                : AppColors.brandPrimary,
                           ),
                           const SizedBox(width: AppConstants.spacingXs),
                           Text(
@@ -361,13 +361,13 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                         child: LinearProgressIndicator(
                           value: progress,
                           minHeight: 14,
-                          backgroundColor: AppColors.successGreen.withValues(
+                          backgroundColor: AppColors.brandPrimary.withValues(
                             alpha: isDark ? 0.12 : 0.1,
                           ),
                           valueColor: AlwaysStoppedAnimation<Color>(
                             goalAchieved
-                                ? AppColors.successGreen
-                                : AppColors.softTeal,
+                                ? AppColors.brandLightBlue
+                                : AppColors.brandPrimary,
                           ),
                         ),
                       ),
@@ -392,7 +392,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.softTeal,
+                              color: AppColors.brandPrimary,
                             ),
                           ),
                         ],
@@ -407,14 +407,14 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                             AppConstants.spacingMd,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.successGreen.withValues(
+                            color: AppColors.brandPrimary.withValues(
                               alpha: 0.08,
                             ),
                             borderRadius: BorderRadius.circular(
                               AppConstants.radiusSm,
                             ),
                             border: Border.all(
-                              color: AppColors.successGreen.withValues(
+                              color: AppColors.brandPrimary.withValues(
                                 alpha: 0.2,
                               ),
                             ),
@@ -426,14 +426,14 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                                 height: 40,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.successGreen.withValues(
+                                  color: AppColors.brandPrimary.withValues(
                                     alpha: 0.15,
                                   ),
                                 ),
                                 child: const Icon(
                                   Icons.emoji_events_rounded,
                                   size: 22,
-                                  color: AppColors.successGreen,
+                                  color: AppColors.brandPrimary,
                                 ),
                               ),
                               const SizedBox(width: AppConstants.spacingSm),
@@ -480,14 +480,14 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                             AppConstants.spacingMd,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.successGreen.withValues(
+                            color: AppColors.brandPrimary.withValues(
                               alpha: 0.08,
                             ),
                             borderRadius: BorderRadius.circular(
                               AppConstants.radiusSm,
                             ),
                             border: Border.all(
-                              color: AppColors.successGreen.withValues(
+                              color: AppColors.brandPrimary.withValues(
                                 alpha: 0.2,
                               ),
                             ),
@@ -499,14 +499,14 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                                 height: 40,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.successGreen.withValues(
+                                  color: AppColors.brandPrimary.withValues(
                                     alpha: 0.15,
                                   ),
                                 ),
                                 child: const Icon(
                                   Icons.celebration_rounded,
                                   size: 22,
-                                  color: AppColors.successGreen,
+                                  color: AppColors.brandPrimary,
                                 ),
                               ),
                               const SizedBox(width: AppConstants.spacingSm),
@@ -537,14 +537,14 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                             AppConstants.spacingMd,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.softTeal.withValues(
+                            color: AppColors.brandPrimary.withValues(
                               alpha: 0.08,
                             ),
                             borderRadius: BorderRadius.circular(
                               AppConstants.radiusSm,
                             ),
                             border: Border.all(
-                              color: AppColors.softTeal.withValues(
+                              color: AppColors.brandPrimary.withValues(
                                 alpha: 0.2,
                               ),
                             ),
@@ -556,14 +556,14 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                                 height: 40,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.softTeal.withValues(
+                                  color: AppColors.brandPrimary.withValues(
                                     alpha: 0.15,
                                   ),
                                 ),
                                 child: const Icon(
                                   Icons.favorite_rounded,
                                   size: 22,
-                                  color: AppColors.softTeal,
+                                  color: AppColors.brandPrimary,
                                 ),
                               ),
                               const SizedBox(width: AppConstants.spacingSm),
@@ -601,7 +601,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                       'Log ${_formatWeight(currentWeight)}',
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.softTeal,
+                      backgroundColor: AppColors.brandPrimary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius:
@@ -636,7 +636,7 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                           const Icon(
                             Icons.history_rounded,
                             size: 20,
-                            color: AppColors.navyBlue,
+                            color: AppColors.brandPrimary,
                           ),
                           const SizedBox(width: AppConstants.spacingXs),
                           Text(
@@ -724,8 +724,8 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: isDark
-                                  ? AppColors.softTealLight
-                                  : AppColors.navyBlue,
+                                  ? AppColors.brandLightBlue
+                                  : AppColors.brandPrimary,
                             ),
                           ),
                         ),
@@ -849,8 +849,8 @@ class _WeightInputTile extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? AppColors.navyBlueLight
-                                : AppColors.navyBlue,
+                                ? AppColors.brandPrimaryLight
+                                : AppColors.brandPrimary,
                             borderRadius:
                                 BorderRadius.circular(
                                   AppConstants.radiusSm,
@@ -902,7 +902,7 @@ class _UnitToggleChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? (isDark ? AppColors.navyBlueLight : AppColors.navyBlue)
+              ? (isDark ? AppColors.brandPrimaryLight : AppColors.brandPrimary)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(AppConstants.radiusFull),
         ),

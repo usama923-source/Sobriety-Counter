@@ -299,13 +299,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.softOrange.withValues(alpha: 0.15),
+                        color: AppColors.brandLightBlue.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                       ),
                       child: Icon(
                         isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
                         size: 22,
-                        color: AppColors.softOrange,
+                        color: AppColors.brandPrimary,
                       ),
                     ),
                     const SizedBox(width: AppConstants.spacingSm),
@@ -324,8 +324,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       value: isDark,
                       onChanged: (_) =>
                           ref.read(themeServiceProvider).toggleTheme(),
-                      activeThumbColor: AppColors.navyBlue,
-                      activeTrackColor: AppColors.softTealLight.withValues(alpha: 0.5),
+                      activeThumbColor: AppColors.brandPrimary,
+                      activeTrackColor: AppColors.brandLightBlue.withValues(alpha: 0.5),
                     ),
                   ],
                 ),
@@ -348,14 +348,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: AppColors.softTeal.withValues(alpha: 0.15),
+                            color: AppColors.brandPrimary.withValues(alpha: 0.15),
                             borderRadius:
                                 BorderRadius.circular(AppConstants.radiusSm),
                           ),
                           child: const Icon(
                             Icons.notifications_rounded,
                             size: 22,
-                            color: AppColors.softTeal,
+                            color: AppColors.brandPrimary,
                           ),
                         ),
                         const SizedBox(width: AppConstants.spacingSm),
@@ -374,9 +374,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         Switch(
                           value: _dailyReminder,
                           onChanged: (value) => _setDailyReminder(value),
-                          activeThumbColor: AppColors.navyBlue,
+                          activeThumbColor: AppColors.brandPrimary,
                           activeTrackColor:
-                              AppColors.softTealLight.withValues(alpha: 0.5),
+                              AppColors.brandLightBlue.withValues(alpha: 0.5),
                         ),
                       ],
                     ),
@@ -483,8 +483,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       height: 40,
                       decoration: BoxDecoration(
                         color: (isDark
-                                ? AppColors.softTealLight
-                                : AppColors.navyBlue)
+                                ? AppColors.brandLightBlue
+                                : AppColors.brandPrimary)
                             .withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(AppConstants.radiusSm),
                       ),
@@ -492,8 +492,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         Icons.monetization_on_rounded,
                         size: 22,
                         color: isDark
-                            ? AppColors.softTealLight
-                            : AppColors.navyBlue,
+                            ? AppColors.brandLightBlue
+                            : AppColors.brandPrimary,
                       ),
                     ),
                     const SizedBox(width: AppConstants.spacingSm),
@@ -621,7 +621,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   children: [
                     _AboutTile(
                       icon: Icons.privacy_tip_rounded,
-                      iconColor: AppColors.navyBlue,
+                      iconColor: AppColors.brandPrimary,
                       label: 'Privacy Policy',
                       isDark: isDark,
                       onTap: () => Navigator.of(context).push(
@@ -645,7 +645,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     _AboutDivider(isDark: isDark),
                     _AboutTile(
                       icon: Icons.star_rounded,
-                      iconColor: AppColors.softOrange,
+                      iconColor: AppColors.brandPrimary,
                       label: 'Rate the App',
                       isDark: isDark,
                       onTap: () => _launchUrl(
@@ -655,7 +655,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     _AboutDivider(isDark: isDark),
                     _AboutTile(
                       icon: Icons.mail_outline_rounded,
-                      iconColor: AppColors.softTeal,
+                      iconColor: AppColors.brandPrimary,
                       label: 'Contact Us',
                       isDark: isDark,
                       onTap: () => _launchUrl(
@@ -785,7 +785,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           height: 7,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isDark ? AppColors.softTealLight : AppColors.navyBlue,
+            color: isDark ? AppColors.brandLightBlue : AppColors.brandPrimary,
           ),
         ),
         const SizedBox(width: AppConstants.spacingSm),

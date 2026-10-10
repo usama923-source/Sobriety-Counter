@@ -57,12 +57,12 @@ class _ConfettiCelebrationState extends State<ConfettiCelebration>
   List<_ConfettiParticle> _generateParticles() {
     final rng = Random(widget.key.hashCode);
     final defaultColors = [
-      AppColors.softTealDark,
-      AppColors.softOrange,
-      AppColors.softTeal,
+      AppColors.brandPrimaryLight,
+      AppColors.brandPrimary,
+      AppColors.brandPrimary,
       AppColors.softRed,
-      AppColors.softOrangeLight,
-      AppColors.softTealLight,
+      AppColors.brandLightBlue,
+      AppColors.brandLightBlue,
     ];
     final colors = widget.colors ?? defaultColors;
 

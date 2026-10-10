@@ -101,14 +101,14 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                       height: 88,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.softTeal.withValues(
+                        color: AppColors.brandPrimary.withValues(
                           alpha: isDark ? 0.15 : 0.1,
                         ),
                       ),
                       child: const Icon(
                         Icons.auto_awesome_rounded,
                         size: 48,
-                        color: AppColors.softTeal,
+                        color: AppColors.brandPrimary,
                       ),
                     ),
                     const SizedBox(height: AppConstants.spacingLg),
@@ -169,7 +169,7 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                       Icon(
                         Icons.format_quote_rounded,
                         size: 48,
-                        color: AppColors.softTeal.withValues(
+                        color: AppColors.brandPrimary.withValues(
                           alpha: isDark ? 0.2 : 0.15,
                         ),
                       ),
@@ -222,7 +222,7 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                       label: 'New Quote',
                       onTap: _nextQuote,
                       isDark: isDark,
-                      color: AppColors.navyBlue,
+                      color: AppColors.brandPrimary,
                     ),
                   ),
                   const SizedBox(width: AppConstants.spacingMd),
@@ -238,7 +238,7 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                       isDark: isDark,
                       color: _isFavorite
                           ? AppColors.softRed
-                          : AppColors.navyBlue,
+                          : AppColors.brandPrimary,
                     ),
                   ),
                   const SizedBox(width: AppConstants.spacingMd),
@@ -250,7 +250,7 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                       label: 'Copy',
                       onTap: _copyQuote,
                       isDark: isDark,
-                      color: AppColors.navyBlue,
+                      color: AppColors.brandPrimary,
                     ),
                   ),
                 ],
@@ -269,13 +269,13 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                         vertical: AppConstants.spacingSm,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.softTeal.withValues(alpha: 0.1),
+                        color: AppColors.brandPrimary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(
                           AppConstants.radiusSm,
                         ),
                         border: Border.all(
                           color:
-                              AppColors.softTeal.withValues(alpha: 0.2),
+                              AppColors.brandPrimary.withValues(alpha: 0.2),
                         ),
                       ),
                       child: Row(
@@ -284,7 +284,7 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                           const Icon(
                             Icons.check_rounded,
                             size: 18,
-                            color: AppColors.softTeal,
+                            color: AppColors.brandPrimary,
                           ),
                           const SizedBox(width: AppConstants.spacingXs),
                           Text(
@@ -397,8 +397,8 @@ class _MotivationScreenState extends ConsumerState<MotivationScreen> {
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: isDark
-                                  ? AppColors.softTealLight
-                                  : AppColors.navyBlue,
+                                  ? AppColors.brandLightBlue
+                                  : AppColors.brandPrimary,
                             ),
                           ),
                         ),
