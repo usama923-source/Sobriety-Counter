@@ -1,4 +1,4 @@
-package com.example.quit_drinking
+package com.quitdrink.ai
 
 import io.flutter.embedding.android.FlutterActivity
 
