@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 
 /// Builds the complete light and dark theme for QuitDrink Ai.
 class AppTheme {
   AppTheme._();
+
+  /// Bundled display family (see the `fonts:` section of pubspec.yaml).
+  static const String _displayFontFamily = 'Montserrat';
+
+  /// Bundled body/label family (see the `fonts:` section of pubspec.yaml).
+  static const String _bodyFontFamily = 'Lato';
 
   /// The single source of truth for typography.
   ///
@@ -14,12 +19,15 @@ class AppTheme {
   /// from this text theme, so the fonts apply app-wide (app bars, buttons,
   /// chips, snackbars, tooltips, inputs) without re-declaring a font family.
   static TextTheme _textTheme(Brightness brightness) {
-    final base = brightness == Brightness.dark
-        ? GoogleFonts.latoTextTheme(ThemeData.dark().textTheme)
-        : GoogleFonts.latoTextTheme();
+    final base = (brightness == Brightness.dark
+            ? ThemeData.dark().textTheme
+            : ThemeData.light().textTheme)
+        .apply(fontFamily: _bodyFontFamily);
 
-    TextStyle? heading(TextStyle? style, FontWeight weight) =>
-        GoogleFonts.montserrat(textStyle: style, fontWeight: weight);
+    TextStyle? heading(TextStyle? style, FontWeight weight) => style?.copyWith(
+          fontFamily: _displayFontFamily,
+          fontWeight: weight,
+        );
 
     return base.copyWith(
       displayLarge: heading(base.displayLarge, FontWeight.w700),
