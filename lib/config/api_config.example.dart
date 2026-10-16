@@ -33,4 +33,20 @@ class ApiConfig {
 
   /// Display name for the AI companion
   static const String aiName = 'AI Friend';
+
+  // ── Temporary client-side chat safeguards ─────────────────────────────
+  // These limits keep usage (and cost) in check until a server-side proxy
+  // enforces them. They live here so every number sits in one place.
+
+  /// Maximum user messages per device per calendar day.
+  static const int dailyMessageLimit = 25;
+
+  /// Maximum characters allowed in a single chat message.
+  static const int maxMessageLength = 500;
+
+  /// How many of the most recent messages are sent as history.
+  static const int historyMessageLimit = 10;
+
+  /// Maximum tokens requested from the model per reply.
+  static const int maxResponseTokens = 300;
 }

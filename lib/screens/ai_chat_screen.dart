@@ -88,6 +88,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   void initState() {
     super.initState();
     _loadHistory();
+    _loadDailyUsage();
     _checkDisclaimer();
     _textController.addListener(() => setState(() {}));
   }
@@ -154,6 +155,66 @@ class _AIChatScreenState extends State<AIChatScreen> {
     }
   }
 
+  // ── Daily Message Limit (temporary client-side safeguard) ─────────────
+  // A server-side proxy will enforce this later; until then the count lives
+  // in SharedPreferences so it survives app restarts.
+
+  static const String _dailyCountKey = 'chat_daily_count';
+  static const String _dailyDateKey = 'chat_daily_date';
+
+  int _dailyCount = 0;
+
+  /// Messages left for today, never negative.
+  int get _messagesRemaining {
+    final remaining = ApiConfig.dailyMessageLimit - _dailyCount;
+    return remaining > 0 ? remaining : 0;
+  }
+
+  /// Today's calendar day as a `yyyy-mm-dd` key.
+  String get _todayKey {
+    final now = DateTime.now();
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    return '${now.year}-$month-$day';
+  }
+
+  /// Loads today's usage. A missing or unreadable value, or a stored date
+  /// that is not today, means the day starts fresh at zero.
+  Future<void> _loadDailyUsage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final storedCount = prefs.getInt(_dailyCountKey) ?? 0;
+      final storedDate = prefs.getString(_dailyDateKey);
+      final used = storedDate == _todayKey && storedCount > 0 ? storedCount : 0;
+
+      if (mounted) setState(() => _dailyCount = used);
+
+      // First run of a new calendar day — reset the stored count.
+      if (used == 0 && storedDate != _todayKey) {
+        await prefs.setString(_dailyDateKey, _todayKey);
+        await prefs.setInt(_dailyCountKey, 0);
+      }
+    } catch (e) {
+      debugPrint('[AIChat] Failed to load daily usage: $e');
+      if (mounted) setState(() => _dailyCount = 0);
+    }
+  }
+
+  /// Counts one user message against today's allowance. A storage failure
+  /// still counts in memory so a single session cannot run away.
+  Future<void> _recordUserMessage() async {
+    final next = _dailyCount + 1;
+    if (mounted) setState(() => _dailyCount = next);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_dailyDateKey, _todayKey);
+      await prefs.setInt(_dailyCountKey, next);
+    } catch (e) {
+      debugPrint('[AIChat] Failed to save daily usage: $e');
+    }
+  }
+
   // ── Welcome ───────────────────────────────────────────────────────────
 
   void _addWelcomeMessage() {
@@ -173,6 +234,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
     final trimmed = text.trim();
     if (trimmed.isEmpty || _isSending) return;
 
+    // ── Temporary daily limit — show a friendly note instead of calling
+    // the API once the day's allowance is used up. ────────────────
+    if (_messagesRemaining <= 0) {
+      _showDailyLimitMessage();
+      return;
+    }
+
     debugPrint('API Key exists: $_hasRealApiKey');
     debugPrint('Sending to: ${ApiConfig.apiUrl}');
 
@@ -190,6 +258,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
     _textController.clear();
     _scrollToBottom();
 
+    // Count this message against today's allowance.
+    await _recordUserMessage();
+
     // Get AI response
     await _getAIResponse(trimmed);
 
@@ -200,6 +271,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
       setState(() => _isSending = false);
       _scrollToBottom();
     }
+  }
+
+  /// The most recent messages sent as conversation history.
+  List<_ChatMessage> get _historyWindow {
+    final limit = ApiConfig.historyMessageLimit;
+    if (_messages.length <= limit) return _messages;
+    return _messages.sublist(_messages.length - limit);
   }
 
   Future<void> _getAIResponse(String userMessage) async {
@@ -247,15 +325,16 @@ class _AIChatScreenState extends State<AIChatScreen> {
                   'but a supportive companion. If someone is in crisis, '
                   'encourage them to call a helpline.',
             },
-            // Send all conversation history — _sendMessage already added
-            // the user's latest message to _messages before calling us.
-            ..._messages.map((m) => {
+            // Send only the most recent messages as history — _sendMessage
+            // already added the user's latest message to _messages before
+            // calling us. A server-side proxy will own this limit later.
+            ..._historyWindow.map((m) => {
                   'role': m.isUser ? 'user' : 'assistant',
                   'content': m.text,
                 }),
           ],
           'temperature': 0.7,
-          'max_tokens': 300,
+          'max_tokens': ApiConfig.maxResponseTokens,
         }),
       )
       .timeout(const Duration(seconds: 30));
@@ -503,6 +582,37 @@ class _AIChatScreenState extends State<AIChatScreen> {
     );
   }
 
+  /// Friendly notice shown instead of calling the API once today's limit is
+  /// reached. A server-side proxy will enforce this later.
+  void _showDailyLimitMessage() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.schedule_rounded,
+              size: 20,
+              color: AppColors.white,
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                "You've reached today's chat limit. Come back tomorrow.",
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.brandPrimary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+        ),
+        margin: const EdgeInsets.all(AppConstants.spacingMd),
+      ),
+    );
+  }
+
   // ── Build ─────────────────────────────────────────────────────────────
 
   @override
@@ -707,6 +817,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
           if (_messages.length <= 1 && !_isSending)
             _buildSuggestedPrompts(isDark),
 
+          // ── Messages Left Today (temporary client-side limit) ──────
+          _buildMessagesRemaining(isDark),
+
           // ── Input Bar ──────────────────────────────────────────────
           _buildInputBar(isDark),
         ],
@@ -860,6 +973,35 @@ class _AIChatScreenState extends State<AIChatScreen> {
     );
   }
 
+  // ── Messages Left Today (temporary client-side limit) ─────────────────
+
+  Widget _buildMessagesRemaining(bool isDark) {
+    final bool exhausted = _messagesRemaining <= 0;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppConstants.spacingLg,
+        0,
+        AppConstants.spacingMd,
+        AppConstants.spacingXs,
+      ),
+      child: Text(
+        exhausted
+            ? 'No messages left today'
+            : '$_messagesRemaining of ${ApiConfig.dailyMessageLimit} messages left today',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+          color: exhausted
+              ? AppColors.softRed
+              : (isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textTertiary),
+        ),
+      ),
+    );
+  }
+
   // ── Input Bar ─────────────────────────────────────────────────────────
 
   Widget _buildInputBar(bool isDark) {
@@ -901,6 +1043,14 @@ class _AIChatScreenState extends State<AIChatScreen> {
                   textInputAction: TextInputAction.send,
                   maxLines: 4,
                   minLines: 1,
+                  // Temporary client-side cap — a server-side proxy will
+                  // enforce this later. The formatter keeps the pill clean
+                  // (no character counter under the field).
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(
+                      ApiConfig.maxMessageLength,
+                    ),
+                  ],
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     hintText: 'Type a message…',
