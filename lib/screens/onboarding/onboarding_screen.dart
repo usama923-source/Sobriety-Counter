@@ -446,8 +446,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Flexible(
                   child: Text(
                     'Your data stays on your device — except anonymous '
-                    'usage analytics, a random device ID for Pro status, and '
-                    'AI chat messages sent to the AI provider.',
+                    'usage analytics and a random device ID, and AI chat '
+                    'messages sent to the AI provider.',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

@@ -30,9 +30,9 @@ collected.
   collect). There is no in-app analytics opt-out toggle.
 - **Purposes:** Analytics
 - **What this covers:** Basic usage events such as the app being opened
-  (`app_open`), a daily reminder being scheduled (`reminder_scheduled`), and
-  a Pro-upgrade event (`pro_purchase`). No name, email, contact details,
-  journal text, reason text, weight values, or chat text is included.
+  (`app_open`) and a daily reminder being scheduled (`reminder_scheduled`).
+  No name, email, contact details, journal text, reason text, weight values,
+  or chat text is included.
 
 ### 2. Device or other IDs → Device or other IDs
 
@@ -73,9 +73,11 @@ not be declared as collected:
   so **not collected**.
 - **Personal notes / journal entries / saved reasons:** Stored only on the
   device. Not collected.
-- **Financial info:** Not collected. The money-saved calculator is a local
-  estimate only; no payments are processed by the app. There is no billing
-  integration in this version.
+- **Financial info / purchase history:** Not collected and not shared. **No
+  purchase information is collected** — the app has no billing integration and
+  processes no payments, so there are no purchase records to declare. The
+  money-saved calculator is a local estimate only; it is not a financial
+  service and no payment data exists.
 - **Photos, videos, files, audio, contacts, calendar:** Not collected.
 - **Location:** Not collected.
 - **Web browsing, in-app search history, other user-generated content:**

@@ -123,23 +123,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 3: Pro Purchases ───────────────────────────
-              _PolicySection(
-                icon: Icons.workspace_premium_rounded,
-                iconColor: AppColors.gold,
-                title: 'Pro Purchases',
-                body:
-                    'Unlocking Pro is stored on your device and is not tied to '
-                    'any account or personal details. When real billing is '
-                    'added, purchase records will be handled by the store '
-                    'billing system (Google Play or the App Store) under their '
-                    'own privacy policies.',
-                isDark: isDark,
-              ),
-
-              const SizedBox(height: AppConstants.spacingSm),
-
-              // ── Section 4: AI Chat ─────────────────────────────────
+              // ── Section 3: AI Chat ─────────────────────────────────
               _PolicySection(
                 icon: Icons.smart_toy_rounded,
                 iconColor: AppColors.brandPrimary,
@@ -149,13 +133,15 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     'sent to the Groq API (groq.com) to generate helpful responses. '
                     'Groq\'s privacy policy applies to those transmissions. We do '
                     'not store your chat messages on our servers — they remain on '
-                    'your device.',
+                    'your device. AI chat has a daily message limit, and the app '
+                    'keeps a count of the messages you send each day in your '
+                    'device\'s private storage to enforce it.',
                 isDark: isDark,
               ),
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 3: No Account Required ─────────────────────
+              // ── Section 4: No Account Required ─────────────────────
               _PolicySection(
                 icon: Icons.person_off_rounded,
                 iconColor: AppColors.brandLightBlue,
@@ -170,7 +156,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 4: No Data Selling ─────────────────────────
+              // ── Section 5: No Data Selling ─────────────────────────
               _PolicySection(
                 icon: Icons.verified_rounded,
                 iconColor: AppColors.brandPrimary,
@@ -184,7 +170,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 5: Children ────────────────────────────────
+              // ── Section 6: Children ────────────────────────────────
               _PolicySection(
                 icon: Icons.family_restroom_rounded,
                 iconColor: AppColors.brandPrimary,
@@ -198,7 +184,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 6: Contact Us ──────────────────────────────
+              // ── Section 7: Contact Us ──────────────────────────────
               _PolicySection(
                 icon: Icons.mail_outline_rounded,
                 iconColor: AppColors.softRed,

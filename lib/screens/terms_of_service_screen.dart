@@ -131,28 +131,14 @@ class TermsOfServiceScreen extends StatelessWidget {
                     'motivational purposes only. They do not constitute medical '
                     'or professional advice. Always consult a qualified '
                     'professional for serious concerns or emergencies. If you '
-                    'are in crisis, please contact a helpline immediately.',
+                    'are in crisis, please contact a helpline immediately. AI '
+                    'chat has a daily message limit.',
                 isDark: isDark,
               ),
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 4: Pro Features ────────────────────────────
-              _TermsSection(
-                icon: Icons.star_rounded,
-                iconColor: AppColors.brandPrimary,
-                title: 'Pro Features',
-                body:
-                    'Pro features are available as a one-time in-app purchase. '
-                    'All purchases are non-refundable after activation. '
-                    'Unlocking Pro provides access to the AI Friend chat '
-                    'feature and supports future development of the app.',
-                isDark: isDark,
-              ),
-
-              const SizedBox(height: AppConstants.spacingSm),
-
-              // ── Section 5: User Responsibility ─────────────────────
+              // ── Section 4: User Responsibility ─────────────────────
               _TermsSection(
                 icon: Icons.person_outline_rounded,
                 iconColor: AppColors.brandPrimary,
@@ -168,7 +154,7 @@ class TermsOfServiceScreen extends StatelessWidget {
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 6: Changes ─────────────────────────────────
+              // ── Section 5: Changes ─────────────────────────────────
               _TermsSection(
                 icon: Icons.update_rounded,
                 iconColor: AppColors.brandPrimary,
@@ -183,7 +169,7 @@ class TermsOfServiceScreen extends StatelessWidget {
 
               const SizedBox(height: AppConstants.spacingSm),
 
-              // ── Section 7: Contact ─────────────────────────────────
+              // ── Section 6: Contact ─────────────────────────────────
               _TermsSection(
                 icon: Icons.mail_outline_rounded,
                 iconColor: AppColors.softRed,

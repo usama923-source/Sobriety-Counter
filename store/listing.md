@@ -30,6 +30,7 @@ you keep track of your alcohol-free days, get through cravings, and stay
 grounded — one day at a time.
 
 Everything that matters is kept on your device, and no account is needed.
+Every feature is free to use.
 
 **A counter that keeps you going**
 Watch your sober time tick upward, live, down to the second. See the milestones
