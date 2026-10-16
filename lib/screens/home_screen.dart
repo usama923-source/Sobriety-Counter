@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
-import 'package:quit_drinking/widgets/app_logo.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
 import 'package:quit_drinking/core/providers/sobriety_provider.dart';
 import 'package:quit_drinking/core/providers/quotes_provider.dart';
@@ -380,7 +379,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const AppLogo(size: 88),
+                  // Raw brand mark — centered, no circular crop, no box.
+                  Center(
+                    child: Image.asset(
+                      'assets/logo_icon.png',
+                      width: 88,
+                      height: 88,
+                      fit: BoxFit.contain,
+                      // Decode at ~3× the rendered size for crisp scaling.
+                      cacheWidth: 264,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(
+                        Icons.spa_rounded,
+                        size: 44,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: AppConstants.spacingMd),
                   const Text(
                     AppConstants.tagline,
