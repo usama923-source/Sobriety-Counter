@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import "dart:async";
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
@@ -18,7 +16,7 @@ import 'package:quit_drinking/widgets/daily_motivation_card.dart';
 import 'package:quit_drinking/widgets/my_reasons_card.dart';
 import 'package:quit_drinking/widgets/money_saved_card.dart';
 import 'package:quit_drinking/widgets/guided_breathing_card.dart';
-import 'package:quit_drinking/widgets/pro_teaser_card.dart';
+import 'package:quit_drinking/widgets/feature_card.dart';
 import 'package:quit_drinking/widgets/recovery_timeline_card.dart';
 import 'package:quit_drinking/widgets/craving_help_card.dart';
 import 'package:quit_drinking/widgets/daily_checkin_card.dart';
@@ -43,17 +41,11 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _isInitialLoad = true;
   bool _isRefreshing = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  // Drawer tooltip state
-  OverlayEntry? _tooltipEntry;
-  AnimationController? _tooltipFadeController;
-  Timer? _tooltipTimer;
 
   @override
   void initState() {
@@ -63,141 +55,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) setState(() => _isInitialLoad = false);
     });
-
-    // One-time drawer tooltip on first launch
-    _initDrawerTooltip();
   }
 
   @override
   void dispose() {
-    _tooltipTimer?.cancel();
-    // Dispose the tooltip fade controller even if the auto-dismiss timer
-    // never fired (e.g. user left the screen immediately) — otherwise the
-    // controller and its overlay entry leak.
-    _tooltipFadeController?.dispose();
-    _tooltipFadeController = null;
-    _tooltipEntry?.remove();
-    _tooltipEntry?.dispose();
-    _tooltipEntry = null;
     _scrollController.dispose();
     super.dispose();
-  }
-
-  // ── Drawer tooltip (one-time, first launch) ─────────────────────────
-
-  Future<void> _initDrawerTooltip() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // Already shown this session? Skip.
-    if (prefs.getBool('drawer_tooltip_shown') ?? false) return;
-
-    _showDrawerTooltip();
-  }
-
-  void _showDrawerTooltip() {
-    if (!mounted) return;
-
-    final scaffoldContext = _scaffoldKey.currentContext;
-    if (scaffoldContext == null) return;
-
-    // Fade transition controller for the tooltip (tracked on the state so
-    // dispose() can always clean it up).
-    final fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _tooltipFadeController = fadeController;
-    final fadeAnimation = CurvedAnimation(parent: fadeController, curve: Curves.easeOut);
-
-    final entry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: 8,
-        top: 56,
-        child: FadeTransition(
-          opacity: fadeAnimation,
-          child: Material(
-            color: Colors.transparent,
-            child: Center(
-              child: _drawerTooltipContent(),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    // Add to overlay, then track it and start fade in.
-    // Assigned only after a successful insert so a non-null field always
-    // means "inserted and safe to remove".
-    Overlay.of(scaffoldContext).insert(entry);
-    _tooltipEntry = entry;
-    fadeController.forward();
-
-    // Fade out after 3s, then mark as shown
-    _tooltipTimer = Timer(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      _removeDrawerTooltip();
-    });
-  }
-
-  /// Removes the tooltip overlay, disposes its animation controller, and
-  /// persists the "shown" flag. Safe to call from both the timer callback
-  /// and [dispose] (fields are nulled out so nothing is cleaned up twice).
-  void _removeDrawerTooltip() {
-    _tooltipTimer?.cancel();
-    _tooltipTimer = null;
-
-    _tooltipFadeController?.dispose();
-    _tooltipFadeController = null;
-
-    _tooltipEntry?.remove();
-    _tooltipEntry?.dispose();
-    _tooltipEntry = null;
-
-    // Persist the flag for future launches
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setBool('drawer_tooltip_shown', true);
-    });
-  }
-
-  // ── Drawer tooltip content (gold, rounded, one-time) ─────────────────
-
-  Widget _drawerTooltipContent() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.brandPrimary,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.brandPrimary.withValues(alpha: 0.35),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: const BoxDecoration(
-              color: AppColors.gold,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            'Pro features inside! 👆',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   // ── Main build method ──────────────────────────────────────────────
@@ -484,27 +347,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  // ── Locked Pro teaser card ────────────────────────────────────────────
-
-  Widget _buildProTeaserCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    // If the user is already Pro, hide these cards entirely
-    // AsyncValue guards: valueOrNull is null while loading or on error.
-    final bool isProEnabled = ref.watch(isProProvider).valueOrNull ?? false;
-    if (isProEnabled) return const SizedBox.shrink();
-
-    return ProTeaserCard(
-      icon: icon,
-      title: title,
-      subtitle: subtitle,
-      onTap: onTap,
-    );
-  }
-
   // ── AI Friend FAB ─────────────────────────────────────────────────────
 
   Widget _buildAIFab() {
@@ -533,54 +375,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             width: 3,
           ),
         ),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Center(
-              child: Icon(
-                Icons.smart_toy_rounded,
-                size: 26,
-                color: AppColors.white,
-              ),
-            ),
-            // Gold crown badge overlay on top-right
-            Positioned(
-              top: -4,
-              right: -4,
-              child: Container(
-                width: 22,
-                height: 22,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.gold,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1.5,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.gold.withValues(alpha: 0.5),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Text(
-                  '👑',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ),
-            ),
-          ],
+        child: const Center(
+          child: Icon(
+            Icons.smart_toy_rounded,
+            size: 26,
+            color: AppColors.white,
+          ),
         ),
       ),
     );
   }
 
   Future<void> _onAIFabTap() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isPro = prefs.getBool('is_pro') ?? false;
+    // Reads through the Pro gate: while billing is off (kProEnabled = false)
+    // this is always true, so the feature opens directly. The upgrade branch
+    // stays in place for when billing is switched back on.
+    final isPro = await ref.read(isProProvider.future);
 
     if (!mounted) return;
 
@@ -605,8 +415,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // Close drawer first
     nav.pop();
 
-    final prefs = await SharedPreferences.getInstance();
-    final isPro = prefs.getBool('is_pro') ?? false;
+    // Reads through the Pro gate: always true while billing is off, so the
+    // feature opens directly. The upgrade path stays for later billing.
+    final isPro = await ref.read(isProProvider.future);
 
     if (!ctx.mounted) return;
 
@@ -665,8 +476,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
 
-                  // AI Friend (Pro) — right after the sobriety card.
-                  _buildProTeaserCard(
+                  // AI Friend — right after the sobriety card.
+                  FeatureCard(
                     icon: Icons.smart_toy_rounded,
                     title: 'AI Friend',
                     subtitle: '24/7 AI support during cravings',
@@ -702,8 +513,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
 
-                  // Memory Game (Pro) — right after Craving Help.
-                  _buildProTeaserCard(
+                  // Memory Game — right after Craving Help.
+                  FeatureCard(
                     icon: Icons.psychology_rounded,
                     title: 'Memory Game',
                     subtitle: 'Beat cravings with a focus game',
@@ -732,8 +543,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                   const SizedBox(height: AppConstants.spacingLg),
 
-                  // Weight Tracker (Pro) — right after Guided Breathing.
-                  _buildProTeaserCard(
+                  // Weight Tracker — right after Guided Breathing.
+                  FeatureCard(
                     icon: Icons.monitor_weight_rounded,
                     title: 'Weight Tracker',
                     subtitle: 'Track your body transformation',
@@ -920,7 +731,8 @@ class _DrawerProMenuItem extends StatelessWidget {
     required this.title,
     required this.isDark,
     required this.onTapPro,
-    this.isPro = true,
+    // The gold PRO badge only exists while billing is switched on.
+    this.isPro = kProEnabled,
   });
 
   @override

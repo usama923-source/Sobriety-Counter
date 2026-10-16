@@ -1,3 +1,11 @@
+/// Master switch for Pro gating and billing.
+///
+/// The first release ships every feature free, so this stays `false`: all Pro
+/// gates pass, no paywall UI is shown, and the billing code (the upgrade sheet
+/// and the `is_pro` preference) stays in the project but unreachable. Set it to
+/// `true` to switch billing back on.
+const bool kProEnabled = false;
+
 /// App-wide constants used throughout QuitDrink Ai.
 class AppConstants {
   AppConstants._();

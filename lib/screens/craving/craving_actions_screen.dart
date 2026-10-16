@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/theme_provider.dart';
 import 'package:quit_drinking/screens/ai_chat_screen.dart';
 import 'package:quit_drinking/screens/craving/breathing_screen.dart';
 import 'package:quit_drinking/screens/craving/journal_screen.dart';
@@ -9,7 +11,6 @@ import 'package:quit_drinking/screens/craving/my_reasons_screen.dart';
 import 'package:quit_drinking/screens/craving/timed_activity_screen.dart';
 import 'package:quit_drinking/widgets/pro_upgrade_sheet.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Craving Actions screen — a full page of 7 calming activities to help
 /// users ride out a craving.
@@ -171,7 +172,7 @@ const _cravingActions = [
 
 // ── Action Tile with Staggered Animation ────────────────────────────────
 
-class _CravingActionTile extends StatelessWidget {
+class _CravingActionTile extends ConsumerWidget {
   final _CravingAction action;
   final bool isDark;
   final int index;
@@ -183,9 +184,9 @@ class _CravingActionTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return InkWell(
-      onTap: () => _onActionTap(context),
+      onTap: () => _onActionTap(context, ref),
       borderRadius: BorderRadius.circular(AppConstants.radiusLg),
       splashColor: AppColors.brandPrimary.withValues(alpha: 0.12),
       highlightColor: AppColors.brandPrimary.withValues(alpha: 0.12),
@@ -251,7 +252,7 @@ class _CravingActionTile extends StatelessWidget {
     );
   }
 
-  void _onActionTap(BuildContext context) {
+  void _onActionTap(BuildContext context, WidgetRef ref) {
     switch (index) {
       case 0:
         Navigator.of(context).push(
@@ -291,7 +292,7 @@ class _CravingActionTile extends StatelessWidget {
         );
       case 5:
         // Check Pro status first (async), then navigate or show upgrade
-        _handleAIFriend(context);
+        _handleAIFriend(context, ref);
       case 6:
         Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => const MotivationScreen()),
@@ -316,9 +317,11 @@ class _CravingActionTile extends StatelessWidget {
     }
   }
 
-  Future<void> _handleAIFriend(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    final isPro = prefs.getBool('is_pro') ?? false;
+  Future<void> _handleAIFriend(BuildContext context, WidgetRef ref) async {
+    // Reads through the Pro gate: while billing is off (kProEnabled = false)
+    // this is always true, so AI Friend opens directly. The upgrade path below
+    // stays in place for when billing is switched back on.
+    final isPro = await ref.read(isProProvider.future);
 
     if (!context.mounted) return;
 
