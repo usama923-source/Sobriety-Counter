@@ -71,8 +71,11 @@ class NotificationService {
 
   // ── Initialization ──────────────────────────────────────────────────────
 
-  /// Initialize the notification plugin, request permissions, and set up
-  /// the timezone database. Must be called once before any scheduling.
+  /// Initialize the notification plugin and set up the timezone database.
+  /// Must be called once before any scheduling.
+  ///
+  /// This never asks for notification permission: the request is made when
+  /// the user enables the daily reminder (see [scheduleDailyReminder]).
   Future<void> initialize() async {
     if (kIsWeb) return; // notifications not supported on web
     if (_initialized) return;
@@ -101,27 +104,36 @@ class NotificationService {
     // reminder is scheduled (required on Android 8+).
     await _createDailyChannel();
 
-    // Request notification permission on Android 13+.
-    // Note: exact alarm permission cannot be requested at runtime, so we
-    // fall back to AndroidScheduleMode.inexactAllowWhileIdle for repeated
-    // announcements at the same clock time every day.
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
     // Report (and fall back from) inexact scheduling when exact alarms are
-    // not permitted on this device.
+    // not permitted on this device. Exact alarm permission cannot be
+    // requested at runtime, so repeated announcements at the same clock time
+    // every day use AndroidScheduleMode.inexactAllowWhileIdle instead.
     await _resolveScheduleMode(logWhenInexact: true);
 
-    // Request permissions on iOS/macOS
-    if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
+    _initialized = true;
+  }
+
+  /// Ask for notification permission (Android 13+ and iOS/macOS).
+  ///
+  /// Called only from [scheduleDailyReminder], i.e. after the user explicitly
+  /// turns the daily reminder on — never during app startup.
+  Future<void> _requestPermissions() async {
+    if (kIsWeb) return;
+
+    if (Platform.isAndroid) {
+      await _plugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
+      return;
+    }
+
+    if (Platform.isIOS || Platform.isMacOS) {
       await _plugin
           .resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>()
           ?.requestPermissions(alert: true, badge: true, sound: true);
     }
-
-    _initialized = true;
   }
 
   /// Configure the local timezone from the device.
@@ -222,6 +234,10 @@ class NotificationService {
     try {
       await cancelReminder();
       if (!_initialized) await initialize();
+
+      // The user just enabled the reminder, so ask for permission now rather
+      // than at app startup.
+      await _requestPermissions();
 
       // Schedule the next daily occurrence. If today's time has already
       // passed, roll to tomorrow so the notification fires on time.

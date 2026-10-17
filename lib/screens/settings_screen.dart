@@ -665,7 +665,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       label: 'Rate the App',
                       isDark: isDark,
                       onTap: () => _launchUrl(
-                        'https://play.google.com/store/apps/details?id=com.example.quit_drinking',
+                        'https://play.google.com/store/apps/details?id=com.quitdrink.ai',
                       ),
                     ),
                     _AboutDivider(isDark: isDark),
