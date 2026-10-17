@@ -58,12 +58,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyB1qo0jRgK-RkvjHCeNFTjo09i-wHI8IoA',
-    appId: '1:42057394879:android:91cfb4fdf18515eef2b40a',
+    appId: '1:42057394879:android:20de4c6f9d43e360f2b40a',
     messagingSenderId: '42057394879',
     projectId: 'quitdrink-1475e',
     storageBucket: 'quitdrink-1475e.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyC0jBfsZtb3YcDr-rVwEIbxKz2lIDPRIdY',
     appId: '1:42057394879:ios:1c26130c02a8432bf2b40a',

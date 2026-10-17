@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/services/currency_service.dart';
 import 'package:quit_drinking/services/savings_service.dart';
 import 'package:quit_drinking/services/sobriety_service.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Section 5 — Money Saved Card.
 ///
@@ -14,11 +14,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MoneySavedCard extends StatefulWidget {
   final SavingsService savingsService;
   final SobrietyService sobrietyService;
+  final CurrencyService currencyService;
 
   const MoneySavedCard({
     super.key,
     required this.savingsService,
     required this.sobrietyService,
+    required this.currencyService,
   });
 
   @override
@@ -28,22 +30,10 @@ class MoneySavedCard extends StatefulWidget {
 class _MoneySavedCardState extends State<MoneySavedCard> {
   bool _showInputs = false;
 
-  /// Cached SharedPreferences instance, loaded once in [initState].
-  /// The currency is re-read from prefs on every [build] so changes made
-  /// in Settings (key: "currency") show up immediately.
-  SharedPreferences? _prefs;
-
   @override
   void initState() {
     super.initState();
     _syncDays();
-    _loadPrefs();
-  }
-
-  Future<void> _loadPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!mounted) return;
-    setState(() => _prefs = prefs);
   }
 
   @override
@@ -63,9 +53,9 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final s = widget.savingsService;
 
-    // Read the currency on every build so a change made in Settings
-    // (key: "currency") is reflected immediately when returning home.
-    final symbol = _currencySymbol(_prefs?.getString('currency') ?? 'USD');
+    // The symbol comes from the shared currency service, so a change made in
+    // Settings rebuilds this card straight away — no refresh required.
+    final symbol = widget.currencyService.symbol;
 
     return SoberCard(
       child: Column(
@@ -228,24 +218,6 @@ class _MoneySavedCardState extends State<MoneySavedCard> {
         ],
       ),
     );
-  }
-
-  /// Map a currency code (as stored in SharedPreferences key "currency")
-  /// to its display symbol. Defaults to \$ for unknown codes.
-  String _currencySymbol(String code) {
-    switch (code) {
-      case 'EUR':
-        return '€';
-      case 'GBP':
-        return '£';
-      case 'CAD':
-        return 'CA\$';
-      case 'AUD':
-        return 'A\$';
-      case 'USD':
-      default:
-        return '\$';
-    }
   }
 
   // ── Inputs UI ─────────────────────────────────────────────────────

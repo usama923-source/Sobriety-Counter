@@ -20,6 +20,12 @@ class SobrietyCounterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // Wait for the stored date to load before deciding there is none, so a
+    // saved date never flashes the "Set Quit Date" prompt on launch.
+    if (!service.isInitialized) {
+      return _buildLoadingCard(isDark);
+    }
+
     if (!service.hasQuitDate) {
       return _buildNoDateCard(context, isDark);
     }
@@ -103,7 +109,31 @@ class SobrietyCounterCard extends StatelessWidget {
     );
   }
 
-  // ── No-Date State ──────────────────────────────────────────────────
+  // ── Loading State ─────────────────────────────────────────────────
+
+  /// Shown for the brief moment while the stored quit date is being read.
+  Widget _buildLoadingCard(bool isDark) {
+    return SoberCard(
+      padding: const EdgeInsets.all(AppConstants.spacingLg),
+      child: SizedBox(
+        height: 120,
+        child: Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: isDark
+                  ? AppColors.brandLightBlue
+                  : AppColors.brandPrimary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── No-Date State ─────────────────────────────────────────────────
 
   Widget _buildNoDateCard(BuildContext context, bool isDark) {
     return SoberCard(

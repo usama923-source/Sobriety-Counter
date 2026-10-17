@@ -12,6 +12,18 @@ class SobrietyService extends ChangeNotifier {
   Timer? _timer;
   bool _disposed = false;
 
+  /// Completed by the first [init] once the stored date has been read.
+  final Completer<void> _initialized = Completer<void>();
+
+  /// Whether the stored quit date has finished loading from storage.
+  ///
+  /// The UI waits for this before concluding that no quit date exists, so a
+  /// saved date is never briefly reported as missing on launch.
+  bool get isInitialized => _initialized.isCompleted;
+
+  /// Completes when [init] has finished its first load.
+  Future<void> get initialized => _initialized.future;
+
   /// The stored quit date, or null if not set.
   DateTime? get quitDate => _quitDate;
 
@@ -71,30 +83,54 @@ class SobrietyService extends ChangeNotifier {
 
   /// Load the quit date from [SharedPreferences] and start the timer.
   ///
-  /// Supports both the current ISO-8601 string format ("2026-08-16T...")
-  /// and the legacy int millis format so old installs keep their data.
+  /// The stored value is inspected by its runtime type, so a date saved as
+  /// int milliseconds since epoch ([setQuitDate], [resetSobriety]) and one
+  /// saved as an ISO-8601 string (older builds) are both restored, and a
+  /// value of the "wrong" type can no longer make the read throw.
+  ///
+  /// The restored date is normalized to midnight, matching [setQuitDate].
   Future<void> init() async {
     if (_disposed) return;
+
+    DateTime? stored;
     try {
       final prefs = await SharedPreferences.getInstance();
       if (_disposed) return;
-
-      final iso = prefs.getString(_quitDateKey);
-      if (iso != null && iso.isNotEmpty) {
-        _quitDate = DateTime.tryParse(iso);
-      } else {
-        final millis = prefs.getInt(_quitDateKey);
-        if (millis != null) {
-          _quitDate = DateTime.fromMillisecondsSinceEpoch(millis);
-        }
-      }
-    } catch (_) {
-      // Corrupted/unreadable prefs fall back to "no quit date yet".
-      _quitDate = null;
+      stored = _readStoredQuitDate(prefs);
+    } catch (e, stackTrace) {
+      // Never swallow a storage failure silently, and never let it look
+      // like "no quit date" without leaving a trace.
+      debugPrint('[Sobriety] Failed to load the quit date: $e\n$stackTrace');
     }
+
+    if (_disposed) return;
+
+    // Only replace what we already hold when storage actually returned a
+    // date — a read failure must not wipe a date the user already has.
+    if (stored != null) {
+      _quitDate = DateTime(stored.year, stored.month, stored.day);
+    }
+
+    if (!_initialized.isCompleted) _initialized.complete();
 
     _startTimer();
     notifyListeners();
+  }
+
+  /// Reads the stored quit date from either supported storage format.
+  ///
+  /// [SharedPreferences.get] hands back the raw value without casting, so a
+  /// key that holds an int cannot make the read throw (which is what
+  /// `getString` does when the stored value is not a string).
+  DateTime? _readStoredQuitDate(SharedPreferences prefs) {
+    final Object? raw = prefs.get(_quitDateKey);
+    if (raw is int) {
+      return DateTime.fromMillisecondsSinceEpoch(raw);
+    }
+    if (raw is String && raw.isNotEmpty) {
+      return DateTime.tryParse(raw);
+    }
+    return null;
   }
 
   /// Set a new quit date, persist it, and restart the counter.

@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/constants/currencies.dart';
+import 'package:quit_drinking/core/providers/currency_provider.dart';
+import 'package:quit_drinking/core/providers/sobriety_provider.dart';
 import 'package:quit_drinking/screens/home_screen.dart';
 
 /// Onboarding screen shown on first app launch.
 ///
 /// Guides the user through setting up their sobriety date, first reason,
 /// and daily spend estimate before entering the main app.
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -27,9 +31,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   // ── Page 4: Money Tracker ─────────────────────────────────────────────
   final TextEditingController _spendController = TextEditingController();
-  String _selectedCurrency = 'USD';
+  String _selectedCurrency = Currencies.fallback;
 
-  final List<String> _currencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD'];
 
   bool get _isLastPage => _currentPage == 3;
 
@@ -44,12 +47,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _onComplete() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Save sobriety start date (page 2)
+    // Save the sobriety start date (page 2) through the service, so it is
+    // normalized and stored in exactly the same format as everywhere else.
     if (_selectedDate != null) {
-      await prefs.setInt(
-        'sobriety_start_date',
-        _selectedDate!.millisecondsSinceEpoch,
-      );
+      await ref.read(sobrietyServiceProvider).setQuitDate(_selectedDate!);
     }
 
     // Save first reason (page 3)
@@ -69,8 +70,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       await prefs.setDouble('daily_spend', spend);
     }
 
-    // Save currency
-    await prefs.setString('currency', _selectedCurrency);
+    // Save the currency through the shared service so Settings and the
+    // Money Saved card follow the choice immediately.
+    await ref.read(currencyServiceProvider).setCurrency(_selectedCurrency);
 
     // Mark onboarding as complete
     await prefs.setBool('onboarding_complete', true);
@@ -717,13 +719,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   fontWeight: FontWeight.w600,
                   color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
                 ),
-                items: _currencies.map((c) {
+                items: Currencies.supported.map((c) {
                   return DropdownMenuItem(
                     value: c,
                     child: Row(
                       children: [
                         Text(
-                          _currencyFlag(c),
+                          Currencies.flag(c),
                           style: const TextStyle(fontSize: 20),
                         ),
                         const SizedBox(width: AppConstants.spacingSm),
@@ -745,14 +747,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  String _currencyFlag(String code) {
-    switch (code) {
-      case 'USD': return '\u{1F1FA}\u{1F1F8}';
-      case 'EUR': return '\u{1F1EA}\u{1F1FA}';
-      case 'GBP': return '\u{1F1EC}\u{1F1E7}';
-      case 'CAD': return '\u{1F1E8}\u{1F1E6}';
-      case 'AUD': return '\u{1F1E6}\u{1F1FA}';
-      default: return '';
-    }
-  }
 }
