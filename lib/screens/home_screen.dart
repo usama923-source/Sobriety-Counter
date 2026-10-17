@@ -292,14 +292,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     title: 'Home',
                     isDark: isDark,
                     isSelected: true,
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: _closeDrawer,
                   ),
                   _DrawerMenuItem(
                     icon: Icons.self_improvement_rounded,
                     title: 'Calming Activities',
                     isDark: isDark,
                     onTap: () {
-                      Navigator.of(context).pop();
+                      _closeDrawer();
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const CravingActionsScreen(),
@@ -337,7 +337,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     isDark: isDark,
                     isPro: false,
                     onTapPro: () {
-                      Navigator.of(context).pop();
+                      _closeDrawer();
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => const SettingsScreen(),
@@ -415,12 +415,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  /// Closes the drawer through the [Scaffold], not the navigator.
+  ///
+  /// `Navigator.pop()` only dismisses the drawer while it still owns a local
+  /// history entry; once the drawer is closing (a second tap, or a tap during
+  /// the close animation) that pop reaches Home — the app's only route — and
+  /// leaves an empty navigator, which renders as a black screen.
+  void _closeDrawer() {
+    final scaffold = _scaffoldKey.currentState;
+    if (scaffold != null && scaffold.isDrawerOpen) {
+      scaffold.closeDrawer();
+    }
+  }
+
   Future<void> _navigateToPro(Widget screen) async {
     // Capture navigator and context before any async gap
     final nav = Navigator.of(context);
     final ctx = context;
-    // Close drawer first
-    nav.pop();
+    // Close drawer first — never with a navigator pop, see [_closeDrawer].
+    _closeDrawer();
 
     // Reads through the Pro gate: always true while billing is off, so the
     // feature opens directly. The upgrade path stays for later billing.

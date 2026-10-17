@@ -291,7 +291,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
             Icons.arrow_back_rounded,
             color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
           ),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
           'Memory Game',
