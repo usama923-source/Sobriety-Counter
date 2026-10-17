@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quit_drinking/config/api_config.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
@@ -42,8 +42,8 @@ class _ChatMessage {
 /// AI Friend Chat screen — a supportive AI companion to help users
 /// through their sobriety journey.
 ///
-/// API credentials are configured in [ApiConfig] (lib/config/api_config.dart).
-/// To get an API key, visit https://console.groq.com/keys
+/// Replies come from Firebase AI Logic (Google's Gemini), protected by
+/// Firebase App Check. No API key ships in the app.
 class AIChatScreen extends StatefulWidget {
   const AIChatScreen({super.key});
 
@@ -64,8 +64,18 @@ class _AIChatScreenState extends State<AIChatScreen> {
   bool _historyLoaded = false;
   bool _showDisclaimer = true;
 
-  /// Whether a real API key is configured (vs. the placeholder value).
-  bool get _hasRealApiKey => ApiConfig.hasRealApiKey;
+  /// Gemini model used for every reply. Flash-Lite is on the free tier of
+  /// the Firebase AI Logic Gemini Developer API.
+  static const String _modelName = 'gemini-2.5-flash-lite';
+
+  /// Instructions that shape every reply.
+  static const String _systemPrompt =
+      'You are a compassionate, supportive AI friend '
+      'helping someone on their sobriety journey. Be warm, '
+      'encouraging, and non-judgmental. Keep responses concise '
+      '(under 120 words) and caring. You are NOT a therapist '
+      'but a supportive companion. If someone is in crisis, '
+      'encourage them to call a helpline.';
 
   // ── Welcome Messages ──────────────────────────────────────────────────
 
@@ -241,9 +251,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
       return;
     }
 
-    debugPrint('API Key exists: $_hasRealApiKey');
-    debugPrint('Sending to: ${ApiConfig.apiUrl}');
-
     HapticFeedback.lightImpact();
 
     // Add user message
@@ -285,133 +292,108 @@ class _AIChatScreenState extends State<AIChatScreen> {
       setState(() => _isLoading = true);
     }
 
-    // ── Placeholder mode — no real API key, simulate a response ──────
-    if (!_hasRealApiKey) {
-      await Future.delayed(const Duration(milliseconds: 800));
-      final aiText = _getSimulatedResponse(userMessage);
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _messages.add(_ChatMessage(
-            text: aiText,
-            isUser: false,
-            timestamp: DateTime.now(),
-          ));
-        });
-      }
-      return;
-    }
-
     try {
-      // ── Real API Call (Groq / OpenAI-compatible) ────────────────────
+      // ── Firebase AI Logic (Gemini) ─────────────────────────────────
+      final model = FirebaseAI.googleAI().generativeModel(
+        model: _modelName,
+        systemInstruction: Content.system(_systemPrompt),
+        generationConfig: GenerationConfig(
+          temperature: 0.7,
+          maxOutputTokens: ApiConfig.maxResponseTokens,
+        ),
+      );
 
-      final response = await http.post(
-        Uri.parse(ApiConfig.apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${ApiConfig.apiKey}',
-        },
-        body: jsonEncode({
-          'model': ApiConfig.model,
-          'messages': [
-            {
-              'role': 'system',
-              'content':
-                  'You are a compassionate, supportive AI friend '
-                  'helping someone on their sobriety journey. Be warm, '
-                  'encouraging, and non-judgmental. Keep responses concise '
-                  '(under 120 words) and caring. You are NOT a therapist '
-                  'but a supportive companion. If someone is in crisis, '
-                  'encourage them to call a helpline.',
-            },
-            // Send only the most recent messages as history — _sendMessage
-            // already added the user's latest message to _messages before
-            // calling us. A server-side proxy will own this limit later.
-            ..._historyWindow.map((m) => {
-                  'role': m.isUser ? 'user' : 'assistant',
-                  'content': m.text,
-                }),
-          ],
-          'temperature': 0.7,
-          'max_tokens': ApiConfig.maxResponseTokens,
-        }),
-      )
-      .timeout(const Duration(seconds: 30));
+      // Only the most recent messages travel to Gemini — _sendMessage has
+      // already added the user's latest message to _messages.
+      final response = await model
+          .generateContent([
+            for (final m in _historyWindow)
+              Content(m.isUser ? 'user' : 'model', [TextPart(m.text)]),
+          ])
+          .timeout(const Duration(seconds: 30));
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final aiText = data['choices']?[0]?['message']?['content']
-            ?.toString()
-            .trim() ??
-            'I\'m here for you. Tell me more.';
-
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _messages.add(_ChatMessage(
-              text: aiText,
-              isUser: false,
-              timestamp: DateTime.now(),
-            ));
-          });
-        }
-        return;
-      }
-
-      // ── Non-200 — log the status and Groq error body (never the key) ─
-      final errorBody = response.body.length > 200
-          ? response.body.substring(0, 200)
-          : response.body;
-      debugPrint('[AIChat] HTTP ${response.statusCode}: $errorBody');
-
-      // Show a short, specific message — never the raw response body.
-      final String message;
-      if (response.statusCode == 401) {
-        message = 'The AI service key is invalid';
-      } else if (response.statusCode == 404) {
-        message = "The AI model isn't available";
-      } else if (response.statusCode == 429) {
-        message = 'Too many requests, try again in a minute';
-      } else {
-        message = 'Something went wrong (code ${response.statusCode})';
-      }
-
-      if (mounted) {
-        setState(() => _isLoading = false);
-        _showError(message);
-      }
+      final aiText = response.text?.trim();
+      _appendAiReply(
+        aiText == null || aiText.isEmpty
+            ? 'I\'m here for you. Tell me more.'
+            : aiText,
+      );
     } on TimeoutException catch (e) {
       debugPrint('[AIChat] Request timed out: $e');
-      if (mounted) {
-        setState(() => _isLoading = false);
-        _showError('The AI took too long to answer');
+      _showAIError('The AI took too long to answer.');
+    } on FirebaseAIException catch (e) {
+      // Log the provider detail for debugging; never show the raw body.
+      debugPrint('[AIChat] Firebase AI error: ${e.message}');
+      if (_isQuotaError(e)) {
+        _showAIError(
+          'The AI is busy right now. Please try again in a few minutes.',
+        );
+      } else if (_looksOffline(e)) {
+        _useOfflineReply(userMessage);
+      } else {
+        _showAIError('Something went wrong.');
       }
     } catch (e) {
-      // A connection failure means the device has no internet — keep the
-      // offline simulated reply so the user still gets a response.
-      if (e is http.ClientException) {
-        debugPrint('[AIChat] Offline: $e');
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _messages.add(_ChatMessage(
-              text: _getSimulatedResponse(userMessage),
-              isUser: false,
-              timestamp: DateTime.now(),
-            ));
-          });
-          _showError('No internet connection. Using offline replies.');
-        }
-        return;
-      }
-
       debugPrint('[AIChat] Unexpected error: $e');
-      if (mounted) {
-        setState(() => _isLoading = false);
-        _showError('Something went wrong');
+      if (_looksOffline(e)) {
+        _useOfflineReply(userMessage);
+      } else {
+        _showAIError('Something went wrong.');
       }
     }
+  }
+
+  /// Existing offline fallback: answer from the built-in replies so the user
+  /// still gets support when there is no connection.
+  void _useOfflineReply(String userMessage) {
+    _appendAiReply(_getSimulatedResponse(userMessage));
+    _showError('No internet connection. Using offline replies.');
+  }
+
+  /// Adds an AI reply to the conversation and clears the typing indicator.
+  void _appendAiReply(String text) {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+      _messages.add(_ChatMessage(
+        text: text,
+        isUser: false,
+        timestamp: DateTime.now(),
+      ));
+    });
+  }
+
+  /// Stops the typing indicator and shows a short, friendly notice.
+  void _showAIError(String message) {
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    _showError(message);
+  }
+
+  /// Quota / rate-limit failures surface as [QuotaExceeded] or a generic
+  /// [FirebaseAIException] whose message names the condition.
+  bool _isQuotaError(Object error) {
+    if (error is QuotaExceeded) return true;
+    final message = error is FirebaseAIException
+        ? error.message.toLowerCase()
+        : error.toString().toLowerCase();
+    return message.contains('quota') ||
+        message.contains('rate limit') ||
+        message.contains('resource_exhausted') ||
+        message.contains('too many requests') ||
+        message.contains('429');
+  }
+
+  /// Best-effort detection of a connection failure. The SDK wraps platform
+  /// network errors differently per platform, so match on the common text.
+  bool _looksOffline(Object error) {
+    final message = error.toString().toLowerCase();
+    return message.contains('socketexception') ||
+        message.contains('clientexception') ||
+        message.contains('failed host lookup') ||
+        message.contains('network') ||
+        message.contains('offline') ||
+        message.contains('unavailable');
   }
 
   // ── Simulated Responses (fallback when API is unavailable) ────────────
@@ -680,17 +662,13 @@ class _AIChatScreenState extends State<AIChatScreen> {
                   ),
                 ),
                 Text(
-                  _hasRealApiKey ? 'Online' : 'Offline replies',
+                  'Online',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                     color: isDark
-                        ? (_hasRealApiKey
-                            ? AppColors.brandLightBlue
-                            : AppColors.textOnDarkSecondary)
-                        : (_hasRealApiKey
-                            ? AppColors.brandPrimary
-                            : AppColors.secondaryTextLight),
+                        ? AppColors.brandLightBlue
+                        : AppColors.brandPrimary,
                   ),
                 ),
               ],
@@ -701,37 +679,6 @@ class _AIChatScreenState extends State<AIChatScreen> {
       ),
       body: Column(
         children: [
-          // ── API Config Notice (only when using placeholder key) ─────
-          if (!_hasRealApiKey)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppConstants.spacingMd,
-                vertical: AppConstants.spacingXs,
-              ),
-              color: AppColors.brandLightBlue.withValues(alpha: 0.15),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.info_outline_rounded,
-                    size: 16,
-                    color: AppColors.brandPrimary,
-                  ),
-                  const SizedBox(width: AppConstants.spacingXs),
-                  Expanded(
-                    child: Text(
-                      'Using offline replies. Set your Groq API key in lib/config/api_config.dart to enable AI chat.',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.brandPrimary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
           // ── Disclaimer Banner ──────────────────────────────────────
           if (_showDisclaimer)
             Container(

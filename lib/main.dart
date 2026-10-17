@@ -1,4 +1,6 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart' hide FirebaseService;
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +25,21 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // App Check protects the AI chat and any other Firebase backend calls.
+    // Release builds attest with Play Integrity (DeviceCheck on Apple);
+    // debug builds use the debug provider so local runs keep working.
+    try {
+      await FirebaseAppCheck.instance.activate(
+        providerAndroid: kReleaseMode
+            ? const AndroidPlayIntegrityProvider()
+            : const AndroidDebugProvider(),
+        providerApple: kReleaseMode
+            ? const AppleDeviceCheckProvider()
+            : const AppleDebugProvider(),
+      );
+    } catch (e) {
+      debugPrint('App Check failed to activate (continuing without it): $e');
+    }
     // Log the app-open event once per launch. Never blocks startup.
     await FirebaseService().logAppOpen();
   } catch (e) {
