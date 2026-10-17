@@ -306,10 +306,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
       // Only the most recent messages travel to Gemini — _sendMessage has
       // already added the user's latest message to _messages.
       final response = await model
-          .generateContent([
-            for (final m in _historyWindow)
-              Content(m.isUser ? 'user' : 'model', [TextPart(m.text)]),
-          ])
+          .generateContent(_buildRequestContents(userMessage))
           .timeout(const Duration(seconds: 30));
 
       final aiText = response.text?.trim();
@@ -318,36 +315,135 @@ class _AIChatScreenState extends State<AIChatScreen> {
             ? 'I\'m here for you. Tell me more.'
             : aiText,
       );
-    } on TimeoutException catch (e) {
-      debugPrint('[AIChat] Request timed out: $e');
-      _showAIError('The AI took too long to answer.');
-    } on FirebaseAIException catch (e) {
-      // Log the provider detail for debugging; never show the raw body.
-      debugPrint('[AIChat] Firebase AI error: ${e.message}');
-      if (_isQuotaError(e)) {
-        _showAIError(
-          'The AI is busy right now. Please try again in a few minutes.',
-        );
-      } else if (_looksOffline(e)) {
-        _useOfflineReply(userMessage);
-      } else {
-        _showAIError('Something went wrong.');
-      }
-    } catch (e) {
-      debugPrint('[AIChat] Unexpected error: $e');
-      if (_looksOffline(e)) {
-        _useOfflineReply(userMessage);
-      } else {
-        _showAIError('Something went wrong.');
-      }
+    } catch (error) {
+      _handleAIError(error, userMessage);
     }
   }
 
-  /// Existing offline fallback: answer from the built-in replies so the user
-  /// still gets support when there is no connection.
-  void _useOfflineReply(String userMessage) {
-    _appendAiReply(_getSimulatedResponse(userMessage));
-    _showError('No internet connection. Using offline replies.');
+  /// Builds the turns sent to Gemini.
+  ///
+  /// Gemini rejects a request unless the first turn comes from the user and
+  /// the roles then alternate. [_messages] also holds the welcome message (a
+  /// `model` turn) and can hold two user turns in a row when a reply failed,
+  /// so the raw list is cleaned up before it leaves the device.
+  List<Content> _buildRequestContents(String currentUserMessage) {
+    final turns = <MapEntry<String, String>>[];
+
+    for (final message in _historyWindow) {
+      final text = message.text.trim();
+      if (text.isEmpty) continue;
+      final role = message.isUser ? 'user' : 'model';
+      // A conversation must open with the user — drop leading model turns.
+      if (turns.isEmpty && role != 'user') continue;
+      if (turns.isNotEmpty && turns.last.key == role) {
+        final previous = turns.removeLast();
+        turns.add(MapEntry(role, '${previous.value}\n\n$text'));
+        continue;
+      }
+      turns.add(MapEntry(role, text));
+    }
+
+    if (turns.isEmpty) {
+      final fallback = currentUserMessage.trim();
+      if (fallback.isNotEmpty) turns.add(MapEntry('user', fallback));
+    }
+
+    return [
+      for (final turn in turns) Content(turn.key, [TextPart(turn.value)]),
+    ];
+  }
+
+  /// Turns any failure into a friendly notice, a short code and the details
+  /// shown behind the "Details" action. The raw text is logged as well.
+  void _handleAIError(Object error, String userMessage) {
+    final details = _errorDetails(error, userMessage);
+    debugPrint('[AIChat] $details');
+
+    if (_looksOffline(error) && !_isQuotaError(error)) {
+      // Existing offline fallback so the user still gets a caring reply.
+      _appendAiReply(_getSimulatedResponse(userMessage));
+      _showError(
+        'No internet connection. Using offline replies. '
+        '(AI-${_errorCode(error)})',
+        details: details,
+      );
+      return;
+    }
+
+    _showAIError(_friendlyAIError(error), details: details);
+  }
+
+  /// The exception class name, used as the short code on every notice.
+  String _errorCode(Object error) {
+    final type = error.runtimeType.toString();
+    return type.isEmpty ? 'Unknown' : type;
+  }
+
+  /// Provider message, without the wrapper added by [Exception.toString].
+  String _rawErrorMessage(Object error) {
+    if (error is FirebaseAIException) return error.message;
+    return error.toString();
+  }
+
+  /// Provider message truncated for the Details dialog, with the user's own
+  /// text and anything key-shaped removed.
+  String _errorDetails(Object error, String userMessage) {
+    var message = _rawErrorMessage(error);
+
+    final userText = userMessage.trim();
+    if (userText.isNotEmpty) {
+      message = message.replaceAll(userText, '[message]');
+    }
+    message = message.replaceAllMapped(
+      RegExp(
+        r'\b(api[-_ ]?key|token|secret|authorization|bearer)\b\s*[:=]\s*\S+',
+        caseSensitive: false,
+      ),
+      (match) => '${match.group(1)}=[redacted]',
+    );
+    message = message.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (message.length > 300) {
+      message = '${message.substring(0, 300)}…';
+    }
+
+    return '${_errorCode(error)}: $message';
+  }
+
+  /// Maps the Firebase AI Logic exceptions to a short, human message.
+  String _friendlyAIError(Object error) {
+    final code = _errorCode(error);
+    final text = _rawErrorMessage(error).toLowerCase();
+
+    String friendly;
+    if (error is ServiceApiNotEnabled ||
+        text.contains('not enabled') ||
+        text.contains('not been used') ||
+        text.contains('service_disabled') ||
+        text.contains('no firebase app') ||
+        text.contains('has not been created')) {
+      friendly = "The AI service isn't enabled yet.";
+    } else if (error is InvalidApiKey ||
+        text.contains('api key') ||
+        text.contains('api_key') ||
+        text.contains('permission') ||
+        text.contains('unauthenticated') ||
+        text.contains('app check') ||
+        text.contains('appcheck') ||
+        text.contains('403')) {
+      friendly = "The AI service couldn't verify this app.";
+    } else if (_isQuotaError(error)) {
+      friendly = 'The AI is busy right now. Please try again in a few minutes.';
+    } else if (error is UnsupportedUserLocation ||
+        text.contains('location is not supported') ||
+        text.contains('user location')) {
+      friendly = "The AI isn't available in your region.";
+    } else if (error is TimeoutException) {
+      friendly = 'The AI took too long to answer.';
+    } else {
+      friendly = 'Something went wrong.';
+    }
+
+    return '$friendly (AI-$code)';
   }
 
   /// Adds an AI reply to the conversation and clears the typing indicator.
@@ -364,10 +460,10 @@ class _AIChatScreenState extends State<AIChatScreen> {
   }
 
   /// Stops the typing indicator and shows a short, friendly notice.
-  void _showAIError(String message) {
+  void _showAIError(String message, {String? details}) {
     if (!mounted) return;
     setState(() => _isLoading = false);
-    _showError(message);
+    _showError(message, details: details);
   }
 
   /// Quota / rate-limit failures surface as [QuotaExceeded] or a generic
@@ -543,8 +639,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
     }
   }
 
-  void _showError(String message) {
+  void _showError(String message, {String? details}) {
     if (!mounted) return;
+    final showDetails = kShowErrorDetails && details != null;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -554,12 +651,69 @@ class _AIChatScreenState extends State<AIChatScreen> {
             Expanded(child: Text(message)),
           ],
         ),
+        // Debug-only escape hatch: the exception type and message live behind
+        // this action, never in the visible notice.
+        action: showDetails
+            ? SnackBarAction(
+                label: 'Details',
+                textColor: AppColors.white,
+                onPressed: () => _showErrorDetailsDialog(details),
+              )
+            : null,
         backgroundColor: AppColors.softRed,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),
         ),
         margin: const EdgeInsets.all(AppConstants.spacingMd),
+      ),
+    );
+  }
+
+  /// Dialog behind the SnackBar's "Details" action: selectable, copyable
+  /// error text with no keys and no message history.
+  Future<void> _showErrorDetailsDialog(String details) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkSurfaceAlt : AppColors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusLg),
+        ),
+        title: Text(
+          'Error details',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: SelectableText(
+            details,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: isDark
+                  ? AppColors.textOnDarkSecondary
+                  : AppColors.textSecondary,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: details));
+              if (ctx.mounted) Navigator.of(ctx).pop();
+            },
+            child: const Text('Copy'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }

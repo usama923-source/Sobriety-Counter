@@ -6,6 +6,11 @@
 /// `true` to switch billing back on.
 const bool kProEnabled = false;
 
+/// Shows the "Details" action on AI error SnackBars and the raw exception
+/// dialog behind it. Debug-only affordance: set to `false` for a production
+/// release so users never see provider error text.
+const bool kShowErrorDetails = true;
+
 /// App-wide constants used throughout QuitDrink Ai.
 class AppConstants {
   AppConstants._();
