@@ -225,18 +225,22 @@
     <section>
       <h2>5. AI Friend chat</h2>
       <p>
-        The AI Friend chat is optional. When you send a message and the AI
-        service is configured, your messages — together with the recent
-        conversation history needed to generate a reply — are sent to the Groq
-        API (groq.com) to produce a response. Groq's own privacy policy applies
-        to those transmissions.
+        The AI Friend chat is optional. When you send a message, that message —
+        together with the recent conversation history needed to generate a
+        reply — is sent through Firebase AI Logic to Google's Gemini to produce
+        a response. Requests are protected by Firebase App Check, which verifies
+        that they come from this app. Google's privacy policy applies to those
+        transmissions. Under Google's terms for the free Gemini API tier,
+        Google may use submitted content to improve its products and services.
+        Please do not share personal or sensitive information, such as your
+        name, contact details, or medical information, in the chat.
       </p>
       <p>
         We do not store your chat messages on our own servers. Your chat history
         is saved on your device, and you can clear it at any time with the
-        delete button in the chat screen. If the app has no internet connection
-        or no AI key is configured, it responds with built-in offline replies
-        and no message is sent anywhere.
+        delete button in the chat screen. If the app has no internet connection,
+        it responds with built-in offline replies and no message is sent
+        anywhere.
       </p>
       <p>
         AI chat has a daily message limit. The number of messages you have sent
@@ -261,7 +265,8 @@
       <p>
         We do not sell or rent your personal data. We share information only
         with the service providers named above (Google Firebase for analytics
-        and Groq for AI replies) to the extent needed to operate the app.
+        and Google Gemini, through Firebase AI Logic, for AI replies) to the
+        extent needed to operate the app.
       </p>
     </section>
 

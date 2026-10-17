@@ -60,9 +60,11 @@ in this folder are ready. Tick items off from top to bottom.
 
 ## 4. Build and signing
 
-- [ ] Confirm the AI key is not committed and there is no secret in the release
-      build (`lib/config/api_config.dart` must stay git-ignored; the example
-      file must hold only the placeholder).
+- [ ] Confirm no AI credentials ship in the release build: AI chat goes
+      through Firebase AI Logic (Google Gemini) and is protected by Firebase
+      App Check.
+- [ ] Confirm Firebase AI Logic is enabled for the project in the Firebase
+      Console and that Play Integrity is registered for App Check.
 - [ ] Build a release **Android App Bundle (.aab)** with your own keystore.
 - [ ] Enroll in **Play App Signing**.
 - [ ] Upload the bundle to the **internal testing** track.
@@ -73,7 +75,10 @@ in this folder are ready. Tick items off from top to bottom.
 - [ ] Check the onboarding health notice ("Before You Begin") shows.
 - [ ] Check the daily reminder can be enabled, fires, and can be turned off.
 - [ ] Check the AI Friend chat works (or shows offline replies) and the "not a
-      medical professional" disclaimer is visible.
+      medical professional" disclaimer is visible. Confirm the privacy policy
+      says chat messages are sent through Firebase AI Logic to Google Gemini,
+      are protected by App Check, and may be used by Google to improve its
+      products under the free tier.
 - [ ] Verify **Settings → Reset All Data** truly clears data and returns to
       onboarding, and that the privacy policy link opens the hosted URL.
 - [ ] Confirm the privacy policy URL opens without a login on a phone.

@@ -49,14 +49,16 @@ collected.
 ### 3. Messages → Other in-app messages (AI Friend chat)
 
 - **Collected:** Yes
-- **Shared:** Yes — with Groq (the AI provider), solely to generate a reply.
-- **Processed ephemerally:** No (the request is sent to the provider to produce
-  a response; we do not store the messages on our own servers).
+- **Shared:** Yes — with Google, solely to generate a reply. Messages are sent
+  through Firebase AI Logic to Google's Gemini.
+- **Processed ephemerally:** No (the request is sent to Google to produce a
+  response; we do not store the messages on our own servers).
 - **Required or optional:** Optional — only occurs if the user uses the AI
   Friend chat and an AI service is configured. Core features work offline.
 - **Purposes:** App functionality
 - **What this covers:** The text the user types in the AI Friend chat, plus the
-  recent conversation history sent along with it. The user's own chat history
+  recent conversation history sent along with it, shared with Google (Gemini,
+  through Firebase AI Logic) to generate a reply. The user's own chat history
   is stored on the device and can be cleared in the chat screen.
 
 ---
@@ -89,13 +91,16 @@ not be declared as collected:
 ## Data usage and handling
 
 - **Sharing summary:** Data is shared only with service providers needed to run
-  the app — **Google (Firebase Analytics)** for usage analytics and **Groq**
-  for AI Friend replies. Data is not sold.
+  the app — **Google (Firebase Analytics)** for usage analytics and **Google
+  Gemini (through Firebase AI Logic)** for AI Friend replies. User chat
+  messages are shared with Google for app functionality. Data is not sold.
 - **Advertising / marketing:** Analytics data is not used for advertising, and
   the app contains no ads.
 - **Security practices:**
   - Data in transit is encrypted (all network calls use HTTPS/TLS —
-    Firebase and the Groq API endpoint).
+    Firebase and Google's Gemini endpoint through Firebase AI Logic).
+  - AI chat requests are protected by **Firebase App Check**, which verifies
+    that they come from the app.
   - Users can request deletion (see below).
   - No account or login system exists, so there is no account data to protect.
 - **Data retention:** On-device data is kept until the user deletes it in the

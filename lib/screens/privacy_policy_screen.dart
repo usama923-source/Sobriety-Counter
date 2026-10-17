@@ -66,7 +66,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppConstants.spacingXs),
                     Text(
-                      'Last updated: July 2026',
+                      'Last updated: October 2026',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -129,13 +129,21 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 iconColor: AppColors.brandPrimary,
                 title: 'AI Chat',
                 body:
-                    'When you use the AI Friend chat feature, your messages are '
-                    'sent to the Groq API (groq.com) to generate helpful responses. '
-                    'Groq\'s privacy policy applies to those transmissions. We do '
-                    'not store your chat messages on our servers — they remain on '
-                    'your device. AI chat has a daily message limit, and the app '
-                    'keeps a count of the messages you send each day in your '
-                    'device\'s private storage to enforce it.',
+                    'When you use the AI Friend chat feature, your messages — '
+                    'together with the recent conversation history needed to '
+                    'generate a reply — are sent through Firebase AI Logic to '
+                    'Google\'s Gemini to produce a response. Requests are '
+                    'protected by Firebase App Check, which verifies that they '
+                    'come from this app. Google\'s privacy policy applies to '
+                    'those transmissions. Under Google\'s terms for the free '
+                    'Gemini API tier, Google may use submitted content to '
+                    'improve its products and services. Please do not share '
+                    'personal or sensitive information (such as your name, '
+                    'contact details, or medical information) in the chat. We '
+                    'do not store your chat messages on our servers — they '
+                    'remain on your device. AI chat has a daily message limit, '
+                    'and the app keeps a count of the messages you send each '
+                    'day in your device\'s private storage to enforce it.',
                 isDark: isDark,
               ),
 
@@ -163,8 +171,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 title: 'We Don\'t Sell Your Data',
                 body:
                     'We do not sell or rent your personal data. We share data only '
-                    'with the service providers described above (Google Firebase '
-                    'and Groq) to operate the app.',
+                    'with the service providers described above (Google Firebase, '
+                    'including Firebase AI Logic and Gemini for AI replies) to '
+                    'operate the app.',
                 isDark: isDark,
               ),
 
