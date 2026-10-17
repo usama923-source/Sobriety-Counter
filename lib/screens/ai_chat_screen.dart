@@ -51,7 +51,8 @@ class AIChatScreen extends StatefulWidget {
   State<AIChatScreen> createState() => _AIChatScreenState();
 }
 
-class _AIChatScreenState extends State<AIChatScreen> {
+class _AIChatScreenState extends State<AIChatScreen>
+    with WidgetsBindingObserver {
   // ── State ─────────────────────────────────────────────────────────────
 
   static const String _storageKey = 'chat_history';
@@ -97,6 +98,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadHistory();
     _loadDailyUsage();
     _checkDisclaimer();
@@ -105,9 +107,17 @@ class _AIChatScreenState extends State<AIChatScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Opening or closing the keyboard changes the height left for the message
+  /// list, so keep the newest message in view after the relayout.
+  @override
+  void didChangeMetrics() {
+    _scrollToBottom();
   }
 
   // ── History Persistence ───────────────────────────────────────────────
@@ -572,16 +582,22 @@ class _AIChatScreenState extends State<AIChatScreen> {
 
   // ── Helpers ───────────────────────────────────────────────────────────
 
+  /// Scrolls to the newest message once the current frame has laid out.
+  ///
+  /// A second pass after the frame handles the keyboard inset, where the
+  /// first layout can still report the previous scroll extent.
   void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _animateToBottom());
+    Future.delayed(const Duration(milliseconds: 120), _animateToBottom);
+  }
+
+  void _animateToBottom() {
+    if (!mounted || !_scrollController.hasClients) return;
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
+    );
   }
 
   Future<void> _confirmClearHistory(BuildContext context) async {
@@ -756,6 +772,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      // The body shrinks with the keyboard; the input bar is the bottom child,
+      // so nothing is ever covered and no manual inset padding is needed.
+      resizeToAvoidBottomInset: true,
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightGray,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -831,10 +850,16 @@ class _AIChatScreenState extends State<AIChatScreen> {
         ),
         centerTitle: true,
       ),
-      body: Column(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // A raised keyboard (or a very short screen) can leave less room
+          // than the informational rows need. Drop them there so the message
+          // list and the input bar always fit instead of overflowing.
+          final compact = constraints.maxHeight < 340;
+          return Column(
         children: [
           // ── Disclaimer Banner ──────────────────────────────────────
-          if (_showDisclaimer)
+          if (_showDisclaimer && !compact)
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(
@@ -915,15 +940,19 @@ class _AIChatScreenState extends State<AIChatScreen> {
           ),
 
           // ── Suggested Prompts ──────────────────────────────────────
-          if (_messages.length <= 1 && !_isSending)
+          // Hidden while the keyboard is up so short screens keep room for
+          // the conversation instead of overflowing.
+          if (_messages.length <= 1 && !_isSending && !compact)
             _buildSuggestedPrompts(isDark),
 
           // ── Messages Left Today (temporary client-side limit) ──────
-          _buildMessagesRemaining(isDark),
+          if (!compact) _buildMessagesRemaining(isDark),
 
           // ── Input Bar ──────────────────────────────────────────────
           _buildInputBar(isDark),
         ],
+          );
+        },
       ),
     );
   }
@@ -1106,14 +1135,15 @@ class _AIChatScreenState extends State<AIChatScreen> {
   // ── Input Bar ─────────────────────────────────────────────────────────
 
   Widget _buildInputBar(bool isDark) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-
     return Container(
-      padding: EdgeInsets.fromLTRB(
+      // The Scaffold's resize already applies the keyboard inset, so adding
+      // MediaQuery.viewInsets here would push the bar up twice. SafeArea
+      // covers the gesture/navigation bar when the keyboard is closed.
+      padding: const EdgeInsets.fromLTRB(
         AppConstants.spacingMd,
         AppConstants.spacingSm,
         AppConstants.spacingMd,
-        bottomInset + AppConstants.spacingSm,
+        AppConstants.spacingSm,
       ),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.white,
