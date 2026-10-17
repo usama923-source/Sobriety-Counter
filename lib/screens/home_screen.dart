@@ -48,6 +48,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isRefreshing = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  /// Time of the last back press that only showed the "press again" notice.
+  DateTime? _lastBackPress;
+
   @override
   void initState() {
     super.initState();
@@ -69,7 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-return Scaffold(
+    final content = Scaffold(
       key: _scaffoldKey,
       drawer: _buildDrawer(isDark),
       appBar: _buildAppBar(isDark),
@@ -145,6 +148,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
     );
+
+    // Home sits at the root of the navigator: back must never pop it, or the
+    // stack empties and the app renders black. This scope only applies while
+    // Home is the top route, so pushed screens keep their own back handling.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) => _handleSystemBack(didPop),
+      child: content,
+    );
+  }
+
+  /// First back press warns, a second one within two seconds exits the app.
+  void _handleSystemBack(bool didPop) {
+    if (didPop) return;
+
+    final scaffold = _scaffoldKey.currentState;
+    if (scaffold != null && scaffold.isDrawerOpen) {
+      scaffold.closeDrawer();
+      return;
+    }
+
+    final now = DateTime.now();
+    final lastPress = _lastBackPress;
+    if (lastPress == null ||
+        now.difference(lastPress) > const Duration(seconds: 2)) {
+      _lastBackPress = now;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Press back again to exit'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+          ),
+          margin: const EdgeInsets.all(AppConstants.spacingMd),
+        ),
+      );
+      return;
+    }
+
+    HapticFeedback.lightImpact();
+    SystemNavigator.pop();
   }
 
   // ── Refresh ────────────────────────────────────────────────────────
