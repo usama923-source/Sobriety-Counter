@@ -6,10 +6,6 @@ import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/core/providers/weight_tracker_provider.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
 
-// ── Unit Enum ────────────────────────────────────────────────────────────
-
-enum _WeightUnit { kg, lbs }
-
 // ── Screen ───────────────────────────────────────────────────────────────
 
 /// Weight Tracker screen — track your weight transformation since quitting.
@@ -29,19 +25,23 @@ class WeightTrackerScreen extends ConsumerStatefulWidget {
 
 class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
   // ── Local UI State ──────────────────────────────────────────────────
-  _WeightUnit _unit = _WeightUnit.kg;
   final TextEditingController _goalController = TextEditingController();
   final TextEditingController _currentController = TextEditingController();
 
   // ── Unit helpers ────────────────────────────────────────────────────
-  String get _unitLabel => _unit == _WeightUnit.kg ? 'kg' : 'lbs';
 
-  /// Formats [weight] with at most one decimal and the active unit.
+  /// Display unit — owned and persisted by the provider; storage stays in kg.
+  WeightUnit get _unit => ref.read(weightTrackerProvider).unit;
+
+  String get _unitLabel => _unit.label;
+
+  /// Formats a canonical kilogram [weight] in the active display unit.
   ///
   /// Whole numbers drop the decimal ("80 kg") while fractions keep one
   /// digit ("80.5 kg").
   String _formatWeight(double weight) {
-    final rounded = double.parse(weight.toStringAsFixed(1));
+    final value = _unit.fromKg(weight);
+    final rounded = double.parse(value.toStringAsFixed(1));
     final text = rounded == rounded.roundToDouble()
         ? rounded.toStringAsFixed(0)
         : rounded.toStringAsFixed(1);
@@ -56,10 +56,12 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
     // Populate the text fields once persisted values finish loading.
     ref.listenManual(weightTrackerProvider, (previous, next) {
       if (next.goalWeight != null && _goalController.text.isEmpty) {
-        _goalController.text = next.goalWeight!.toStringAsFixed(1);
+        _goalController.text =
+            next.unit.fromKg(next.goalWeight!).toStringAsFixed(1);
       }
       if (next.currentWeight != null && _currentController.text.isEmpty) {
-        _currentController.text = next.currentWeight!.toStringAsFixed(1);
+        _currentController.text =
+            next.unit.fromKg(next.currentWeight!).toStringAsFixed(1);
       }
     }, fireImmediately: true);
   }
@@ -76,22 +78,25 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
   void _setGoalWeight() {
     final text = _goalController.text.trim();
     if (text.isEmpty) return;
-    final weight = double.tryParse(text);
-    if (weight == null || weight <= 0) return;
+    final entered = double.tryParse(text);
+    if (entered == null || entered <= 0) return;
 
     HapticFeedback.mediumImpact();
-    ref.read(weightTrackerProvider.notifier).setGoalWeight(weight);
+    // The input is in the display unit; storage is always kilograms.
+    ref.read(weightTrackerProvider.notifier).setGoalWeight(_unit.toKg(entered));
     _clearFocus();
   }
 
   void _setCurrentWeight() {
     final text = _currentController.text.trim();
     if (text.isEmpty) return;
-    final weight = double.tryParse(text);
-    if (weight == null || weight <= 0) return;
+    final entered = double.tryParse(text);
+    if (entered == null || entered <= 0) return;
 
     HapticFeedback.mediumImpact();
-    ref.read(weightTrackerProvider.notifier).setCurrentWeight(weight);
+    ref
+        .read(weightTrackerProvider.notifier)
+        .setCurrentWeight(_unit.toKg(entered));
     _clearFocus();
   }
 
@@ -118,27 +123,19 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
   }
 
   void _toggleUnit() {
-    final wasKg = _unit == _WeightUnit.kg;
-    setState(() {
-      _unit = wasKg ? _WeightUnit.lbs : _WeightUnit.kg;
-    });
+    final next = _unit == WeightUnit.kg ? WeightUnit.lbs : WeightUnit.kg;
+    // Stored weights stay canonical kilograms — only the display changes.
+    ref.read(weightTrackerProvider.notifier).setUnit(next);
 
-    // Stored values are kept in the active unit, so convert them in the
-    // provider (which owns persistence) when the unit changes.
-    final factor = wasKg ? 2.20462 : 1 / 2.20462;
-    ref
-        .read(weightTrackerProvider.notifier)
-        .convertStoredWeights(factor)
-        .then((_) {
-      if (!mounted) return;
-      final state = ref.read(weightTrackerProvider);
-      if (state.goalWeight != null) {
-        _goalController.text = state.goalWeight!.toStringAsFixed(1);
-      }
-      if (state.currentWeight != null) {
-        _currentController.text = state.currentWeight!.toStringAsFixed(1);
-      }
-    });
+    final state = ref.read(weightTrackerProvider);
+    if (state.goalWeight != null) {
+      _goalController.text =
+          next.fromKg(state.goalWeight!).toStringAsFixed(1);
+    }
+    if (state.currentWeight != null) {
+      _currentController.text =
+          next.fromKg(state.currentWeight!).toStringAsFixed(1);
+    }
 
     HapticFeedback.lightImpact();
   }
@@ -271,16 +268,16 @@ class _WeightTrackerScreenState extends ConsumerState<WeightTrackerScreen> {
                             children: [
                               _UnitToggleChip(
                                 label: 'kg',
-                                isSelected: _unit == _WeightUnit.kg,
-                                onTap: _unit == _WeightUnit.lbs
+                                isSelected: state.unit == WeightUnit.kg,
+                                onTap: state.unit == WeightUnit.lbs
                                     ? _toggleUnit
                                     : null,
                                 isDark: isDark,
                               ),
                               _UnitToggleChip(
                                 label: 'lbs',
-                                isSelected: _unit == _WeightUnit.lbs,
-                                onTap: _unit == _WeightUnit.kg
+                                isSelected: state.unit == WeightUnit.lbs,
+                                onTap: state.unit == WeightUnit.kg
                                     ? _toggleUnit
                                     : null,
                                 isDark: isDark,

@@ -6,7 +6,10 @@ import 'package:quit_drinking/services/theme_service.dart';
 
 /// Provider for the ThemeService instance.
 final themeServiceProvider = ChangeNotifierProvider<ThemeService>((ref) {
-  return ThemeService();
+  final service = ThemeService();
+  // Restore the saved theme as soon as the service is first needed.
+  service.init();
+  return service;
 });
 
 /// Provider that exposes the current ThemeMode.

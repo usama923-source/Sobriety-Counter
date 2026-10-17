@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/currency_provider.dart';
+import 'package:quit_drinking/core/providers/sobriety_provider.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
 import 'package:quit_drinking/theme/app_theme.dart';
 import 'package:quit_drinking/core/services/firebase_service.dart';
@@ -71,6 +73,17 @@ class _SoberTodayAppState extends ConsumerState<SoberTodayApp> {
   @override
   void initState() {
     super.initState();
+
+    // Start loading the stored quit date while the splash is on screen, so
+    // the counter never renders a "no quit date" state first.
+    ref.read(sobrietyServiceProvider);
+
+    // Same for the saved currency, so money is never briefly shown with the
+    // default symbol on launch.
+    ref.read(currencyServiceProvider);
+
+    // And the saved theme, so a dark-mode user never sees a light flash.
+    ref.read(themeServiceProvider);
 
     // Animate splash screen away after 2 seconds
     Future.delayed(const Duration(seconds: 2), () {

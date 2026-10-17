@@ -9,7 +9,6 @@ import 'package:quit_drinking/services/sobriety_service.dart';
 import 'package:quit_drinking/widgets/confetti_celebration.dart';
 import 'package:quit_drinking/widgets/milestone_badges.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Section 10 — Daily Check-In Card.
 ///
@@ -367,13 +366,12 @@ class _DailyCheckinCardState extends ConsumerState<DailyCheckinCard> {
     );
 
     if (confirmed == true && context.mounted) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(
-        'sobriety_start_date',
-        DateTime.now().toIso8601String(),
-      );
-      // Refresh sobriety service so the counter resets immediately
-      await ref.read(sobrietyServiceProvider).init();
+      // Record today's check-in as "drank" as well as resetting the journey,
+      // so the calendar, streaks and success rate stay truthful.
+      await service.checkIn(false);
+      // Reset through the service so the quit date keeps a single storage
+      // format and the counter updates immediately.
+      await ref.read(sobrietyServiceProvider).resetSobriety();
     }
   }
 

@@ -28,25 +28,40 @@ class ReasonsService extends ChangeNotifier {
   // ── Initialization ──────────────────────────────────────────────────
 
   /// Load reasons from SharedPreferences, migrating any legacy formats.
+  ///
+  /// [storageKey] may hold either the canonical JSON-encoded list of strings
+  /// or the plain string list written by onboarding (`setStringList`). Both
+  /// are accepted and then rewritten as one canonical JSON string.
   Future<void> init() async {
-    final prefs = await SharedPreferences.getInstance();
+    try {
+      final prefs = await SharedPreferences.getInstance();
 
-    // Preferred format: JSON-encoded list of strings under [storageKey].
-    final raw = prefs.getString(storageKey);
-    if (raw != null && raw.isNotEmpty) {
-      _reasons = _decode(raw);
-    } else {
-      // Migrate legacy plain string-list storage (old "my_reasons" list or
-      // the even older "quit_reasons" list).
-      final legacy = prefs.getStringList(storageKey) ??
-          prefs.getStringList(_legacyKey);
-      if (legacy != null) {
-        _reasons = legacy;
+      // `get` returns the raw value without casting, so a key holding a list
+      // cannot make the read throw (which `getString` would).
+      final Object? raw = prefs.get(storageKey);
+      if (raw is String) {
+        if (raw.isNotEmpty) _reasons = _decode(raw);
+      } else if (raw is List) {
+        _reasons = raw.whereType<String>().toList();
+      } else if (raw == null) {
+        // Migrate the even older "quit_reasons" storage, which may be either
+        // a plain string list or a JSON-encoded list.
+        final Object? legacy = prefs.get(_legacyKey);
+        if (legacy is List) {
+          _reasons = legacy.whereType<String>().toList();
+        } else if (legacy is String && legacy.isNotEmpty) {
+          _reasons = _decode(legacy);
+        }
+      }
+
+      // Rewrite in one canonical format whenever the stored value was not
+      // already that format, and drop the obsolete key.
+      if (raw is List || prefs.containsKey(_legacyKey)) {
         await _save();
         await prefs.remove(_legacyKey);
-      } else {
-        _reasons = [];
       }
+    } catch (e, stackTrace) {
+      debugPrint('[Reasons] Failed to load reasons: $e\n$stackTrace');
     }
 
     _initialized = true;

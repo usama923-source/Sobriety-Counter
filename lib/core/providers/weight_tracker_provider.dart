@@ -14,7 +14,33 @@ final weightTrackerProvider =
   return WeightTrackerNotifier();
 });
 
+/// The unit used to display weights.
+///
+/// Storage is always canonical kilograms — this only controls display and
+/// input conversion, and is persisted so the labels survive a restart.
+enum WeightUnit {
+  kg,
+  lbs;
+
+  static const double lbsPerKg = 2.20462;
+
+  String get label => this == WeightUnit.kg ? 'kg' : 'lbs';
+
+  /// Converts a canonical kilogram value into this unit for display.
+  double fromKg(double kg) => this == WeightUnit.kg ? kg : kg * lbsPerKg;
+
+  /// Converts a value entered in this unit into canonical kilograms.
+  double toKg(double value) =>
+      this == WeightUnit.kg ? value : value / lbsPerKg;
+
+  /// Parses the persisted value, defaulting to kilograms.
+  static WeightUnit fromStorage(Object? raw) =>
+      raw == 'lbs' ? WeightUnit.lbs : WeightUnit.kg;
+}
+
 /// A single logged weight entry.
+///
+/// [weight] is always stored in kilograms.
 class WeightEntry {
   final DateTime date;
   final double weight;
@@ -34,10 +60,12 @@ class WeightEntry {
 
 /// The state held by the weight-tracker provider.
 class WeightTrackerState {
+  /// All weights below are stored in kilograms; [unit] is display-only.
   final double? goalWeight;
   final double? currentWeight;
   final double? startWeight;
   final List<WeightEntry> weightLog;
+  final WeightUnit unit;
   final bool isLoading;
 
   const WeightTrackerState({
@@ -45,6 +73,7 @@ class WeightTrackerState {
     this.currentWeight,
     this.startWeight,
     this.weightLog = const [],
+    this.unit = WeightUnit.kg,
     this.isLoading = true,
   });
 
@@ -107,6 +136,7 @@ class WeightTrackerState {
     double? currentWeight,
     double? startWeight,
     List<WeightEntry>? weightLog,
+    WeightUnit? unit,
     bool? isLoading,
   }) {
     return WeightTrackerState(
@@ -114,6 +144,7 @@ class WeightTrackerState {
       currentWeight: currentWeight ?? this.currentWeight,
       startWeight: startWeight ?? this.startWeight,
       weightLog: weightLog ?? this.weightLog,
+      unit: unit ?? this.unit,
       isLoading: isLoading ?? this.isLoading,
     );
   }
@@ -129,6 +160,7 @@ class WeightTrackerNotifier extends StateNotifier<WeightTrackerState> {
   static const String _currentWeightKey = 'current_weight';
   static const String _startWeightKey = 'start_weight';
   static const String _weightLogKey = 'weight_log';
+  static const String _unitKey = 'weight_unit';
 
   /// Load persisted values from SharedPreferences and update state.
   Future<void> _loadData() async {
@@ -156,6 +188,7 @@ class WeightTrackerNotifier extends StateNotifier<WeightTrackerState> {
       currentWeight: prefs.getDouble(_currentWeightKey),
       startWeight: prefs.getDouble(_startWeightKey),
       weightLog: log,
+      unit: WeightUnit.fromStorage(prefs.get(_unitKey)),
       isLoading: false,
     );
   }
@@ -199,35 +232,19 @@ class WeightTrackerNotifier extends StateNotifier<WeightTrackerState> {
     );
   }
 
-  /// Multiply every stored weight by [factor] (kg <-> lbs conversion) and
-  /// persist the converted values.
-  Future<void> convertStoredWeights(double factor) async {
-    final convertedLog = state.weightLog
-        .map((e) => WeightEntry(date: e.date, weight: e.weight * factor))
-        .toList();
+  /// Set and persist the display unit.
+  ///
+  /// No stored weight is converted: the values stay in kilograms and the UI
+  /// converts them for display, so toggling units is always lossless.
+  Future<void> setUnit(WeightUnit unit) async {
+    if (state.unit == unit) return;
+    state = state.copyWith(unit: unit);
 
-    state = state.copyWith(
-      goalWeight: state.goalWeight == null ? null : state.goalWeight! * factor,
-      currentWeight:
-          state.currentWeight == null ? null : state.currentWeight! * factor,
-      startWeight:
-          state.startWeight == null ? null : state.startWeight! * factor,
-      weightLog: convertedLog,
-    );
-
-    final prefs = await SharedPreferences.getInstance();
-    if (state.goalWeight != null) {
-      await prefs.setDouble(_goalWeightKey, state.goalWeight!);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_unitKey, unit == WeightUnit.lbs ? 'lbs' : 'kg');
+    } catch (e) {
+      debugPrint('[WeightTracker] Failed to save the unit: $e');
     }
-    if (state.currentWeight != null) {
-      await prefs.setDouble(_currentWeightKey, state.currentWeight!);
-    }
-    if (state.startWeight != null) {
-      await prefs.setDouble(_startWeightKey, state.startWeight!);
-    }
-    await prefs.setString(
-      _weightLogKey,
-      jsonEncode(state.weightLog.map((e) => e.toJson()).toList()),
-    );
   }
 }

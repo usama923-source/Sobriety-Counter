@@ -2,7 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/constants/currencies.dart';
+import 'package:quit_drinking/core/providers/breathing_provider.dart';
+import 'package:quit_drinking/core/providers/checkin_provider.dart';
+import 'package:quit_drinking/core/providers/currency_provider.dart';
+import 'package:quit_drinking/core/providers/journal_provider.dart';
+import 'package:quit_drinking/core/providers/quotes_provider.dart';
+import 'package:quit_drinking/core/providers/reasons_provider.dart';
+import 'package:quit_drinking/core/providers/savings_provider.dart';
+import 'package:quit_drinking/core/providers/sobriety_provider.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
+import 'package:quit_drinking/core/providers/weight_tracker_provider.dart';
 import 'package:quit_drinking/core/services/notification_service.dart';
 import 'package:quit_drinking/screens/onboarding/onboarding_screen.dart';
 import 'package:quit_drinking/screens/privacy_policy_screen.dart';
@@ -22,10 +32,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _dailyReminder = false;
   TimeOfDay _reminderTime = const TimeOfDay(hour: 20, minute: 0);
-  String _currency = 'USD';
   bool _isLoading = true;
-
-  final List<String> _currencies = ['USD', 'EUR', 'GBP'];
 
   @override
   void initState() {
@@ -34,6 +41,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _loadPreferences() async {
+    // The currency lives in its own service — wait for it to read storage so
+    // the dropdown never shows the default while the real value is loading.
+    await ref.read(currencyServiceProvider).ensureInitialized();
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final dailyReminder = prefs.getBool('reminder_enabled') ?? false;
@@ -48,16 +59,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           );
         }
       }
-      var currency = prefs.getString('currency') ?? 'USD';
-      // Guard against currencies that are no longer available (e.g. PKR)
-      if (!_currencies.contains(currency)) {
-        currency = 'USD';
-      }
       if (!mounted) return;
       setState(() {
         _dailyReminder = dailyReminder;
         _reminderTime = reminderTime;
-        _currency = currency;
         _isLoading = false;
       });
     } catch (_) {
@@ -66,7 +71,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       setState(() {
         _dailyReminder = false;
         _reminderTime = const TimeOfDay(hour: 20, minute: 0);
-        _currency = 'USD';
         _isLoading = false;
       });
     }
@@ -126,14 +130,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (mounted) setState(() => _reminderTime = time);
   }
 
+  /// Persists the choice and notifies the shared currency state, which the
+  /// Money Saved card (and any other money UI) follows.
   Future<void> _setCurrency(String currency) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('currency', currency);
-      setState(() => _currency = currency);
-    } catch (_) {
-      // Persist failure should not break the settings UI.
-    }
+    await ref.read(currencyServiceProvider).setCurrency(currency);
   }
 
   Future<void> _resetAllData() async {
@@ -256,6 +256,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await prefs.clear();
 
       if (!mounted) return;
+
+      // Dropping the stored data is not enough: every service keeps a copy in
+      // memory, and those copies would be shown again on the next launch.
+      // Invalidate them all so each reloads from the now-empty store.
+      ref.invalidate(sobrietyServiceProvider);
+      ref.invalidate(checkinServiceProvider);
+      ref.invalidate(savingsServiceProvider);
+      ref.invalidate(quotesServiceProvider);
+      ref.invalidate(breathingServiceProvider);
+      ref.invalidate(reasonsServiceProvider);
+      ref.invalidate(journalProvider);
+      ref.invalidate(weightTrackerProvider);
+      ref.invalidate(currencyServiceProvider);
+      ref.invalidate(themeServiceProvider);
+      ref.invalidate(isProProvider);
+
       // Navigate to onboarding, removing all previous routes
       Navigator.pushAndRemoveUntil(
         context,
@@ -509,7 +525,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                     ),
                     DropdownButton<String>(
-                      value: _currency,
+                      value: ref.watch(currencyServiceProvider).code,
                       dropdownColor:
                           isDark ? AppColors.darkSurfaceAlt : AppColors.white,
                       style: TextStyle(
@@ -518,7 +534,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
                       ),
                       underline: const SizedBox(),
-                      items: _currencies.map((c) {
+                      items: Currencies.supported.map((c) {
                         return DropdownMenuItem(
                           value: c,
                           child: Text(c),

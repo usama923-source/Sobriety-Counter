@@ -42,6 +42,72 @@ class _RecoveryTimelineCardState extends State<RecoveryTimelineCard> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // No quit date yet (or a same-day start): milestones have nothing to
+    // measure against, so prompt for the date instead of showing zero days.
+    if (widget.currentDays <= 0) {
+      return SoberCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.brandLightBlue
+                        .withValues(alpha: isDark ? 0.22 : 0.15),
+                    borderRadius: BorderRadius.circular(AppConstants.radiusSm),
+                  ),
+                  child: const Icon(
+                    Icons.emoji_events_rounded,
+                    size: 22,
+                    color: AppColors.brandLightBlue,
+                  ),
+                ),
+                const SizedBox(width: AppConstants.spacingSm),
+                Expanded(
+                  child: Text(
+                    'Recovery Timeline',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      height: 1.3,
+                      color:
+                          isDark ? AppColors.textOnDark : AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppConstants.spacingMd),
+            Text(
+              'Set your quit date to begin',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppConstants.spacingXxs),
+            Text(
+              'Add your sobriety date and your recovery milestones will '
+              'appear here as you reach them.',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                height: 1.4,
+                color: isDark
+                    ? AppColors.textOnDarkSecondary
+                    : AppColors.secondaryTextLight,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     final allAchieved = _completedCount == _totalCount;
 
     return ConfettiOverlay(

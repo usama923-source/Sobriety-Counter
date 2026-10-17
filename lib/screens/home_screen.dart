@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
+import 'package:quit_drinking/core/providers/currency_provider.dart';
 import 'package:quit_drinking/core/providers/theme_provider.dart';
 import 'package:quit_drinking/core/providers/sobriety_provider.dart';
 import 'package:quit_drinking/core/providers/quotes_provider.dart';
@@ -152,20 +153,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     HapticFeedback.mediumImpact();
     setState(() => _isRefreshing = true);
 
-    // Re-init all services via their providers
-    await Future.wait([
-      ref.read(sobrietyServiceProvider).init(),
-      ref.read(quotesServiceProvider).init(),
-      ref.read(reasonsServiceProvider).init(),
-      ref.read(savingsServiceProvider).init(),
-      ref.read(breathingServiceProvider).init(),
-      ref.read(checkinServiceProvider).init(),
-    ]);
+    try {
+      // Re-init all services via their providers
+      await Future.wait([
+        ref.read(sobrietyServiceProvider).init(),
+        ref.read(quotesServiceProvider).init(),
+        ref.read(reasonsServiceProvider).init(),
+        ref.read(savingsServiceProvider).init(),
+        ref.read(breathingServiceProvider).init(),
+        ref.read(checkinServiceProvider).init(),
+      ]);
 
-    await Future.delayed(const Duration(milliseconds: 300));
-    if (mounted) {
-      HapticFeedback.heavyImpact();
-      setState(() => _isRefreshing = false);
+      await Future.delayed(const Duration(milliseconds: 300));
+    } catch (e, stackTrace) {
+      debugPrint('[Home] Refresh failed: $e\n$stackTrace');
+    } finally {
+      // Always clear the spinner, even if one of the reloads failed.
+      if (mounted) {
+        HapticFeedback.heavyImpact();
+        setState(() => _isRefreshing = false);
+      }
     }
   }
 
@@ -439,7 +446,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildBody(bool isDark) {
     final soberDays = ref.watch(totalDaysProvider);
-    final milestoneDays = ref.watch(hasQuitDateProvider) ? soberDays : 47;
+    // No hardcoded fallback: with no quit date the timeline shows its
+    // "set your quit date" state instead of a fabricated day count.
+    final milestoneDays = ref.watch(hasQuitDateProvider) ? soberDays : 0;
 
     return Center(
       child: Container(
@@ -527,6 +536,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       index: 8,
                       child: MoneySavedCard(
                         savingsService: ref.watch(savingsServiceProvider),
+                        // reactive: the card follows the currency chosen in
+                        // Settings without needing a refresh.
+                        currencyService: ref.watch(currencyServiceProvider),
                         // read (not watch): this card must not rebuild on the
                         // once-per-second sobriety counter tick.
                         sobrietyService: ref.read(sobrietyServiceProvider),
