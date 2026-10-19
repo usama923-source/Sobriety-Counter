@@ -17,6 +17,7 @@ class ReasonsService extends ChangeNotifier {
 
   List<String> _reasons = [];
   bool _initialized = false;
+  Future<void>? _initializing;
 
   List<String> get reasons => List.unmodifiable(_reasons);
   bool get isEmpty => _reasons.isEmpty;
@@ -32,7 +33,28 @@ class ReasonsService extends ChangeNotifier {
   /// [storageKey] may hold either the canonical JSON-encoded list of strings
   /// or the plain string list written by onboarding (`setStringList`). Both
   /// are accepted and then rewritten as one canonical JSON string.
+  ///
+  /// Calls are safe while a load is already in flight: every caller awaits
+  /// the same future, so a caller that needs the loaded state (e.g.
+  /// onboarding) can simply `await init()` first. Once the load finishes,
+  /// later calls load again (used by pull-to-refresh).
   Future<void> init() async {
+    final inFlight = _initializing;
+    if (inFlight != null) {
+      await inFlight;
+      return;
+    }
+
+    final future = _load();
+    _initializing = future;
+    try {
+      await future;
+    } finally {
+      _initializing = null;
+    }
+  }
+
+  Future<void> _load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
 
@@ -84,6 +106,9 @@ class ReasonsService extends ChangeNotifier {
   Future<void> add(String reason) async {
     final trimmed = reason.trim();
     if (trimmed.isEmpty) return;
+    // Never store the same reason twice (onboarding may re-add one the user
+    // already has, and the home card can be tapped repeatedly).
+    if (_reasons.any((r) => r.toLowerCase() == trimmed.toLowerCase())) return;
     _reasons.insert(0, trimmed);
     await _save();
     notifyListeners();

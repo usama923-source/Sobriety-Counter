@@ -5,6 +5,7 @@ import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/constants/currencies.dart';
 import 'package:quit_drinking/core/providers/currency_provider.dart';
+import 'package:quit_drinking/core/providers/reasons_provider.dart';
 import 'package:quit_drinking/core/providers/sobriety_provider.dart';
 import 'package:quit_drinking/screens/home_screen.dart';
 
@@ -53,10 +54,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       await ref.read(sobrietyServiceProvider).setQuitDate(_selectedDate!);
     }
 
-    // Save first reason (page 3)
+    // Save first reason (page 3) through the shared service, so the already
+    // loaded home card state sees it immediately instead of only after a
+    // restart. Await init first in case the service is still loading.
     final reason = _reasonController.text.trim();
     if (reason.isNotEmpty) {
-      await prefs.setStringList('my_reasons', [reason]);
+      final reasonsService = ref.read(reasonsServiceProvider);
+      await reasonsService.init();
+      await reasonsService.add(reason);
     }
 
     // Save daily spend (page 4)
