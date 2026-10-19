@@ -271,7 +271,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Drawer(
       // Only the header carries a background; the body is plain surface.
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.white,
+      // Only the bottom inset is needed: the gradient header paints behind
+      // the status bar and adds that inset to its own top padding instead.
       child: SafeArea(
+        top: false,
         child: Column(
           children: [
             // ── Header — gradient with logo + tagline ────────────────
@@ -287,9 +290,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ],
                 ),
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppConstants.spacingLg,
-                vertical: AppConstants.spacingXl,
+              padding: EdgeInsets.fromLTRB(
+                AppConstants.spacingLg,
+                MediaQuery.paddingOf(context).top + AppConstants.spacingMd,
+                AppConstants.spacingLg,
+                AppConstants.spacingXl,
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -298,15 +303,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Center(
                     child: Image.asset(
                       'assets/logo_icon.png',
-                      width: 88,
-                      height: 88,
+                      width: 104,
+                      height: 104,
                       fit: BoxFit.contain,
                       // Decode at ~3× the rendered size for crisp scaling.
-                      cacheWidth: 264,
+                      cacheWidth: 312,
                       errorBuilder: (context, error, stackTrace) =>
                           const Icon(
                         Icons.spa_rounded,
-                        size: 44,
+                        size: 52,
                         color: AppColors.white,
                       ),
                     ),
@@ -316,7 +321,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     AppConstants.tagline,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: FontWeight.w400,
                       fontStyle: FontStyle.italic,
                       color: AppColors.white,
