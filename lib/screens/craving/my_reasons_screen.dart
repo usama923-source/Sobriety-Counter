@@ -25,14 +25,28 @@ class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
     await ref.read(reasonsServiceProvider).add(trimmed);
   }
 
+  Future<void> _updateReason(int index, String reason) async {
+    final trimmed = reason.trim();
+    if (trimmed.isEmpty) return;
+    await ref.read(reasonsServiceProvider).update(index, trimmed);
+  }
+
   Future<void> _deleteReason(int index) async {
     await ref.read(reasonsServiceProvider).delete(index);
     HapticFeedback.mediumImpact();
   }
 
-  void _showAddDialog() {
-    final controller = TextEditingController();
+  void _showAddDialog() => _showReasonDialog();
+
+  void _showEditDialog(int index, String currentReason) =>
+      _showReasonDialog(index: index, initialText: currentReason);
+
+  void _showReasonDialog({int? index, String? initialText}) {
+    // Keep the entered value in a local instead of a TextEditingController:
+    // the controller would have to outlive the dialog's close animation.
+    var text = initialText ?? '';
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isEditing = index != null;
 
     showDialog(
       context: context,
@@ -43,17 +57,18 @@ class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
           borderRadius: BorderRadius.circular(AppConstants.radiusLg),
         ),
         title: Text(
-          'Add a Reason',
+          isEditing ? 'Edit Reason' : 'Add a Reason',
           style: TextStyle(
             fontWeight: FontWeight.w700,
             color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
           ),
         ),
-        content: TextField(
-          controller: controller,
+        content: TextFormField(
+          initialValue: initialText,
           autofocus: true,
           maxLines: 3,
           minLines: 1,
+          onChanged: (value) => text = value,
           decoration: InputDecoration(
             hintText: 'Why do you want to stay sober?',
             filled: true,
@@ -79,9 +94,13 @@ class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              final text = controller.text.trim();
-              if (text.isNotEmpty) {
-                _addReason(text);
+              final entered = text.trim();
+              if (entered.isNotEmpty) {
+                if (isEditing) {
+                  _updateReason(index, entered);
+                } else {
+                  _addReason(entered);
+                }
                 Navigator.pop(ctx);
               }
             },
@@ -96,7 +115,7 @@ class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
           ),
         ],
       ),
-    ).then((_) => controller.dispose());
+    );
   }
 
   @override
@@ -148,6 +167,10 @@ class _MyReasonsScreenState extends ConsumerState<MyReasonsScreen> {
                                   reason: reasons[index],
                                   index: index,
                                   isDark: isDark,
+                                  onEdit: () => _showEditDialog(
+                                    index,
+                                    reasons[index],
+                                  ),
                                   onDelete: () => _confirmDelete(context, index),
                                 );
                               },
@@ -330,12 +353,14 @@ class _ReasonTile extends StatelessWidget {
   final String reason;
   final int index;
   final bool isDark;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   const _ReasonTile({
     required this.reason,
     required this.index,
     required this.isDark,
+    required this.onEdit,
     required this.onDelete,
   });
 
@@ -381,8 +406,30 @@ class _ReasonTile extends StatelessWidget {
               ),
             ),
 
-            // Delete by long press
+            // Edit
             GestureDetector(
+              onTap: onEdit,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.brandPrimary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.edit_rounded,
+                  size: 18,
+                  color: AppColors.brandPrimary.withValues(alpha: 0.7),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppConstants.spacingXs),
+
+            // Delete (tap, with long press kept as a shortcut)
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.heavyImpact();
+                onDelete();
+              },
               onLongPress: () {
                 HapticFeedback.heavyImpact();
                 onDelete();
