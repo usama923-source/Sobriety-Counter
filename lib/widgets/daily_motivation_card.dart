@@ -4,6 +4,7 @@ import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 import 'package:quit_drinking/services/quotes_service.dart';
 import 'package:quit_drinking/widgets/sober_card.dart';
+import 'package:share_plus/share_plus.dart';
 
 /// Section 3 — Daily Motivation Card.
 ///
@@ -149,7 +150,7 @@ class DailyMotivationCard extends StatelessWidget {
                   isDark: isDark,
                 ),
               ),
-              const SizedBox(width: AppConstants.spacingSm),
+              const SizedBox(width: AppConstants.spacingXs),
 
               // Favorite toggle
               Expanded(
@@ -161,14 +162,25 @@ class DailyMotivationCard extends StatelessWidget {
                   isDark: isDark,
                 ),
               ),
-              const SizedBox(width: AppConstants.spacingSm),
+              const SizedBox(width: AppConstants.spacingXs),
+
+              // Copy
+              Expanded(
+                child: _ActionButton(
+                  icon: Icons.copy_rounded,
+                  label: 'Copy',
+                  onTap: () => _copy(context, service.shareText),
+                  isDark: isDark,
+                ),
+              ),
+              const SizedBox(width: AppConstants.spacingXs),
 
               // Share
               Expanded(
                 child: _ActionButton(
                   icon: Icons.share_rounded,
                   label: 'Share',
-                  onTap: () => _share(context, service.shareText),
+                  onTap: () => _share(service.shareText),
                   isDark: isDark,
                 ),
               ),
@@ -200,11 +212,17 @@ class DailyMotivationCard extends StatelessWidget {
     return card;
   }
 
-  void _share(BuildContext context, String text) {
+  Future<void> _share(String text) async {
+    await SharePlus.instance.share(
+      ShareParams(text: text, subject: AppConstants.appName),
+    );
+  }
+
+  void _copy(BuildContext context, String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Quote copied to clipboard!'),
+        content: const Text('Copied'),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.radiusSm),

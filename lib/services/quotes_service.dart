@@ -99,7 +99,16 @@ class QuotesService extends ChangeNotifier {
   /// Whether the current quote is today's daily quote.
   bool get isDaily => _currentIndex == _dailyIndex;
 
-  /// Share text for the current quote.
-  String get shareText =>
-      '"${currentQuote.text}" — ${currentQuote.author}';
+  /// Share text for the current quote: the quote, the author when there is
+  /// one, then a branded line.
+  String get shareText {
+    final quote = currentQuote;
+    final author = quote.author.trim();
+    final buffer = StringBuffer('"${quote.text}"');
+    if (author.isNotEmpty) {
+      buffer.write('\n— $author');
+    }
+    buffer.write('\n— QuitDrink Ai');
+    return buffer.toString();
+  }
 }
