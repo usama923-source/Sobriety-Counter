@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.quitdrink.ai"
+    namespace = "com.nexcitesolution.quitdrink"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -24,7 +24,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.quitdrink.ai"
+        applicationId = "com.nexcitesolution.quitdrink"
         // Keep this in sync with android/app/google-services.json.
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
