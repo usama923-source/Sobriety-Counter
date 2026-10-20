@@ -1,98 +1,114 @@
-# QuitDrink Ai: Sober Tracker — Google Play Listing
+# QuitDrink: Sober Tracker — Google Play Listing
 
 Store listing copy and asset plan for the Google Play Console. Copy is written
 to match what the app actually does, in a calm and honest tone, with no medical
 claims.
 
+- **App name:** QuitDrink
+- **Developer:** NexciteSolution
+- **Package name:** `com.nexcitesolution.quitdrink`
+
 ---
 
 ## Title (max 30 characters)
 
-**QuitDrink Ai: Sober Tracker**
+**QuitDrink: Sober Tracker**
 
-`27 characters`
+`24 characters`
 
 ---
 
 ## Short description (max 80 characters)
 
-**Track sober days, calm cravings, and find your calm anytime.**
+**Quit drinking with calm: sober day counter, craving help, breathing & check-ins.**
 
-`58 characters`
+`80 characters`
 
 ---
 
 ## Full description (target 2,500–3,500 characters)
 
 <!-- full-description-start -->
-QuitDrink Ai is a calm, private companion for your sobriety journey. It helps
-you keep track of your alcohol-free days, get through cravings, and stay
-grounded — one day at a time.
+Quit drinking with a calm, private companion built to support you through your
+alcohol-free days. QuitDrink is a sober tracker built for the moments that
+matter — the good days worth celebrating and the hard ones you just need to get
+through.
 
-Everything that matters is kept on your device, and no account is needed.
-Every feature is free to use.
+Everything you enter stays on your device, no account is needed, and every
+feature is free to use.
 
-**A counter that keeps you going**
+**A sobriety counter that keeps you going**
 Watch your sober time tick upward, live, down to the second. See the milestones
-ahead and a simple recovery timeline that reminds you of the progress you have
-already made. Every hour counts, and it is all yours.
+ahead and a simple recovery timeline that reminds you how far you have already
+come. Every hour counts, and it is all yours.
 
-**Check in with yourself each day**
-Mark each day as alcohol-free or not in a single tap. Build streaks, earn
-badges as you go, and look back at your check-in history to see the bigger
-picture. Small daily wins add up.
+**A daily check-in and small rewards**
+Mark each day as alcohol-free or not with a single tap. Build streaks, earn
+badges along the way, and look back at your history to see the bigger picture.
+Small daily wins add up.
 
-**Help for the hard moments**
-When a craving hits, open the Craving Help screen for seven simple things you
-can do right now: drink water, go for a walk, reread your personal reasons,
-start a guided breathing exercise, journal how you feel, read a motivating
-quote, or talk things through with the AI Friend.
+**Craving help for the hard moments**
+When a craving hits, open Craving Help for seven simple things you can do right
+now: drink water, go for a walk, reread your personal reasons, start a guided
+breathing exercise, journal how you feel, read a motivating quote, or talk
+things through with the AI Friend.
 
-**Guided breathing**
+**Guided breathing exercises**
 Follow a gentle visual breathing exercise to slow down and steady yourself.
-QuitDrink Ai can even track your best breathing sessions so you can watch your
+QuitDrink can even track your best breathing sessions so you can watch your
 calm grow.
 
-**Your reasons, front and centre**
-Write down why you chose to quit and keep those reasons close. On a difficult
-day, a quick reminder of your own words can make all the difference.
+**Your reasons, close at hand**
+Write down why you chose to quit drinking and keep those reasons nearby. On a
+difficult day, a quick reminder of your own words can make all the difference.
 
 **A journal for your journey**
-Write down how you feel, what triggered a craving, and the moments you are
-proud of. Your entries stay private on your device and you can delete any of
-them whenever you like.
+Note how you feel, what triggered a craving, and the moments you are proud of.
+Entries stay private on your device, and you can delete any of them whenever
+you like.
 
-**See the money you are saving**
-Tell the app your usual spending and watch the total climb as your sober days
-add up. It is a simple but powerful reminder of one more reason to keep going.
+**See the money saved**
+Tell the app your usual spending and watch the total climb as your
+alcohol-free days add up. It is a simple reminder of one more reason to keep
+going.
 
 **Daily motivation**
 Start each day with a fresh motivational quote. Save your favourites and share
 the ones that speak to you.
 
+**Track your weight, gently**
+Log your weight, set a goal, and follow the trend over time — a quiet way to
+notice how other changes are settling in.
+
+**A small game for a busy mind**
+Play a memory game when you want to redirect your attention for a few minutes
+and give a craving somewhere else to go.
+
 **A gentle daily reminder**
-Set a daily reminder at a time that suits you and receive a warm local
-notification to check in. You can change or turn it off whenever you want.
+Set a reminder at a time that suits you and receive a warm local notification to
+check in. Change it or turn it off whenever you want.
 
 **Talk to an AI Friend**
 When you need someone to talk to, the optional AI Friend chat offers a
-supportive, non-judgemental companion. It is there for encouragement and calm
-— not as a therapist and not as a replacement for real care.
+supportive, non-judgemental companion. It is there for encouragement and calm —
+not as a therapist and not as a replacement for real care.
 
 **Made to be calm and private**
 - Dark and light themes to match your mood.
 - Works offline for your core features.
 - No account, and no personal details required.
-- Your quit date, check-ins, journal, reasons, and weight are stored on your
-  device.
+- Your quit date, check-ins, journal, reasons, and weight entries are stored on
+  your device.
 
 **Please note**
-QuitDrink Ai is a motivational and self-tracking tool. It is not medical advice
-and is not a substitute for professional care. Stopping heavy drinking suddenly
-can be dangerous — please talk to a doctor before making big changes, and in an
-emergency call your local emergency number or 988 in the US.
+QuitDrink is a motivational and self-tracking tool. It is not medical advice and
+is not a substitute for professional care, diagnosis, or treatment. Stopping
+heavy drinking suddenly can be dangerous — please talk to a doctor before making
+big changes, and in an emergency call your local emergency number or 988 in the
+US.
 
-Take it one day at a time. Find your calm, anytime.
+However you got here, you do not have to do this alone. Take it one day at a
+time. Find your calm, anytime.
 <!-- full-description-end -->
 
 ---
@@ -101,19 +117,20 @@ Take it one day at a time. Find your calm, anytime.
 
 Use these in the tags and in the description wording (do not stuff them):
 
-- sober tracker
 - quit drinking
+- sober tracker
 - sobriety counter
-- alcohol free
+- alcohol-free days
 - sober days
+- quitting alcohol
 - craving help
-- alcohol recovery support (support only — not treatment)
-- daily check in
+- breathing exercises
+- daily check-in
+- money saved
 - motivational quotes
-- breathing exercise
-- money saved calculator
-- habit tracker
-- alcohol free tracker
+- recovery milestones
+- weight tracker
+- memory game
 - calm and mindfulness
 - self care
 
@@ -124,9 +141,9 @@ Avoid any terms that imply treatment or a medical service.
 ## What's new
 
 **What's new (version 1.0.0)**
-First release! Track your sober days with a live counter, check in daily, calm
-cravings with guided breathing and quick actions, see the money you save, and
-talk to the AI Friend when you need support.
+First release: a calm sober tracker with a live sobriety counter, daily
+check-ins, craving help, guided breathing, money saved, and an AI Friend to talk
+to.
 
 ---
 
@@ -163,7 +180,7 @@ soft sunrise gradient:
 
 - **Background:** gentle vertical gradient from deep navy at the bottom to warm
   teal at the top, with a soft rising sun glow near the centre.
-- **Centre/left:** the app logo/wordmark **QuitDrink Ai** in clean white type,
+- **Centre/left:** the app logo/wordmark **QuitDrink** in clean white type,
   with the tagline *"Find your calm, anytime."* underneath in a lighter weight.
 - **Right side:** three or four floating phone "cards" or soft glass panels
   hinting at the counter, a checkmark, and a breathing circle — enough to

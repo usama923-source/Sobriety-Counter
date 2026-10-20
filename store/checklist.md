@@ -18,17 +18,18 @@ in this folder are ready. Tick items off from top to bottom.
 ## 1. Create the app in Play Console
 
 - [ ] Create a new app; set the default language and the app name
-      **QuitDrink Ai: Sober Tracker**.
+      **QuitDrink: Sober Tracker** (developer name **NexciteSolution**).
 - [ ] Accept the Play Console developer agreements and the U.S. export
       declarations.
-- [ ] Note the package name (`quit_drinking` / the `applicationId` used by the
-      release build).
+- [ ] Confirm the package name is `com.nexcitesolution.quitdrink` (the
+      `applicationId` used by the release build).
 
 ## 2. Store listing (from `listing.md`)
 
 - [ ] Paste the **title**, **short description**, and **full description**.
 - [ ] Enter the **app category** (Health & Fitness) and add tags/keywords.
-- [ ] Add **contact details** (email required; website optional).
+- [ ] Add **contact details** (developer name **NexciteSolution**, email
+      required; website optional).
 - [ ] Upload the **512 × 512 app icon**.
 - [ ] Upload the **1024 × 500 feature graphic**.
 - [ ] Upload the **6 phone screenshots** (see `listing.md`) in the planned

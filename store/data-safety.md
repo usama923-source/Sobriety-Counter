@@ -1,5 +1,8 @@
 # Play Console — Data Safety form (draft answers)
 
+App: **QuitDrink: Sober Tracker** · Developer: **NexciteSolution** · Package:
+`com.nexcitesolution.quitdrink`
+
 Draft responses for the Google Play "Data safety" section, based on what the
 app's code actually does. Google's definitions matter here: **"collected"
 means data that leaves the device** and is transmitted off it. Data that only
