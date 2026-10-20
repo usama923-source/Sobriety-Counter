@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 import 'package:quit_drinking/constants/app_constants.dart';
 
-/// Builds the complete light and dark theme for QuitDrink Ai.
+/// Builds the complete light and dark theme for QuitDrink.
 class AppTheme {
   AppTheme._();
 

@@ -108,7 +108,7 @@ class QuotesService extends ChangeNotifier {
     if (author.isNotEmpty) {
       buffer.write('\n— $author');
     }
-    buffer.write('\n— QuitDrink Ai');
+    buffer.write('\n— QuitDrink');
     return buffer.toString();
   }
 }

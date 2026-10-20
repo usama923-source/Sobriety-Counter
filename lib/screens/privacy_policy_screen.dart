@@ -78,7 +78,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                     const SizedBox(height: AppConstants.spacingSm),
                     Text(
                       'Your privacy matters to us. Here\'s a simple overview of '
-                      'how QuitDrink Ai handles your data.',
+                      'how QuitDrink handles your data.',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -185,7 +185,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                 iconColor: AppColors.brandPrimary,
                 title: 'Children',
                 body:
-                    'QuitDrink Ai is not intended for use by individuals '
+                    'QuitDrink is not intended for use by individuals '
                     'under the age of 18. We do not knowingly collect any '
                     'information from minors.',
                 isDark: isDark,

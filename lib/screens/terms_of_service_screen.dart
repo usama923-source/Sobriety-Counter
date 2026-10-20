@@ -77,7 +77,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: AppConstants.spacingSm),
                     Text(
-                      'Please read these terms carefully before using QuitDrink Ai.',
+                      'Please read these terms carefully before using QuitDrink.',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
@@ -97,7 +97,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                 iconColor: AppColors.brandLightBlue,
                 title: 'Acceptance',
                 body:
-                    'By using QuitDrink Ai, you agree to these terms of '
+                    'By using QuitDrink, you agree to these terms of '
                     'service. If you do not agree with any part of these terms, '
                     'please refrain from using the application.',
                 isDark: isDark,
@@ -111,7 +111,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                 iconColor: AppColors.softRed,
                 title: 'Not Medical Advice',
                 body:
-                    'QuitDrink Ai is designed for motivational and '
+                    'QuitDrink is designed for motivational and '
                     'informational purposes only. It is not a substitute for '
                     'professional medical advice, diagnosis, or addiction '
                     'treatment. Always consult a qualified healthcare provider '
@@ -145,7 +145,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                 title: 'User Responsibility',
                 body:
                     'You are responsible for your own sobriety journey. '
-                    'QuitDrink Ai is a tool to help you track and stay '
+                    'QuitDrink is a tool to help you track and stay '
                     'motivated — it is not a treatment program. The app '
                     'developers are not responsible for any outcomes related '
                     'to your use of the application.',

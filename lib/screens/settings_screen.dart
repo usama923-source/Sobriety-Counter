@@ -675,7 +675,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       label: 'Contact Us',
                       isDark: isDark,
                       onTap: () => _launchUrl(
-                        'mailto:support.quitdrinkai@gmail.com?subject=QuitDrink%20Ai%20Feedback',
+                        'mailto:support.quitdrinkai@gmail.com?subject=QuitDrink%20Feedback',
                       ),
                     ),
                     _AboutDivider(isDark: isDark),

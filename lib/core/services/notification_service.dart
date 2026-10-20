@@ -52,7 +52,7 @@ class NotificationService {
           android: AndroidNotificationDetails(
             _dailyReminderChannelId,
             _dailyReminderChannelName,
-            channelDescription: 'Test notification for QuitDrink Ai',
+            channelDescription: 'Test notification for QuitDrink',
             importance: Importance.high,
             priority: Priority.high,
             icon: '@mipmap/ic_launcher',

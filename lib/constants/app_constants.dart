@@ -11,12 +11,12 @@ const bool kProEnabled = false;
 /// release so users never see provider error text.
 const bool kShowErrorDetails = true;
 
-/// App-wide constants used throughout QuitDrink Ai.
+/// App-wide constants used throughout QuitDrink.
 class AppConstants {
   AppConstants._();
 
   /// Application name
-  static const String appName = 'QuitDrink Ai';
+  static const String appName = 'QuitDrink';
 
   /// Brand tagline — the single source of truth for the app's tagline text.
   static const String tagline = 'Find your calm, anytime.';

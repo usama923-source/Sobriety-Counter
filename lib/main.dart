@@ -73,7 +73,7 @@ Future<void> main() async {
   );
 }
 
-/// Root widget for the QuitDrink Ai application.
+/// Root widget for the QuitDrink application.
 /// Wrapped in [ProviderScope] for Riverpod state management.
 class SoberTodayApp extends ConsumerStatefulWidget {
   final bool showOnboarding;
@@ -116,7 +116,7 @@ class _SoberTodayAppState extends ConsumerState<SoberTodayApp> {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
-      title: 'QuitDrink Ai',
+      title: 'QuitDrink',
       debugShowCheckedModeBanner: false,
 
       // ── Theme ──────────────────────────────────────────────────────────

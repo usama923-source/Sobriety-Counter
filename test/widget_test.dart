@@ -4,7 +4,7 @@ import 'package:quit_drinking/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('Sober Today app renders without crashing',
+  testWidgets('QuitDrink app renders without crashing',
       (WidgetTester tester) async {
     // Initialize SharedPreferences with empty mock values for test environment
     SharedPreferences.setMockInitialValues({});
@@ -23,6 +23,6 @@ void main() {
 
     // Verify the app renders without crashing by checking for the app title
     // (the home header renders the wordmark in uppercase).
-    expect(find.text('QUIT DRINK AI'), findsAtLeastNWidgets(1));
+    expect(find.text('QUITDRINK'), findsAtLeastNWidgets(1));
   });
 }

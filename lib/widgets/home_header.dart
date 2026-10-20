@@ -46,7 +46,7 @@ class HomeHeader extends StatelessWidget {
                   children: [
                     // Wordmark — theme text style, brand colored.
                     Text(
-                      'QUIT DRINK AI',
+                      'QUITDRINK',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: (Theme.of(context).textTheme.titleMedium ??

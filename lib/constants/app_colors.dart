@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Core color palette for the QuitDrink Ai app.
+/// Core color palette for the QuitDrink app.
 /// Designed to feel calming, premium, and motivational.
 class AppColors {
   AppColors._();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quit_drinking/constants/app_colors.dart';
 
 /// A reusable circular app logo built from the brand image (Logo-02), which
-/// already contains the "QUIT DRINK AI" wordmark — so no separate name text
+/// already contains the wordmark — so no separate name text
 /// is drawn beside it.
 class AppLogo extends StatelessWidget {
   /// Logo diameter in logical pixels.

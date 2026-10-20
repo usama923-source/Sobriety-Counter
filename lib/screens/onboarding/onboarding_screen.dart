@@ -102,7 +102,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
-  /// One-time notice: QuitDrink Ai is not medical advice, and stopping heavy
+  /// One-time notice: QuitDrink is not medical advice, and stopping heavy
   /// drinking suddenly can be dangerous.
   Future<void> _showHealthNoticeDialog() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -124,7 +124,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
         ),
         content: Text(
-          'QuitDrink Ai is not medical advice and is not a substitute for '
+          'QuitDrink is not medical advice and is not a substitute for '
           'professional care.\n\n'
           'Stopping heavy drinking suddenly can be dangerous. Please talk to '
           'a doctor before making big changes — especially if you drink '
@@ -371,7 +371,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           const SizedBox(height: AppConstants.spacingLg),
 
           Text(
-            'Welcome to\nQuitDrink Ai',
+            'Welcome to\nQuitDrink',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 32,
